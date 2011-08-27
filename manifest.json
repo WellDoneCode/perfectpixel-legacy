@@ -4,9 +4,9 @@
   "description": "The first extension that I made.",
   "browser_action": {
     "default_icon": "icon.png",
-	"popup": "popup.html"
+    "popup": "popup.html"
   },
   "permissions": [
-    "http://api.flickr.com/"
+      "tabs", "http://*/*", "https://*/*"
   ]
 }
