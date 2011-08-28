@@ -8,10 +8,10 @@
                  <input type="text" id="opacity" size="1" maxlength="3" value="0.5" readonly/>
                  <a href="" id="opmore" class="ppbutton">></a><br/>
         X: <a href="" id="xless" class="ppbutton"><</a>
-           <input type="text" id="coordX" value="50" size="2" maxlength="4"/>
+           <input type="text" class="coords" id="coordX" value="50" size="2" maxlength="4"/>
            <a href="" id="xmore" class="ppbutton">></a><br/>
         Y:  <a href="" id="yless" class="ppbutton"><</a>
-            <input type="text" id="coordY" value="50" size="2" maxlength="4"/>
+            <input type="text" class="coords" id="coordY" value="50" size="2" maxlength="4"/>
             <a href="" id="ymore" class="ppbutton">></a>
 
         <div>
@@ -136,7 +136,16 @@
                    xtop($(this));
                 }
             });
-            
+
+            $('.coords').live("keypress", function (event) {
+                if (event.which == 13) {
+                    if ($(this).attr("id") == "coordX")
+                        change(false, $(this).val(), false);
+                    if ($(this).attr("id") == "coordY")
+                        change(false, false, $(this).val());
+                }
+            });
+
             var opacity = function(button){
                 var offset=0;
                 if(button.attr('id') == "opless"){ 
