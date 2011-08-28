@@ -25,17 +25,20 @@
                     // will re-encode the image.
                     var dataURL = canvas.toDataURL("image/jpg");
 
-                    return dataURL; //.replace(/^data:image\/(png|jpg);base64,/, "");
+                    return dataURL;
                 }
 
 
                 // Save image by Url into localStorage
-                var saveImage = function (url) {
+                var saveImage = function (url, callback) {
                     var img = $("<img src='" + url + "' />");
                     img.load(function () {
                         var imageData = getBase64Image(this);
                         localStorage["imageData"] = imageData;
-                        $('#image').attr('src', imageData);
+                        localStorage["imageWidth"] = img[0].width;
+                        localStorage["imageHeight"] = img[0].height;
+                        callback();
+                        //$('#image').attr('src', imageData);
                     });
                 }
 
@@ -45,10 +48,13 @@
                         return;
 
                     var imageData = localStorage["imageData"];
+                    var width = localStorage["imageWidth"];
+                    var height = localStorage["imageHeight"];
+
                     chrome.tabs.executeScript(null, {
                         code:
-                            "$('#overlay_3985123731465987').css('background'," +
-                                "'url(" + imageData + ")');"
+                            "$('#overlay_3985123731465987').css('background', 'url(" + imageData + ")')" + //";"
+                                ".css('width','" + width + "px').css('height','" + height + "px');"
                     });
                 }
 
@@ -70,8 +76,10 @@
                         }
                     }
 
-                    saveImage(url);
-                    showImage();
+                    saveImage(url,
+                    function () {
+                        showImage(); 
+                    });
                 }
 
         </script>

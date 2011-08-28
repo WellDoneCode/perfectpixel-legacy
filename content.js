@@ -8,7 +8,7 @@ var zIndex = 1000;
 
 var overlayUniqueId = 'overlay_3985123731465987';
 if ($('#' + overlayUniqueId).length > 0) {
-    $('#' + overlayUniqueId).remove();
+    //$('#' + overlayUniqueId).remove();
 }
 else {    
     var overlay = $('<div></div>');
