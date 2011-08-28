@@ -149,16 +149,16 @@
             var opacity = function(button){
                 var offset=0;
                 if(button.attr('id') == "opless"){ 
-                    if($('input#opacity').val()>=0)
+                    if($('input#opacity').val()>=0.11)
                         offset= 0.1;
                     else offset = 0;
                 }
                 else{
-                    if($('input#opacity').val()<=1)
+                    if($('input#opacity').val()<=0.99)
                         offset = -0.1;
                     else offset = 0;
                 }
-                var thisOpacity = $('input#opacity').val()-offset;
+                var thisOpacity = Number($('input#opacity').val() - offset).toFixed(1);
                 $('input#opacity').val(thisOpacity);
                 change(thisOpacity,false,false);
             }

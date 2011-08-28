@@ -1,7 +1,7 @@
 ﻿{
-  "name": "My First Extension",
-  "version": "1.0",
-  "description": "The first extension that I made.",
+  "name": "ChromePerfectPixel",
+  "version": "0.1",
+  "description": "Semitransparent image overlay over top of the developed html",
   "browser_action": {
     "default_icon": "icon.png",
     "popup": "popup.html"
