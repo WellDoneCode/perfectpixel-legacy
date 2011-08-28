@@ -7,14 +7,12 @@ var height_px = 300;
 var zIndex = 1000;
 var overlayUniqueId = 'overlay_3985123731465987';
 
-var toggleOverlay = function () {
-    alert('toggleOverlay');
-
+var createOverlay = function()
+{
     if ($('#' + overlayUniqueId).length > 0) {
-        $('#' + overlayUniqueId).remove();
     }
     else {
-        var overlay = $('<div></div>');
+        var overlay = $('<img />');
         overlay.attr({
             'id': overlayUniqueId
         }).css({
@@ -24,7 +22,7 @@ var toggleOverlay = function () {
             'position': 'absolute',
             'top': top_px + 'px',
             'left': left_px + 'px',
-            'background-color': 'red',
+            'background-color': 'transparent',
             'opacity': opacity,
             'display': 'block',
             'cursor': 'all-scroll'
@@ -32,6 +30,16 @@ var toggleOverlay = function () {
         $('body').append(overlay);
 
         overlay.draggable();
+    }
+}
+
+var toggleOverlay = function () {
+    if ($('#' + overlayUniqueId).length > 0) {
+        $('#' + overlayUniqueId).attr('src', '');
+        $('#' + overlayUniqueId).remove();
+    }
+    else {
+        createOverlay();
     }
 }
 

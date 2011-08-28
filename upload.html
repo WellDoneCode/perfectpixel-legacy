@@ -17,6 +17,7 @@
 
                     // Copy the image contents to the canvas
                     var ctx = canvas.getContext("2d");
+                    //ctx.scale(0.835, 0.835);
                     ctx.drawImage(img, 0, 0);
 
                     // Get the data-URL formatted image
@@ -71,10 +72,11 @@
                     saveImage(url,
                     function () {
                         showThumb();
+                        toggleOverlay1(true);
                     });
                 }
 
-                function toggleOverlay1() {
+                function toggleOverlay1(createOnly) {
                     if (!localStorage["imageData"])
                         return;
 
@@ -82,9 +84,10 @@
                     var width = localStorage["imageWidth"];
                     var height = localStorage["imageHeight"];
 
+                    var funcName = createOnly ? "createOverlay" : "toggleOverlay";
                     chrome.tabs.executeScript(null, {
                         code:
-                            "toggleOverlay(); $('#overlay_3985123731465987').css('background', 'none'); $('#overlay_3985123731465987').css('background', 'url(" + imageData + ")')" + //";"
+                        funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + imageData + "')" + //";"
                                 ".css('width','" + width + "px').css('height','" + height + "px');"
                     });
                 }
@@ -97,7 +100,7 @@
         <input type="file" onchange="upload(this.files)" />
         <img id="thumb" style="width: 50px; height: 50px" />
         <div>
-            <input type="button" value="Show/Hide" onclick="toggleOverlay1();" />
+            <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
         </div>
     </body>
 </html>
