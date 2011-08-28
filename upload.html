@@ -1,17 +1,84 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script>
-            var showOverlay = function() {
-                chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function() {
-                    chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function() {
-                            chrome.tabs.executeScript(null, { file: "content.js" });
-                        });
+        <script type="text/javascript" src="jquery-1.6.2.min.js"></script> 
+        <script type="text/javascript">
+            chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function() {
+                chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function() {
+                        chrome.tabs.executeScript(null, { file: "content.js" });
+                    });
                 });
-            }
+
+                var getBase64Image = function (img) {
+                    // Create an empty canvas element
+                    var canvas = document.createElement("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    // Copy the image contents to the canvas
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+
+                    // Get the data-URL formatted image
+                    // Firefox supports PNG and JPEG. You could check img.src to
+                    // guess the original format, but be aware the using "image/jpg"
+                    // will re-encode the image.
+                    var dataURL = canvas.toDataURL("image/jpg");
+
+                    return dataURL; //.replace(/^data:image\/(png|jpg);base64,/, "");
+                }
+
+
+                // Save image by Url into localStorage
+                var saveImage = function (url) {
+                    var img = $("<img src='" + url + "' />");
+                    img.load(function () {
+                        var imageData = getBase64Image(this);
+                        localStorage["imageData"] = imageData;
+                        $('#image').attr('src', imageData);
+                    });
+                }
+
+                // Show image saved in localStorage
+                var showImage = function () {
+                    if (!localStorage["imageData"])
+                        return;
+
+                    var imageData = localStorage["imageData"];
+                    chrome.tabs.executeScript(null, {
+                        code:
+                            "$('#overlay_3985123731465987').css('background'," +
+                                "'url(" + imageData + ")');"
+                    });
+                }
+
+                $(function () {
+                    showImage();
+                });
+
+                function upload(files) {
+                    for (var i = 0; i < files.length; i++) {
+                        var url, file = files[i];
+                        if (window.createObjectURL) {
+                            url = window.createObjectURL(file)
+                        } else if (window.createBlobURL) {
+                            url = window.createBlobURL(file)
+                        } else if (window.URL && window.URL.createObjectURL) {
+                            url = window.URL.createObjectURL(file)
+                        } else if (window.webkitURL && window.webkitURL.createObjectURL) {
+                            url = window.webkitURL.createObjectURL(file)
+                        }
+                    }
+
+                    saveImage(url);
+                    showImage();
+                }
+
         </script>
+
     </head>
     <body>
-        <input type="button" value="Show/hide overlay" onclick="showOverlay();" />
+        <!--<input type="button" value="Show/hide overlay" onclick="showOverlay();" />-->
+        <input type="file" onchange="upload(this.files)" />
     </body>
 </html>
