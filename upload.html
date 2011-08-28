@@ -38,23 +38,6 @@
                         localStorage["imageWidth"] = img[0].width;
                         localStorage["imageHeight"] = img[0].height;
                         callback();
-                        //$('#image').attr('src', imageData);
-                    });
-                }
-
-                // Show image saved in localStorage
-                var showImage = function () {
-                    if (!localStorage["imageData"])
-                        return;
-
-                    var imageData = localStorage["imageData"];
-                    var width = localStorage["imageWidth"];
-                    var height = localStorage["imageHeight"];
-
-                    chrome.tabs.executeScript(null, {
-                        code:
-                            "$('#overlay_3985123731465987').css('background', 'url(" + imageData + ")')" + //";"
-                                ".css('width','" + width + "px').css('height','" + height + "px');"
                     });
                 }
 
@@ -69,7 +52,6 @@
 
                 $(function () {
                     showThumb();
-                    //showImage();
                 });
 
                 function upload(files) {
@@ -89,12 +71,22 @@
                     saveImage(url,
                     function () {
                         showThumb();
-                        //showImage(); 
                     });
                 }
 
-                function toggleShow() {
-                    showImage();
+                function toggleOverlay1() {
+                    if (!localStorage["imageData"])
+                        return;
+
+                    var imageData = localStorage["imageData"];
+                    var width = localStorage["imageWidth"];
+                    var height = localStorage["imageHeight"];
+
+                    chrome.tabs.executeScript(null, {
+                        code:
+                            "toggleOverlay(); $('#overlay_3985123731465987').css('background', 'none'); $('#overlay_3985123731465987').css('background', 'url(" + imageData + ")')" + //";"
+                                ".css('width','" + width + "px').css('height','" + height + "px');"
+                    });
                 }
 
         </script>
@@ -105,7 +97,7 @@
         <input type="file" onchange="upload(this.files)" />
         <img id="thumb" style="width: 50px; height: 50px" />
         <div>
-            <input type="button" value="Show/Hide" onclick="toggleShow();" />
+            <input type="button" value="Show/Hide" onclick="toggleOverlay1();" />
         </div>
     </body>
 </html>
