@@ -16,7 +16,7 @@
 
         <div>
             <input type="file" onchange="upload(this.files)" />
-            <img id="thumb" style="width: 50px; height: 50px" />
+            <img id="thumb" />
             <div>
                 <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
             </div>
@@ -62,9 +62,16 @@
             }
 
             var showThumb = function () {
+                var thumbHeight = 50;
+
                 if (localStorage["imageData"]) {
                     var imageData = localStorage["imageData"];
-                    $('#thumb').attr('src', imageData);
+                    var width = localStorage["imageWidth"];
+                    var height = localStorage["imageHeight"];
+                    var coeff = height / thumbHeight;
+                    var thumbWidth = Math.ceil(width / coeff);
+
+                    $('#thumb').attr('src', imageData).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
                 }
             }
 
@@ -177,7 +184,7 @@
                 change(false,false,thisY);
             }
             
-            var change = function(op,left,top){
+            var change = function(op,left,top) {
                 chrome.tabs.executeScript(null, { code: "opacity="+op+";left="+left+"; xtop="+top+";"}, function() {
                    chrome.tabs.executeScript(null, { file: "settings.js" }, function() {
                        
