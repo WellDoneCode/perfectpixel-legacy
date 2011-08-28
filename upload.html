@@ -58,8 +58,18 @@
                     });
                 }
 
+                var showThumb = function()
+                {
+                    if (localStorage["imageData"])
+                    {
+                        var imageData = localStorage["imageData"];
+                        $('#thumb').attr('src', imageData);
+                    }
+                }
+
                 $(function () {
-                    showImage();
+                    showThumb();
+                    //showImage();
                 });
 
                 function upload(files) {
@@ -78,8 +88,13 @@
 
                     saveImage(url,
                     function () {
-                        showImage(); 
+                        showThumb();
+                        //showImage(); 
                     });
+                }
+
+                function toggleShow() {
+                    showImage();
                 }
 
         </script>
@@ -88,5 +103,9 @@
     <body>
         <!--<input type="button" value="Show/hide overlay" onclick="showOverlay();" />-->
         <input type="file" onchange="upload(this.files)" />
+        <img id="thumb" style="width: 50px; height: 50px" />
+        <div>
+            <input type="button" value="Show/Hide" onclick="toggleShow();" />
+        </div>
     </body>
 </html>
