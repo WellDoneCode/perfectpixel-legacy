@@ -15,7 +15,7 @@
             <a href="" id="ymore" class="ppbutton">></a>
 
         <div>
-            <input type="file" onchange="upload(this.files)" />
+            <input type="file" onchange="upload(this.files)" accept="image/*" />
             <img id="thumb" />
             <div>
                 <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
@@ -28,37 +28,86 @@
                 });
             });
 
-            var getBase64Image = function (img) {
-                // Create an empty canvas element
-                var canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
+//            var getBase64Image = function (img) {
+//                // Create an empty canvas element
+//                var canvas = document.createElement("canvas");
+//                canvas.width = img.width;
+//                canvas.height = img.height;
 
-                // Copy the image contents to the canvas
-                var ctx = canvas.getContext("2d");
-                //ctx.scale(0.835, 0.835);
-                ctx.drawImage(img, 0, 0);
+//                // Copy the image contents to the canvas
+//                var ctx = canvas.getContext("2d");
+//                ctx.drawImage(img, 0, 0);
 
-                // Get the data-URL formatted image
-                // Firefox supports PNG and JPEG. You could check img.src to
-                // guess the original format, but be aware the using "image/jpg"
-                // will re-encode the image.
-                var dataURL = canvas.toDataURL("image/jpg");
+//                // Get the data-URL formatted image
+//                // Firefox supports PNG and JPEG. You could check img.src to
+//                // guess the original format, but be aware the using "image/jpg"
+//                // will re-encode the image.
+//                var dataURL = canvas.toDataURL("image/jpg");
 
-                return dataURL;
-            }
+//                return dataURL;
+//            }
 
 
-            // Save image by Url into localStorage
-            var saveImage = function (url, callback) {
-                var img = $("<img src='" + url + "' />");
-                img.load(function () {
-                    var imageData = getBase64Image(this);
-                    localStorage["imageData"] = imageData;
-                    localStorage["imageWidth"] = img[0].width;
-                    localStorage["imageHeight"] = img[0].height;
-                    callback();
-                });
+            // Save image into localStorage
+            var saveImage = function (file, callback) {
+
+                // Only process image files.
+                if (!file.type.match('image.*')) {
+                    alert('File must contain image');
+                }
+
+                var reader = new FileReader();
+
+                // Closure to capture the file information.
+                reader.onload = (function (theFile) {
+                    return function (e) {
+                        localStorage["imageData"] = null;
+                        localStorage["imageData"] = e.target.result;
+
+                        // Render thumbnail.
+                        var span = $('<span></span>').css('position', 'absolute').css('opacity', 0);
+                        var img = $('<img />').attr({
+                            src: e.target.result,
+                            title: theFile.name
+                        });
+                        span.append(img);
+                        $(document.body).append(span);
+
+                        img.load(function () {
+                            localStorage["imageWidth"] = img[0].offsetWidth;
+                            localStorage["imageHeight"] = img[0].offsetHeight;
+                            span.remove();
+                            callback();
+                        });
+                    };
+                })(file);
+
+                // Read in the image file as a data URL.
+                reader.readAsDataURL(file);
+
+                //                var xhr = new XMLHttpRequest();
+                //                xhr.open('GET', 'http://www.renderedsource.com/alex/img/small.jpg', true);
+
+                //                xhr.responseType = 'arraybuffer';
+
+                //                xhr.onload = function (e) {
+                //                    if (this.status == 200) {
+
+                //                        var uInt8Array = new Uint8Array(this.response); // Note: not xhr.responseText
+                //                        //"data:image/png;base64,"
+                //                    }
+                //                };
+
+                //                xhr.send();
+                //                var img = $("<img src='" + url + "' />");
+                //                img.load(function () {
+                //                    var imageData = getBase64Image(this);
+                //                    localStorage["imageData"] = null;
+                //                    localStorage["imageData"] = imageData;
+                //                    localStorage["imageWidth"] = img[0].width;
+                //                    localStorage["imageHeight"] = img[0].height;
+                //                    callback();
+                //                });
             }
 
             var showThumb = function () {
@@ -80,20 +129,22 @@
             });
 
             function upload(files) {
-                for (var i = 0; i < files.length; i++) {
-                    var url, file = files[i];
-                    if (window.createObjectURL) {
-                        url = window.createObjectURL(file)
-                    } else if (window.createBlobURL) {
-                        url = window.createBlobURL(file)
-                    } else if (window.URL && window.URL.createObjectURL) {
-                        url = window.URL.createObjectURL(file)
-                    } else if (window.webkitURL && window.webkitURL.createObjectURL) {
-                        url = window.webkitURL.createObjectURL(file)
-                    }
-                }
+                file = files[0];
 
-                saveImage(url,
+//                for (var i = 0; i < files.length; i++) {
+//                    file = files[i];
+//                    if (window.createObjectURL) {
+//                        url = window.createObjectURL(file)
+//                    } else if (window.createBlobURL) {
+//                        url = window.createBlobURL(file)
+//                    } else if (window.URL && window.URL.createObjectURL) {
+//                        url = window.URL.createObjectURL(file)
+//                    } else if (window.webkitURL && window.webkitURL.createObjectURL) {
+//                        url = window.webkitURL.createObjectURL(file)
+//                    }
+//                }
+
+                saveImage(file,
                     function () {
                         showThumb();
                         toggleOverlay1(true);
@@ -117,7 +168,7 @@
             }
 
         </script>
-        <script>
+        <script type="text/javascript">
 //            chrome.extension.onRequest.addListener(
 //                function(request,sender,sendResponse){
 //                    alert(request.coordX);
