@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="jquery-1.6.2.min.js"></script>
+        <script src="jquery-1.6.2.min.js" type="text/javascript"></script>
+        <script src="images.js" type="text/javascript"></script>
     </head>
     <body>
         Opacity: <a href="" id="opless" class="ppbutton"><</a>
@@ -24,103 +25,20 @@
         <script type="text/javascript">
             chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
                 chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "content.js" });
+                    chrome.tabs.executeScript(null, { file: "content.js" }, function () {
+                        chrome.tabs.executeScript(null, { file: "images.js" });
+                    });
                 });
             });
 
-//            var getBase64Image = function (img) {
-//                // Create an empty canvas element
-//                var canvas = document.createElement("canvas");
-//                canvas.width = img.width;
-//                canvas.height = img.height;
-
-//                // Copy the image contents to the canvas
-//                var ctx = canvas.getContext("2d");
-//                ctx.drawImage(img, 0, 0);
-
-//                // Get the data-URL formatted image
-//                // Firefox supports PNG and JPEG. You could check img.src to
-//                // guess the original format, but be aware the using "image/jpg"
-//                // will re-encode the image.
-//                var dataURL = canvas.toDataURL("image/jpg");
-
-//                return dataURL;
-//            }
-
-
-            // Save image into localStorage
-            var saveImage = function (file, callback) {
-
-                // Only process image files.
-                if (!file.type.match('image.*')) {
-                    alert('File must contain image');
-                }
-
-                var reader = new FileReader();
-
-                // Closure to capture the file information.
-                reader.onload = (function (theFile) {
-                    return function (e) {
-                        localStorage["imageData"] = null;
-                        localStorage["imageData"] = e.target.result;
-
-                        // Render thumbnail.
-                        var span = $('<span></span>').css('position', 'absolute').css('opacity', 0);
-                        var img = $('<img />').attr({
-                            src: e.target.result,
-                            title: theFile.name
-                        });
-                        span.append(img);
-                        $(document.body).append(span);
-
-                        img.load(function () {
-                            localStorage["imageWidth"] = img[0].offsetWidth;
-                            localStorage["imageHeight"] = img[0].offsetHeight;
-                            span.remove();
-                            callback();
-                        });
-                    };
-                })(file);
-
-                // Read in the image file as a data URL.
-                reader.readAsDataURL(file);
-
-                //                var xhr = new XMLHttpRequest();
-                //                xhr.open('GET', 'http://www.renderedsource.com/alex/img/small.jpg', true);
-
-                //                xhr.responseType = 'arraybuffer';
-
-                //                xhr.onload = function (e) {
-                //                    if (this.status == 200) {
-
-                //                        var uInt8Array = new Uint8Array(this.response); // Note: not xhr.responseText
-                //                        //"data:image/png;base64,"
-                //                    }
-                //                };
-
-                //                xhr.send();
-                //                var img = $("<img src='" + url + "' />");
-                //                img.load(function () {
-                //                    var imageData = getBase64Image(this);
-                //                    localStorage["imageData"] = null;
-                //                    localStorage["imageData"] = imageData;
-                //                    localStorage["imageWidth"] = img[0].width;
-                //                    localStorage["imageHeight"] = img[0].height;
-                //                    callback();
-                //                });
-            }
-
             var showThumb = function () {
                 var thumbHeight = 50;
+                var image = PPStorage.GetImage();
+                if (image != null) {
+                    var coeff = image.Height / thumbHeight;
+                    var thumbWidth = Math.ceil(image.Width / coeff);
 
-                if (localStorage["imageData"]) {
-                    var imageData = localStorage["imageData"];
-                    var width = localStorage["imageWidth"];
-                    var height = localStorage["imageHeight"];
-                    var coeff = height / thumbHeight;
-                    var thumbWidth = Math.ceil(width / coeff);
-
-                    $('#thumb').attr('src', imageData).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
+                    $('#thumb').attr('src', image.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
                 }
             }
 
@@ -144,7 +62,7 @@
 //                    }
 //                }
 
-                saveImage(file,
+                PPStorage.SaveImageFromFile(file,
                     function () {
                         showThumb();
                         toggleOverlay1(true);
@@ -152,18 +70,15 @@
             }
 
             function toggleOverlay1(createOnly) {
-                if (!localStorage["imageData"])
+                var image = PPStorage.GetImage();
+                if (image == null)
                     return;
-
-                var imageData = localStorage["imageData"];
-                var width = localStorage["imageWidth"];
-                var height = localStorage["imageHeight"];
 
                 var funcName = createOnly ? "createOverlay" : "toggleOverlay";
                 chrome.tabs.executeScript(null, {
                     code:
-                        funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + imageData + "')" + //";"
-                                ".css('width','" + width + "px').css('height','" + height + "px');"
+                        funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + image.Url + "')" + //";"
+                                ".css('width','" + image.Width + "px').css('height','" + image.Height + "px');"
                 });
             }
 
