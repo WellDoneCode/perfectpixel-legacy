@@ -33,12 +33,12 @@
 
             var showThumb = function () {
                 var thumbHeight = 50;
-                var image = PPStorage.GetImage();
-                if (image != null) {
-                    var coeff = image.Height / thumbHeight;
-                    var thumbWidth = Math.ceil(image.Width / coeff);
+                var overlay = PPStorage.GetOverlay();
+                if (overlay != null) {
+                    var coeff = overlay.Height / thumbHeight;
+                    var thumbWidth = Math.ceil(overlay.Width / coeff);
 
-                    $('#thumb').attr('src', image.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
+                    $('#thumb').attr('src', overlay.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
                 }
             }
 
@@ -62,7 +62,7 @@
 //                    }
 //                }
 
-                PPStorage.SaveImageFromFile(file,
+                PPStorage.SaveOverlayFromFile(file,
                     function () {
                         showThumb();
                         toggleOverlay1(true);
@@ -70,15 +70,15 @@
             }
 
             function toggleOverlay1(createOnly) {
-                var image = PPStorage.GetImage();
-                if (image == null)
+                var overlay = PPStorage.GetOverlay();
+                if (overlay == null)
                     return;
 
                 var funcName = createOnly ? "createOverlay" : "toggleOverlay";
                 chrome.tabs.executeScript(null, {
                     code:
-                        funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + image.Url + "')" + //";"
-                                ".css('width','" + image.Width + "px').css('height','" + image.Height + "px');"
+                        funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + overlay.Url + "')" + //";"
+                                ".css('width','" + overlay.Width + "px').css('height','" + overlay.Height + "px');"
                 });
             }
 

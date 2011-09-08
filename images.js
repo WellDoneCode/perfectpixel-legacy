@@ -1,10 +1,14 @@
-// -------------------------------
-// PPImage - abstraction for image
-// -------------------------------
-var PPImage = function () {
+// -----------------------------------
+// PPOverlay - abstraction for overlay
+// -----------------------------------
+var PPOverlay = function () {
     this.Url = null;
     this.Width = 0;
     this.Height = 0;
+
+    this.X = 0;
+    this.Y = 0;
+    this.Opacity = 1;
 }
 
 // --------------------------------------------------------------------
@@ -13,40 +17,30 @@ var PPImage = function () {
 var PPStorage = new function () {
 
     // -------------------------------
-    // Get PPImage object from storage
+    // Get PPOverlay object from storage
     // -------------------------------
-    this.GetImage = function () {
-        var imageData = localStorage["imageData"];
-        var width = localStorage["imageWidth"];
-        var height = localStorage["imageHeight"];
-
-        if (imageData == null)
+    this.GetOverlay = function () {
+        var overlayAsStr = localStorage["overlay0"];
+        if (overlayAsStr == null)
             return null;
-
-        var image = new PPImage();
-        image.Url = imageData;
-        image.Width = width;
-        image.Height = height;
-        return image;
+        var overlay = JSON.parse(overlayAsStr);
+        return overlay;
     };
 
-    // --------------------------------
-    // Save PPImage object into storage
-    // --------------------------------
-    this.SaveImage = function (image) {
-        if (!(image instanceof PPImage))
-            alert("Object of type PPImage should be provided");
+    // ----------------------------------
+    // Save PPOverlay object into storage
+    // ----------------------------------
+    this.SaveOverlay = function (overlay) {
+        if (!(overlay instanceof PPOverlay))
+            alert("Object of type PPOverlay should be provided");
 
-        localStorage["imageData"] = null;
-        localStorage["imageData"] = image.Url;
-        localStorage["imageWidth"] = image.Width;
-        localStorage["imageHeight"] = image.Height;
+        localStorage["overlay0"] = JSON.stringify(overlay);
     };
 
-    // -------------------------------------------------
-    // Create PPImage from file and save it into storage
-    // -------------------------------------------------
-    this.SaveImageFromFile = function (file, callback) {
+    // ---------------------------------------------------
+    // Create PPOverlay from file and save it into storage
+    // ---------------------------------------------------
+    this.SaveOverlayFromFile = function (file, callback) {
         // Only process image files.
         if (!file.type.match('image.*')) {
             alert('File must contain image');
@@ -57,10 +51,10 @@ var PPStorage = new function () {
         // Closure to capture the file information.
         reader.onload = (function (theFile) {
             return function (e) {
-                var newImage = new PPImage();
-                newImage.Url = e.target.result;
+                var overlay = new PPOverlay();
+                overlay.Url = e.target.result;
 
-                // Render thumbnail.
+                // Render invisible thumbnail to obtain image width and height.
                 var span = $('<span></span>').css('position', 'absolute').css('opacity', 0);
                 var img = $('<img />').attr({
                     src: e.target.result,
@@ -70,10 +64,10 @@ var PPStorage = new function () {
                 $(document.body).append(span);
 
                 img.load(function () {
-                    newImage.Width = img[0].offsetWidth;
-                    newImage.Height = img[0].offsetHeight;
+                    overlay.Width = img[0].offsetWidth;
+                    overlay.Height = img[0].offsetHeight;
 
-                    PPStorage.SaveImage(newImage);
+                    PPStorage.SaveOverlay(overlay);
 
                     span.remove();
                     callback();
