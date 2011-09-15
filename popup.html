@@ -31,6 +31,12 @@
                 });
             });
 
+            $(function () {
+                showThumb();
+                // set inputs values
+                refreshCoords();
+            });
+
             var showThumb = function () {
                 var thumbHeight = 50;
                 var overlay = PPStorage.GetOverlay();
@@ -42,9 +48,14 @@
                 }
             }
 
-            $(function () {
-                showThumb();
-            });
+            var refreshCoords = function () {
+                var overlay = PPStorage.GetOverlay();
+                if (overlay != null) {
+                    $('#coordX').val(overlay.X);
+                    $('#coordY').val(overlay.Y);
+                    $('#opacity').val(Number(overlay.Opacity).toFixed(1));
+                }
+            }
 
             function upload(files) {
                 file = files[0];
@@ -64,6 +75,7 @@
 
                 PPStorage.SaveOverlayFromFile(file,
                     function () {
+                        refreshCoords();
                         showThumb();
                         toggleOverlay1(true);
                     });
@@ -78,7 +90,9 @@
                 chrome.tabs.executeScript(null, {
                     code:
                         funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + overlay.Url + "')" + //";"
-                                ".css('width','" + overlay.Width + "px').css('height','" + overlay.Height + "px');"
+                                ".css('width','" + overlay.Width + "px').css('height','" + overlay.Height + "px')" +
+                                ".css('left','" + overlay.X + "px').css('top','" + overlay.Y + "px')" +
+                                ".css('opacity'," + overlay.Opacity + ");"
                 });
             }
 
@@ -158,12 +172,13 @@
                 $('input#coordY').val(thisY);
                 change(false,false,thisY);
             }
-            
-            var change = function(op,left,top) {
-                chrome.tabs.executeScript(null, { code: "opacity="+op+";left="+left+"; xtop="+top+";"}, function() {
-                   chrome.tabs.executeScript(null, { file: "settings.js" }, function() {
-                       
-                   });
+
+            var change = function (op, left, top) {
+
+                chrome.tabs.executeScript(null, { code: "opacity=" + op + ";left=" + left + "; xtop=" + top + ";" }, function () {
+                    chrome.tabs.executeScript(null, { file: "settings.js" }, function () {
+                        chrome.tabs.executeScript(null, { code: "onOverlayUpdate();" });
+                    });
                 });
             }
             

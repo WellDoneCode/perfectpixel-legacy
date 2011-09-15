@@ -1,3 +1,5 @@
+/// <reference path="vs/chrome_extensions.js" />
+
 // temporary hardcoded
 var opacity = 0.5;
 var top_px = 50;
@@ -7,8 +9,7 @@ var height_px = 300;
 var zIndex = 1000;
 var overlayUniqueId = 'overlay_3985123731465987';
 
-var createOverlay = function()
-{
+var createOverlay = function () {
     if ($('#' + overlayUniqueId).length > 0) {
     }
     else {
@@ -29,7 +30,11 @@ var createOverlay = function()
         });
         $('body').append(overlay);
 
-        overlay.draggable();
+        overlay.draggable({
+            drag: function () {
+                onOverlayUpdate();
+            }
+        });
     }
 }
 
@@ -41,5 +46,14 @@ var toggleOverlay = function () {
     else {
         createOverlay();
     }
+}
+
+var onOverlayUpdate = function () {
+    var overlay = $('#' + overlayUniqueId);
+    var X = overlay[0].offsetLeft;
+    var Y = overlay[0].offsetTop;
+    var Opacity = overlay.css('opacity');
+
+    chrome.extension.sendRequest({ Type: 'OverlayChanged', X: X, Y: Y, Opacity: Opacity });
 }
 

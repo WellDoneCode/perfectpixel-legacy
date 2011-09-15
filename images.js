@@ -6,9 +6,10 @@ var PPOverlay = function () {
     this.Width = 0;
     this.Height = 0;
 
-    this.X = 0;
-    this.Y = 0;
-    this.Opacity = 1;
+    // Position
+    this.X = 50;
+    this.Y = 50;
+    this.Opacity = 0.5;
 }
 
 // --------------------------------------------------------------------
@@ -20,10 +21,21 @@ var PPStorage = new function () {
     // Get PPOverlay object from storage
     // -------------------------------
     this.GetOverlay = function () {
-        var overlayAsStr = localStorage["overlay0"];
-        if (overlayAsStr == null)
+        var overlayDataAsStr = localStorage["overlay0_data"];
+        var overlayPositionAsStr = localStorage["overlay0_position"];
+        if (overlayDataAsStr == null || overlayPositionAsStr == null)
             return null;
-        var overlay = JSON.parse(overlayAsStr);
+        var overlayData = JSON.parse(overlayDataAsStr);
+        var overlayPosition = JSON.parse(overlayPositionAsStr);
+
+        var overlay = new PPOverlay();
+        overlay.Width = overlayData.Width;
+        overlay.Height = overlayData.Height;
+        overlay.Url = overlayData.Url;
+        overlay.X = overlayPosition.X;
+        overlay.Y = overlayPosition.Y;
+        overlay.Opacity = overlayPosition.Opacity;
+
         return overlay;
     };
 
@@ -34,8 +46,15 @@ var PPStorage = new function () {
         if (!(overlay instanceof PPOverlay))
             alert("Object of type PPOverlay should be provided");
 
-        localStorage["overlay0"] = JSON.stringify(overlay);
+        var overlayData = { Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
+        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
+        localStorage["overlay0_data"] = JSON.stringify(overlayData);
+        localStorage["overlay0_position"] = JSON.stringify(overlayPosition);
     };
+
+    this.UpdateOverlayPosition = function (newPosition) {
+        localStorage["overlay0_position"] = JSON.stringify(newPosition);
+    }
 
     // ---------------------------------------------------
     // Create PPOverlay from file and save it into storage
