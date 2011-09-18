@@ -3,6 +3,28 @@
     <head>
         <script src="jquery-1.6.2.min.js" type="text/javascript"></script>
         <script src="images.js" type="text/javascript"></script>
+        <style type="text/css">
+            #layers
+            {
+                border: 1px solid blue;
+            }
+            
+            .layer
+            {
+                border: 1px solid black;
+                padding: 5px;
+            }
+            
+            .layer checkbox
+            {
+                padding-right: 10px;
+            }
+            
+            .layer .delete
+            {
+                float: right;
+            }
+        </style>
     </head>
     <body>
         Opacity: <a href="" id="opless" class="ppbutton"><</a>
@@ -15,13 +37,24 @@
             <input type="text" class="coords" id="coordY" value="50" size="2" maxlength="4"/>
             <a href="" id="ymore" class="ppbutton">></a>
 
-        <div>
-            <input type="file" onchange="upload(this.files)" accept="image/*" />
-            <img id="thumb" />
-            <div>
-                <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
+        <br /><br />
+        Layers:
+        <div id="layers">
+            <div class="layer">
+                <input type=checkbox name="selectedLayer" />
+                <img id="thumb" />
+                <input type=button class="delete" value="X" />
             </div>
         </div>
+
+        Add new layer:
+        <div>
+            <input type="file" onchange="upload(this.files)" accept="image/*" />
+        </div>
+        <div>
+            <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
+        </div>
+
         <script type="text/javascript">
             chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
                 chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function () {
@@ -39,7 +72,7 @@
 
             var showThumb = function () {
                 var thumbHeight = 50;
-                var overlay = PPStorage.GetOverlay();
+                var overlay = PPStorage.GetOverlay(0);
                 if (overlay != null) {
                     var coeff = overlay.Height / thumbHeight;
                     var thumbWidth = Math.ceil(overlay.Width / coeff);
@@ -49,7 +82,7 @@
             }
 
             var refreshCoords = function () {
-                var overlay = PPStorage.GetOverlay();
+                var overlay = PPStorage.GetOverlay(0);
                 if (overlay != null) {
                     $('#coordX').val(overlay.X);
                     $('#coordY').val(overlay.Y);
@@ -82,7 +115,7 @@
             }
 
             function toggleOverlay1(createOnly) {
-                var overlay = PPStorage.GetOverlay();
+                var overlay = PPStorage.GetOverlay(0);
                 if (overlay == null)
                     return;
 

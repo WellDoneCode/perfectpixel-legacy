@@ -2,6 +2,7 @@
 // PPOverlay - abstraction for overlay
 // -----------------------------------
 var PPOverlay = function () {
+    this.Id;
     this.Url = null;
     this.Width = 0;
     this.Height = 0;
@@ -18,17 +19,30 @@ var PPOverlay = function () {
 var PPStorage = new function () {
 
     // -------------------------------
+    // Get all PPOverlays from storage
+    // -------------------------------
+    this.GetOverlays = function () {
+        var overlaysCount = this._getOverlaysCount();
+        var overlays = [];
+        for (var i = 0; i < overlaysCount; i++) {
+            overlays[i] = this.GetOverlay(i);
+        }
+        return overlays;
+    }
+
+    // -------------------------------
     // Get PPOverlay object from storage
     // -------------------------------
-    this.GetOverlay = function () {
-        var overlayDataAsStr = localStorage["overlay0_data"];
-        var overlayPositionAsStr = localStorage["overlay0_position"];
+    this.GetOverlay = function (id) {
+        var overlayDataAsStr = localStorage["overlay" + id + "_data"];
+        var overlayPositionAsStr = localStorage["overlay" + id + "_position"];
         if (overlayDataAsStr == null || overlayPositionAsStr == null)
             return null;
         var overlayData = JSON.parse(overlayDataAsStr);
         var overlayPosition = JSON.parse(overlayPositionAsStr);
 
         var overlay = new PPOverlay();
+        overlay.Id = overlayData.Id;
         overlay.Width = overlayData.Width;
         overlay.Height = overlayData.Height;
         overlay.Url = overlayData.Url;
@@ -46,14 +60,20 @@ var PPStorage = new function () {
         if (!(overlay instanceof PPOverlay))
             alert("Object of type PPOverlay should be provided");
 
-        var overlayData = { Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
+        if (!overlay.Id) {
+            // New overlay
+            overlay.Id = 0;//TODO delete
+            //overlay.Id = this._getOverlaysCount();//TODO uncomment
+        }
+
+        var overlayData = { Id: overlay.Id, Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
         var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
-        localStorage["overlay0_data"] = JSON.stringify(overlayData);
-        localStorage["overlay0_position"] = JSON.stringify(overlayPosition);
+        localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
+        localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
     };
 
-    this.UpdateOverlayPosition = function (newPosition) {
-        localStorage["overlay0_position"] = JSON.stringify(newPosition);
+    this.UpdateOverlayPosition = function (overlayId, newPosition) {
+        localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
 
     // ---------------------------------------------------
@@ -97,6 +117,15 @@ var PPStorage = new function () {
         // Read in the image file as a data URL.
         reader.readAsDataURL(file);
     };
+
+    // -- Private members --
+    this._getOverlaysCount = function () {
+        var count = 0;
+        while (localStorage["overlay" + count + "_data"]) {
+            count++;
+        }
+        return count;
+    }
 
 };
 //            var getBase64Image = function (img) {
