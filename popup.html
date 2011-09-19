@@ -39,13 +39,7 @@
 
         <br /><br />
         Layers:
-        <div id="layers">
-            <div class="layer">
-                <input type=checkbox name="selectedLayer" />
-                <img id="thumb" />
-                <input type=button class="delete" value="X" />
-            </div>
-        </div>
+        <div id="layers"></div>
 
         Add new layer:
         <div>
@@ -53,6 +47,7 @@
         </div>
         <div>
             <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
+            <input type="button" value="Render" onclick="renderLayers();" />
         </div>
 
         <script type="text/javascript">
@@ -65,21 +60,69 @@
             });
 
             $(function () {
-                showThumb();
+                //showThumb();
+                renderLayers();
                 // set inputs values
                 refreshCoords();
             });
 
-            var showThumb = function () {
-                var thumbHeight = 50;
-                var overlay = PPStorage.GetOverlay(0);
-                if (overlay != null) {
-                    var coeff = overlay.Height / thumbHeight;
-                    var thumbWidth = Math.ceil(overlay.Width / coeff);
-
-                    $('#thumb').attr('src', overlay.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
+            // Layers
+            var renderLayers = function () {
+                var container = $('#layers');
+                container.empty();
+                var overlays = PPStorage.GetOverlays();
+                for (var i = 0; i < overlays.length; i++) {
+                    renderLayer(overlays[i]);
                 }
             }
+
+            var renderLayer = function (overlay) {
+                var container = $('#layers');
+                var layer = $('<div></div>', {
+                    class: 'layer',
+                    data: {
+                        Id: overlay.Id
+                    }
+                }); // class="layer" data-id="' + overlay.Id + '"></div>');
+                var thumbHeight = 50;
+                var coeff = overlay.Height / thumbHeight;
+                var thumbWidth = Math.ceil(overlay.Width / coeff);
+                //var thumb = $('<img class="thumb" />').attr('src', overlay.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
+                var thumb = $('<img />', {
+                    class: 'thumb',
+                    src: overlay.Url,
+                    css: {
+                        width: thumbWidth + 'px',
+                        height: thumbHeight + 'px'
+                    }
+                });
+
+                layer.append($('<input type=checkbox name="selectedLayer" />'));
+                layer.append(thumb);
+                layer.append($('<input type=button class="delete" value="X" onclick="deleteLayer($(this).parents(\'.layer\'));" />'));
+                container.append(layer);
+            }
+
+            var deleteLayer = function (layer) {
+                if (confirm('Are you sure want to delete layer?')) {
+                    var overlayId = $(layer).data('Id');
+                    PPStorage.DeleteOverlay(overlayId);
+                    layer.remove();
+                }
+            }
+
+            // end Layers
+
+//            var showThumb = function () {
+//                var thumbHeight = 50;
+//                var overlay = PPStorage.GetOverlay(0);
+//                if (overlay != null) {
+//                    var coeff = overlay.Height / thumbHeight;
+//                    var thumbWidth = Math.ceil(overlay.Width / coeff);
+
+//                    $('#thumb').attr('src', overlay.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
+//                }
+//            }
 
             var refreshCoords = function () {
                 var overlay = PPStorage.GetOverlay(0);
@@ -107,9 +150,12 @@
 //                }
 
                 PPStorage.SaveOverlayFromFile(file,
-                    function () {
+                    function (overlay) {
+                        if (overlay == null)
+                            return;
                         refreshCoords();
-                        showThumb();
+                        //showThumb();
+                        renderLayer(overlay);
                         toggleOverlay1(true);
                     });
             }

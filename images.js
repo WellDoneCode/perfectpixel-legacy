@@ -62,18 +62,43 @@ var PPStorage = new function () {
 
         if (!overlay.Id) {
             // New overlay
-            overlay.Id = 0;//TODO delete
-            //overlay.Id = this._getOverlaysCount();//TODO uncomment
+            //overlay.Id = 0; //TODO delete
+            overlay.Id = this._getOverlaysCount(); //TODO uncomment
         }
 
         var overlayData = { Id: overlay.Id, Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
         var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
-        localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
-        localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
+
+        try {
+            localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
+            localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
+        } catch (e) {
+            if (e.name == "QUOTA_EXCEEDED_ERR") { //data wasn't successfully saved due to quota exceed
+                alert('Image cannot be uploaded because there are no free space. Please remove other layers or try to upload image with less size');
+                return null;
+            }
+            throw e;
+        }
+        return overlay;
     };
 
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
+    }
+
+    // ----------------------------------
+    // Delete overlay from storage
+    // ----------------------------------
+    this.DeleteOverlay = function (overlayId) {
+        var overlaysCount = this._getOverlaysCount();
+
+        for (var i = overlayId; i < overlaysCount - 1; i++) {
+            localStorage["overlay" + i + "_data"] = localStorage["overlay" + (i + 1) + "_data"];
+            localStorage["overlay" + i + "_position"] = localStorage["overlay" + (i + 1) + "_position"];
+        }
+
+        localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
+        localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
     }
 
     // ---------------------------------------------------
@@ -106,10 +131,10 @@ var PPStorage = new function () {
                     overlay.Width = img[0].offsetWidth;
                     overlay.Height = img[0].offsetHeight;
 
-                    PPStorage.SaveOverlay(overlay);
+                    overlay = PPStorage.SaveOverlay(overlay);
 
                     span.remove();
-                    callback();
+                    callback(overlay);
                 });
             };
         })(file);
