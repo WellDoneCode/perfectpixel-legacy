@@ -3,6 +3,7 @@
     <head>
         <script src="jquery-1.6.2.min.js" type="text/javascript"></script>
         <script src="images.js" type="text/javascript"></script>
+        <script src="shared.js" type="text/javascript"></script>
         <style type="text/css">
             #layers
             {
@@ -43,11 +44,11 @@
 
         Add new layer:
         <div>
-            <input type="file" onchange="upload(this.files)" accept="image/*" />
+            <input type="file" onchange="upload(this.files, this)" accept="image/*" />
         </div>
         <div>
-            <input type="button" value="Show/Hide" onclick="toggleOverlay1(false);" />
-            <input type="button" value="Render" onclick="renderLayers();" />
+            <input type="button" value="Show/Hide" onclick="sendToggleOverlay();" />
+            <input type="button" value="Render" onclick="renderLayers();setCurrentLayer(GlobalStorage.get_CurrentOverlayId());" />
         </div>
 
         <script type="text/javascript">
@@ -60,10 +61,13 @@
             });
 
             $(function () {
-                //showThumb();
                 renderLayers();
-                // set inputs values
-                refreshCoords();
+
+                $('input[name="selectedLayer"]').live('click', function () {
+                    // Live handler called.
+                    var overlayId = $(this).parents('.layer').data('Id');
+                    setCurrentLayer(overlayId);
+                });
             });
 
             // Layers
@@ -74,6 +78,7 @@
                 for (var i = 0; i < overlays.length; i++) {
                     renderLayer(overlays[i]);
                 }
+                setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
             }
 
             var renderLayer = function (overlay) {
@@ -83,11 +88,10 @@
                     data: {
                         Id: overlay.Id
                     }
-                }); // class="layer" data-id="' + overlay.Id + '"></div>');
+                });
                 var thumbHeight = 50;
                 var coeff = overlay.Height / thumbHeight;
                 var thumbWidth = Math.ceil(overlay.Width / coeff);
-                //var thumb = $('<img class="thumb" />').attr('src', overlay.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
                 var thumb = $('<img />', {
                     class: 'thumb',
                     src: overlay.Url,
@@ -107,25 +111,41 @@
                 if (confirm('Are you sure want to delete layer?')) {
                     var overlayId = $(layer).data('Id');
                     PPStorage.DeleteOverlay(overlayId);
-                    layer.remove();
+
+                    renderLayers();
+
+                    var overlaysCount = PPStorage.GetOverlaysCount();
+                    if (overlaysCount > 0 && overlaysCount <= GlobalStorage.get_CurrentOverlayId()) {
+                        setCurrentLayer(GlobalStorage.get_CurrentOverlayId() - 1);
+                    }
+                    else if(overlaysCount == 0) {
+                        sendHideOverlay();
+                        GlobalStorage.set_CurrentOverlayId(null);
+                    }
                 }
+            }
+
+            var setCurrentLayer = function (overlayId) {
+                if (PPStorage.GetOverlaysCount() == 0)
+                    return;
+
+                if (!overlayId || overlayId==null)
+                    overlayId = 0;
+
+                $('input[name="selectedLayer"]').removeAttr('checked');
+                $('input[name="selectedLayer"]').filter(function () {
+                    return $(this).parents('.layer').data("Id") == overlayId
+                }).attr('checked', 'checked');
+
+                GlobalStorage.set_CurrentOverlayId(overlayId);
+                refreshCoords();
+                sendShowOverlay();
             }
 
             // end Layers
 
-//            var showThumb = function () {
-//                var thumbHeight = 50;
-//                var overlay = PPStorage.GetOverlay(0);
-//                if (overlay != null) {
-//                    var coeff = overlay.Height / thumbHeight;
-//                    var thumbWidth = Math.ceil(overlay.Width / coeff);
-
-//                    $('#thumb').attr('src', overlay.Url).css('width', thumbWidth + 'px').css('height', thumbHeight + 'px');
-//                }
-//            }
-
             var refreshCoords = function () {
-                var overlay = PPStorage.GetOverlay(0);
+                var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
                 if (overlay != null) {
                     $('#coordX').val(overlay.X);
                     $('#coordY').val(overlay.Y);
@@ -133,7 +153,7 @@
                 }
             }
 
-            function upload(files) {
+            function upload(files, uploadElem) {
                 file = files[0];
 
 //                for (var i = 0; i < files.length; i++) {
@@ -151,21 +171,38 @@
 
                 PPStorage.SaveOverlayFromFile(file,
                     function (overlay) {
+                        $($(uploadElem).parent()).html($(uploadElem).parent().html()); // Hack Clear file upload
+
                         if (overlay == null)
                             return;
-                        refreshCoords();
-                        //showThumb();
                         renderLayer(overlay);
-                        toggleOverlay1(true);
+
+                        if (!GlobalStorage.get_CurrentOverlayId() || PPStorage.GetOverlaysCount() == 1)
+                            setCurrentLayer(overlay.Id);
                     });
             }
 
-            function toggleOverlay1(createOnly) {
-                var overlay = PPStorage.GetOverlay(0);
+            // Overlay commands
+            function sendToggleOverlay() {
+                sendOverlayCommand('toggleOverlay');
+            }
+
+            function sendShowOverlay() {
+                sendOverlayCommand('createOverlay');
+            }
+
+            function sendHideOverlay() {
+                chrome.tabs.executeScript(null, {
+                    code: 'removeOverlay();'
+                });
+            }
+
+            function sendOverlayCommand(funcName) {
+                var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
                 if (overlay == null)
                     return;
 
-                var funcName = createOnly ? "createOverlay" : "toggleOverlay";
+                //var funcName = createOnly ? "createOverlay" : "toggleOverlay";
                 chrome.tabs.executeScript(null, {
                     code:
                         funcName + "(); $('#overlay_3985123731465987').attr('src', ''); $('#overlay_3985123731465987').attr('src', '" + overlay.Url + "')" + //";"
@@ -174,6 +211,7 @@
                                 ".css('opacity'," + overlay.Opacity + ");"
                 });
             }
+
 
         </script>
         <script type="text/javascript">

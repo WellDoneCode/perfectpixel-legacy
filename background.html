@@ -1,10 +1,11 @@
 ﻿<script src="images.js" type="text/javascript"></script>
+<script src="shared.js" type="text/javascript"></script>
 <script type="text/javascript">
     chrome.extension.onRequest.addListener(function(request, sender, sendResponse)
     {
         if(request.Type == 'OverlayChanged')
         {
-            PPStorage.UpdateOverlayPosition(0, request);
+            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), request);
         }
     });
 </script>

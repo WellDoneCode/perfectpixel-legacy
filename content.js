@@ -20,6 +20,8 @@ var createOverlay = function () {
             'z-index': zIndex,
             'width': width_px + 'px',
             'height': height_px + 'px',
+            'margin': 0,
+            'padding': 0,
             'position': 'absolute',
             'top': top_px + 'px',
             'left': left_px + 'px',
@@ -31,17 +33,22 @@ var createOverlay = function () {
         $('body').append(overlay);
 
         overlay.draggable({
-            drag: function () {
-                onOverlayUpdate();
-            }
+            drag: onOverlayUpdate,
+            stop: onOverlayUpdate
         });
+    }
+}
+
+var removeOverlay = function () {
+    if ($('#' + overlayUniqueId).length > 0) {
+        $('#' + overlayUniqueId).attr('src', '');
+        $('#' + overlayUniqueId).remove();
     }
 }
 
 var toggleOverlay = function () {
     if ($('#' + overlayUniqueId).length > 0) {
-        $('#' + overlayUniqueId).attr('src', '');
-        $('#' + overlayUniqueId).remove();
+        removeOverlay();
     }
     else {
         createOverlay();

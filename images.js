@@ -22,7 +22,7 @@ var PPStorage = new function () {
     // Get all PPOverlays from storage
     // -------------------------------
     this.GetOverlays = function () {
-        var overlaysCount = this._getOverlaysCount();
+        var overlaysCount = this.GetOverlaysCount();
         var overlays = [];
         for (var i = 0; i < overlaysCount; i++) {
             overlays[i] = this.GetOverlay(i);
@@ -42,7 +42,7 @@ var PPStorage = new function () {
         var overlayPosition = JSON.parse(overlayPositionAsStr);
 
         var overlay = new PPOverlay();
-        overlay.Id = overlayData.Id;
+        overlay.Id = id;
         overlay.Width = overlayData.Width;
         overlay.Height = overlayData.Height;
         overlay.Url = overlayData.Url;
@@ -62,11 +62,10 @@ var PPStorage = new function () {
 
         if (!overlay.Id) {
             // New overlay
-            //overlay.Id = 0; //TODO delete
-            overlay.Id = this._getOverlaysCount(); //TODO uncomment
+            overlay.Id = this.GetOverlaysCount();
         }
 
-        var overlayData = { Id: overlay.Id, Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
+        var overlayData = { Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
         var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
 
         try {
@@ -90,11 +89,18 @@ var PPStorage = new function () {
     // Delete overlay from storage
     // ----------------------------------
     this.DeleteOverlay = function (overlayId) {
-        var overlaysCount = this._getOverlaysCount();
+        var overlaysCount = this.GetOverlaysCount();
 
         for (var i = overlayId; i < overlaysCount - 1; i++) {
-            localStorage["overlay" + i + "_data"] = localStorage["overlay" + (i + 1) + "_data"];
-            localStorage["overlay" + i + "_position"] = localStorage["overlay" + (i + 1) + "_position"];
+            // use temp variables to prevent QUOTA_EXCEEDED_ERR during copy
+            var dataToCopy = localStorage["overlay" + (i + 1) + "_data"];
+            var positionToCopy = localStorage["overlay" + (i + 1) + "_position"];
+
+            localStorage.removeItem("overlay" + (i + 1) + "_data");
+            localStorage.removeItem("overlay" + (i + 1) + "_position");
+
+            localStorage["overlay" + i + "_data"] = dataToCopy;
+            localStorage["overlay" + i + "_position"] = positionToCopy;
         }
 
         localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
@@ -143,8 +149,10 @@ var PPStorage = new function () {
         reader.readAsDataURL(file);
     };
 
-    // -- Private members --
-    this._getOverlaysCount = function () {
+    // ---------------------------------------------------
+    // Get count of overlays stored
+    // ---------------------------------------------------
+    this.GetOverlaysCount = function () {
         var count = 0;
         while (localStorage["overlay" + count + "_data"]) {
             count++;
