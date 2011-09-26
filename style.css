@@ -1,6 +1,5 @@
 #chromeperfectpixel-panel,
-#chromeperfectpixel-panel *
-{
+#chromeperfectpixel-panel * {
     color:#000;
     padding:0;
     margin:0;
@@ -9,10 +8,18 @@
     width:auto;
     height:auto;
     position:static;
+    font: 10pt/10pt sans-serif;
+    content:none;
+    text-transform:none;
+    text-shadow:none;
 }
 
-#chromeperfectpixel-panel input
-{
+#chromeperfectpixel-panel *:before,
+#chromeperfectpixel-panel *:after {
+    content:none;
+}
+
+#chromeperfectpixel-panel input[type=text] {
     margin:2px;
     padding:1px;
 }
@@ -28,7 +35,6 @@
     top:20px;
     right:20px;
     z-index: 100500;
-    font: 10pt/10pt sans-serif;
     box-shadow: 0 0 10px black;
     opacity:0.7;
     color:#000;
@@ -50,6 +56,59 @@
     font-size:1.2em;
     font-weight:bold;
 }
+
+#chromeperfectpixel-panel #chromeperfectpixel-section-opacity span  {
+    position:relative;
+    top:-3px;
+    padding-right:20px;
+}
+#chromeperfectpixel-panel #chromeperfectpixel-section-opacity input[type=range] {
+    width: 230px;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-section-origin {
+    height: 100px;
+}
+    #chromeperfectpixel-panel #chromeperfectpixel-section-origin > span {
+        position:relative;
+        top:50px;
+    }
+    #chromeperfectpixel-panel #chromeperfectpixel-origin-controls {
+        margin-left: 90px;
+        position: relative;
+    }
+        #chromeperfectpixel-panel #chromeperfectpixel-origin-controls button {
+            width:30px;
+            height:30px;
+            position:absolute;
+            
+        }
+            #chromeperfectpixel-panel #chromeperfectpixel-origin-controls button span {
+                text-align:center;
+                font-size:1.2em;
+            }
+        #chromeperfectpixel-panel #chromeperfectpixel-origin-controls > div {
+            position:absolute;
+            top:21px;
+            left:117px;
+        }
+        #chromeperfectpixel-panel #chromeperfectpixel-origin-controls #chromeperfectpixel-ymore {
+            top:60px;
+            left:30px;
+        }
+        #chromeperfectpixel-panel #chromeperfectpixel-origin-controls #chromeperfectpixel-yless {
+            top:0;
+            left:30px;
+        }
+        #chromeperfectpixel-panel #chromeperfectpixel-origin-controls #chromeperfectpixel-xmore {
+            top:30px;
+            left:60px;
+        }
+        #chromeperfectpixel-panel #chromeperfectpixel-origin-controls #chromeperfectpixel-xless {
+            top:30px;
+            left:0;
+        }
+
 
 #chromeperfectpixel-panel #chromeperfectpixel-layers {
     border: 1px solid blue;

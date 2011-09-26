@@ -5,15 +5,31 @@ var createPanel = function () {
         var panelHtml =
             '<div id="chromeperfectpixel-panel">' +
                 '<h1>ChromePerfectPixel</h1>' +
-                'Opacity: <a href="" id="chromeperfectpixel-opless" class="chromeperfectpixel-ppbutton">&lt;</a>' +
-                '<input type="text" id="chromeperfectpixel-opacity" size="1" maxlength="3" value="0.5" readonly/>' +
-                '<a href="" id="chromeperfectpixel-opmore" class="chromeperfectpixel-ppbutton">&gt;</a><br/>' +
-                'X: <a href="" id="chromeperfectpixel-xless" class="chromeperfectpixel-ppbutton">&lt;</a>' +
-                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
-                '<a href="" id="chromeperfectpixel-xmore" class="chromeperfectpixel-ppbutton">&gt;</a><br/>' +
-                'Y:  <a href="" id="chromeperfectpixel-yless" class="chromeperfectpixel-ppbutton">&lt;</a>' +
-                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
-                '<a href="" id="chromeperfectpixel-ymore" class="chromeperfectpixel-ppbutton">&gt;</a>' +
+                '<div id="chromeperfectpixel-section-opacity">' +
+                    '<span>Opacity:</span>' +
+                    '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
+                '</div>' +
+                '<div id="chromeperfectpixel-section-origin">' +
+                    '<span>Origin:</span>' +
+                    '<div id="chromeperfectpixel-origin-controls">' +
+                        '<button id="chromeperfectpixel-ymore">&darr;</button>' +
+                        '<button id="chromeperfectpixel-yless">&uarr;</button>' +
+                        '<button id="chromeperfectpixel-xless">&larr;</button>' +
+                        '<button id="chromeperfectpixel-xmore">&rarr;</button>' +
+                        '<div>' +
+                            '<div>' +
+                                '<span>X:</span>' +
+                                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
+                            '</div>' +
+                            '<div>' +
+                                '<span>Y:</span>' +
+                                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                
+                
 
                 '<div>Layers:</div>' +
                 '<div id="chromeperfectpixel-layers"></div>' +
@@ -23,7 +39,7 @@ var createPanel = function () {
                     '<input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" />' +
                 '</div>' +
                 '<div>' +
-                    '<input id="chromeperfectpixel-showHideBtn" type="button" value="Show/Hide" />'
+                    '<input id="chromeperfectpixel-showHideBtn" type="button" value="Show/Hide" />' +
                 '</div>' +
             '</div>';
 
@@ -43,12 +59,13 @@ var createPanel = function () {
             var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
             ChromePerfectPixel.setCurrentLayer(overlayId);
         });
+        
+        $('#chromeperfectpixel-opacity').change(function() {
+            ChromePerfectPixel.opacity($(this));
+        });
 
-        $('.chromeperfectpixel-ppbutton').live("click", function (event) {
+        $('#chromeperfectpixel-origin-controls button').live("click", function (event) {
             event.preventDefault();
-            if ($(this).attr('id') == "chromeperfectpixel-opless" || $(this).attr('id') == "chromeperfectpixel-opmore") {
-                ChromePerfectPixel.opacity($(this));
-            }
             if ($(this).attr('id') == "chromeperfectpixel-xless" || $(this).attr('id') == "chromeperfectpixel-xmore") {
                 ChromePerfectPixel.xleft($(this));
             }
@@ -68,7 +85,8 @@ var createPanel = function () {
 
         // On load
 
-        $('#chromeperfectpixel-panel').draggable({ handle: "h1" });
+        $('#chromeperfectpixel-panel').draggable({handle: "h1"});
+        $('#chromeperfectpixel-panel button').button();
         ChromePerfectPixel.renderLayers();
     }
 }
@@ -169,7 +187,7 @@ var ChromePerfectPixel = new function () {
 
         if (isStop) {
             // update storage
-            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity });
+            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), {X: x, Y: y, Opacity: opacity});
         }
     }
 
@@ -292,8 +310,8 @@ var ChromePerfectPixel = new function () {
         //}
     }
 
-    this.opacity = function (button) {
-        var offset = 0;
+    this.opacity = function (input) {
+        /*var offset = 0;
         if (button.attr('id') == "chromeperfectpixel-opless") {
             if ($('input#chromeperfectpixel-opacity').val() >= 0.11)
                 offset = 0.1;
@@ -305,8 +323,8 @@ var ChromePerfectPixel = new function () {
             else offset = 0;
         }
         var thisOpacity = Number($('input#chromeperfectpixel-opacity').val() - offset).toFixed(1);
-        $('input#chromeperfectpixel-opacity').val(thisOpacity);
-        ChromePerfectPixel.change(thisOpacity, false, false);
+        $('input#chromeperfectpixel-opacity').val(thisOpacity);*/
+        ChromePerfectPixel.change(input.val(), false, false);
     }
 
     this.xleft = function (button) {
