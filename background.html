@@ -14,8 +14,12 @@
         chrome.tabs.insertCSS(tab.id, { file: "style.css"});
         chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
             chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "content.js" }, function () {
-                    chrome.tabs.executeScript(null, { code: "togglePanel();" });
+                chrome.tabs.executeScript(null, { file: "shared.js" }, function () {
+                    chrome.tabs.executeScript(null, { file: "images.js" }, function () {
+                        chrome.tabs.executeScript(null, { file: "content.js" }, function () {
+                            chrome.tabs.executeScript(null, { code: "togglePanel();" });
+                        });
+                    });
                 });
             });
         });

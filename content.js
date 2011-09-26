@@ -1,14 +1,5 @@
 /// <reference path="vs/chrome_extensions.js" />
 
-// temporary hardcoded
-var opacity = 0.5;
-var top_px = 50;
-var left_px = 50;
-var width_px = 300;
-var height_px = 300;
-var zIndex = 1000;
-var overlayUniqueId = 'overlay_3985123731465987';
-
 var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {
         var panelHtml =
@@ -29,22 +20,62 @@ var createPanel = function () {
 
                 'Add new layer:' +
                 '<div>' +
-                    '<input type="file" onchange="upload(this.files, this)" accept="image/*" />' +
+                    '<input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" />' +
                 '</div>' +
                 '<div>' +
-                    '<input type="button" value="Show/Hide" onclick="sendToggleOverlay();" />' +
+                    '<input id="chromeperfectpixel-showHideBtn" type="button" value="Show/Hide" />' +
                     '<input type="button" value="Render" onclick="renderLayers();setCurrentLayer(GlobalStorage.get_CurrentOverlayId());" />' +
                 '</div>' +
             '</div>';
 
         $('body').append(panelHtml);
 
+        // Set event handlers
+        $('#chromeperfectpixel-showHideBtn').bind('click', function () {
+            ChromePerfectPixel.toggleOverlay();
+        });
+
+        $('#chromeperfectpixel-fileUploader').bind('change', function () {
+            ChromePerfectPixel.upload(this.files, this);
+        });
+
+        $('input[name="selectedLayer"]').live('click', function () {
+            // Live handler called.
+            var overlayId = $(this).parents('.layer').data('Id');
+            ChromePerfectPixel.setCurrentLayer(overlayId);
+        });
+
+        $('.ppbutton').live("click", function (event) {
+            event.preventDefault();
+            if ($(this).attr('id') == "opless" || $(this).attr('id') == "opmore") {
+                ChromePerfectPixel.opacity($(this));
+            }
+            if ($(this).attr('id') == "xless" || $(this).attr('id') == "xmore") {
+                ChromePerfectPixel.xleft($(this));
+            }
+            if ($(this).attr('id') == "yless" || $(this).attr('id') == "ymore") {
+                ChromePerfectPixel.xtop($(this));
+            }
+        });
+
+        $('.coords').live("keypress", function (event) {
+            if (event.which == 13) {
+                if ($(this).attr("id") == "coordX")
+                    ChromePerfectPixel.change(false, $(this).val(), false);
+                if ($(this).attr("id") == "coordY")
+                    ChromePerfectPixel.change(false, false, $(this).val());
+            }
+        });
+
+        // On load
+
         $('#chromeperfectpixel-panel').draggable({ handle: "h1" });
+        ChromePerfectPixel.renderLayers();
     }
 }
 
 var removePanel = function () {
-    removeOverlay();
+    ChromePerfectPixel.removeOverlay();
     if ($('#chromeperfectpixel-panel').length > 0) {
         $('#chromeperfectpixel-panel').remove();
     }
@@ -59,58 +90,258 @@ var togglePanel = function () {
     }
 }
 
-var createOverlay = function () {
-    if ($('#' + overlayUniqueId).length > 0) {
+var ChromePerfectPixel = new function () {
+    // temporary hardcoded
+    var default_opacity = 0.5;
+    var default_top_px = 50;
+    var default_left_px = 50;
+    var default_width_px = 300;
+    var default_height_px = 300;
+    var default_zIndex = 1000;
+    var overlayUniqueId = 'overlay_3985123731465987';
+
+    // Overlay
+    this.createOverlay = function () {
+        if ($('#' + overlayUniqueId).length > 0) {
+        }
+        else {
+            var overlay = $('<img />');
+            overlay.attr({
+                'id': overlayUniqueId
+            }).css({
+                'z-index': default_zIndex,
+                'width': default_width_px + 'px',
+                'height': default_height_px + 'px',
+                'margin': 0,
+                'padding': 0,
+                'position': 'absolute',
+                'top': default_top_px + 'px',
+                'left': default_left_px + 'px',
+                'background-color': 'transparent',
+                'opacity': default_opacity,
+                'display': 'block',
+                'cursor': 'all-scroll'
+            });
+            $('body').append(overlay);
+
+            overlay.draggable({
+                drag: ChromePerfectPixel.onOverlayUpdate,
+                stop: ChromePerfectPixel.onOverlayUpdate
+            });
+        }
+
+        // Set overlay data
+        var overlayObj = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
+
+        if (overlayObj != null) {
+            $('#' + overlayUniqueId).attr('src', '');
+            $('#' + overlayUniqueId).attr('src', overlayObj.Url)
+                .css('width', overlayObj.Width + 'px').css('height', overlayObj.Height + 'px')
+                .css('left', overlayObj.X + 'px').css('top', overlayObj.Y + 'px')
+                .css('opacity', overlayObj.Opacity);
+        }
     }
-    else {
-        var overlay = $('<img />');
-        overlay.attr({
-            'id': overlayUniqueId
-        }).css({
-            'z-index': zIndex,
-            'width': width_px + 'px',
-            'height': height_px + 'px',
-            'margin': 0,
-            'padding': 0,
-            'position': 'absolute',
-            'top': top_px + 'px',
-            'left': left_px + 'px',
-            'background-color': 'transparent',
-            'opacity': opacity,
-            'display': 'block',
-            'cursor': 'all-scroll'
+
+    this.removeOverlay = function () {
+        if ($('#' + overlayUniqueId).length > 0) {
+            $('#' + overlayUniqueId).attr('src', '');
+            $('#' + overlayUniqueId).remove();
+        }
+    }
+
+    this.toggleOverlay = function () {
+        if ($('#' + overlayUniqueId).length > 0) {
+            ChromePerfectPixel.removeOverlay();
+        }
+        else {
+            ChromePerfectPixel.createOverlay();
+        }
+    }
+
+    this.onOverlayUpdate = function () {
+        var overlay = $('#' + overlayUniqueId);
+        var X = overlay[0].offsetLeft;
+        var Y = overlay[0].offsetTop;
+        var Opacity = overlay.css('opacity');
+
+        chrome.extension.sendRequest({ Type: 'OverlayChanged', X: X, Y: Y, Opacity: Opacity });
+    }
+
+    // Layers
+    this.renderLayers = function () {
+        var container = $('#layers');
+        container.empty();
+        var overlays = PPStorage.GetOverlays();
+        for (var i = 0; i < overlays.length; i++) {
+            ChromePerfectPixel.renderLayer(overlays[i]);
+        }
+        ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
+    }
+
+    this.renderLayer = function (overlay) {
+        var container = $('#layers');
+        var layer = $('<div></div>', {
+            class: 'layer',
+            data: {
+                Id: overlay.Id
+            }
         });
-        $('body').append(overlay);
+        var thumbHeight = 50;
+        var coeff = overlay.Height / thumbHeight;
+        var thumbWidth = Math.ceil(overlay.Width / coeff);
+        var thumb = $('<img />', {
+            class: 'thumb',
+            src: overlay.Url,
+            css: {
+                width: thumbWidth + 'px',
+                height: thumbHeight + 'px'
+            }
+        });
 
-        overlay.draggable({
-            drag: onOverlayUpdate,
-            stop: onOverlayUpdate
+        layer.append($('<input type=checkbox name="selectedLayer" />'));
+        layer.append(thumb);
+        var deleteBtn = ($('<input type=button class="delete" value="X" />'));
+        deleteBtn.bind('click', function () {
+            ChromePerfectPixel.deleteLayer($(this).parents('.layer'));
+        });
+        layer.append(deleteBtn);
+        container.append(layer);
+    }
+
+    this.deleteLayer = function (layer) {
+        if (confirm('Are you sure want to delete layer?')) {
+            var overlayId = $(layer).data('Id');
+            PPStorage.DeleteOverlay(overlayId);
+
+            ChromePerfectPixel.renderLayers();
+
+            var overlaysCount = PPStorage.GetOverlaysCount();
+            if (overlaysCount > 0 && overlaysCount <= GlobalStorage.get_CurrentOverlayId()) {
+                ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId() - 1);
+            }
+            else if (overlaysCount == 0) {
+                ChromePerfectPixel.removeOverlay();
+                GlobalStorage.set_CurrentOverlayId(null);
+            }
+        }
+    }
+
+    this.setCurrentLayer = function (overlayId) {
+        if (PPStorage.GetOverlaysCount() == 0)
+            return;
+
+        if (!overlayId || overlayId == null)
+            overlayId = 0;
+
+        $('input[name="selectedLayer"]').removeAttr('checked');
+        $('input[name="selectedLayer"]').filter(function () {
+            return $(this).parents('.layer').data("Id") == overlayId
+        }).attr('checked', 'checked');
+
+        GlobalStorage.set_CurrentOverlayId(overlayId);
+        ChromePerfectPixel.refreshCoords();
+        ChromePerfectPixel.createOverlay();
+    }
+
+    // end Layers
+
+    this.refreshCoords = function () {
+        var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
+        if (overlay != null) {
+            $('#coordX').val(overlay.X);
+            $('#coordY').val(overlay.Y);
+            $('#opacity').val(Number(overlay.Opacity).toFixed(1));
+        }
+    }
+
+    this.upload = function (files, uploadElem) {
+        file = files[0];
+
+        //                for (var i = 0; i < files.length; i++) {
+        //                    file = files[i];
+        //                    if (window.createObjectURL) {
+        //                        url = window.createObjectURL(file)
+        //                    } else if (window.createBlobURL) {
+        //                        url = window.createBlobURL(file)
+        //                    } else if (window.URL && window.URL.createObjectURL) {
+        //                        url = window.URL.createObjectURL(file)
+        //                    } else if (window.webkitURL && window.webkitURL.createObjectURL) {
+        //                        url = window.webkitURL.createObjectURL(file)
+        //                    }
+        //                }
+
+        PPStorage.SaveOverlayFromFile(file,
+        function (overlay) {
+            $($(uploadElem).parent()).html($(uploadElem).parent().html()); // Hack Clear file upload
+
+            if (overlay == null)
+                return;
+            ChromePerfectPixel.renderLayer(overlay);
+
+            if (!GlobalStorage.get_CurrentOverlayId() || PPStorage.GetOverlaysCount() == 1)
+                ChromePerfectPixel.setCurrentLayer(overlay.Id);
         });
     }
-}
 
-var removeOverlay = function () {
-    if ($('#' + overlayUniqueId).length > 0) {
-        $('#' + overlayUniqueId).attr('src', '');
-        $('#' + overlayUniqueId).remove();
+    // UI
+    this.opacity = function (button) {
+        var offset = 0;
+        if (button.attr('id') == "opless") {
+            if ($('input#opacity').val() >= 0.11)
+                offset = 0.1;
+            else offset = 0;
+        }
+        else {
+            if ($('input#opacity').val() <= 0.99)
+                offset = -0.1;
+            else offset = 0;
+        }
+        var thisOpacity = Number($('input#opacity').val() - offset).toFixed(1);
+        $('input#opacity').val(thisOpacity);
+        ChromePerfectPixel.change(thisOpacity, false, false);
     }
-}
 
-var toggleOverlay = function () {
-    if ($('#' + overlayUniqueId).length > 0) {
-        removeOverlay();
+    this.xleft = function (button) {
+        var offset = 0;
+        if (button.attr('id') == "xless") {
+            if ($('input#coordX').val() >= 0)
+                offset = 1;
+            else offset = 0;
+        }
+        else {
+            offset = -1;
+        }
+        var thisX = $('input#coordX').val() - offset;
+        $('input#coordX').val(thisX);
+        ChromePerfectPixel.change(false, thisX, false);
     }
-    else {
-        createOverlay();
+
+    this.xtop = function (button) {
+        var offset = 0;
+        if (button.attr('id') == "yless") {
+            if ($('input#coordY').val() >= 0)
+                offset = 1;
+            else offset = 0;
+        }
+        else {
+            offset = -1;
+        }
+        var thisY = $('input#coordY').val() - offset;
+        $('input#coordY').val(thisY);
+        ChromePerfectPixel.change(false, false, thisY);
     }
-}
 
-var onOverlayUpdate = function () {
-    var overlay = $('#' + overlayUniqueId);
-    var X = overlay[0].offsetLeft;
-    var Y = overlay[0].offsetTop;
-    var Opacity = overlay.css('opacity');
-
-    chrome.extension.sendRequest({ Type: 'OverlayChanged', X: X, Y: Y, Opacity: Opacity });
+    this.change = function (opacity, left, top) {
+        var overlay = $('#' + overlayUniqueId);
+        if (opacity != false)
+            overlay.css('opacity', opacity);
+        if (left != false) {
+            overlay.css('left', left + "px");
+        }
+        if (top != false) {
+            overlay.css('top', top + "px");
+        }
+        ChromePerfectPixel.onOverlayUpdate();
+    }
 }
 
