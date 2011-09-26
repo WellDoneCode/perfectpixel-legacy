@@ -5,26 +5,25 @@ var createPanel = function () {
         var panelHtml =
             '<div id="chromeperfectpixel-panel">' +
                 '<h1>ChromePerfectPixel</h1>' +
-                'Opacity: <a href="" id="opless" class="ppbutton">&lt;</a>' +
-                '<input type="text" id="opacity" size="1" maxlength="3" value="0.5" readonly/>' +
-                '<a href="" id="opmore" class="ppbutton">&gt;</a><br/>' +
-                'X: <a href="" id="xless" class="ppbutton">&lt;</a>' +
-                '<input type="text" class="coords" id="coordX" value="50" size="2" maxlength="4"/>' +
-                '<a href="" id="xmore" class="ppbutton">&gt;</a><br/>' +
-                'Y:  <a href="" id="yless" class="ppbutton">&lt;</a>' +
-                '<input type="text" class="coords" id="coordY" value="50" size="2" maxlength="4"/>' +
-                '<a href="" id="ymore" class="ppbutton">&gt;</a>' +
+                'Opacity: <a href="" id="chromeperfectpixel-opless" class="chromeperfectpixel-ppbutton">&lt;</a>' +
+                '<input type="text" id="chromeperfectpixel-opacity" size="1" maxlength="3" value="0.5" readonly/>' +
+                '<a href="" id="chromeperfectpixel-opmore" class="chromeperfectpixel-ppbutton">&gt;</a><br/>' +
+                'X: <a href="" id="chromeperfectpixel-xless" class="chromeperfectpixel-ppbutton">&lt;</a>' +
+                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
+                '<a href="" id="chromeperfectpixel-xmore" class="chromeperfectpixel-ppbutton">&gt;</a><br/>' +
+                'Y:  <a href="" id="chromeperfectpixel-yless" class="chromeperfectpixel-ppbutton">&lt;</a>' +
+                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
+                '<a href="" id="chromeperfectpixel-ymore" class="chromeperfectpixel-ppbutton">&gt;</a>' +
 
                 '<div>Layers:</div>' +
-                '<div id="layers"></div>' +
+                '<div id="chromeperfectpixel-layers"></div>' +
 
                 'Add new layer:' +
                 '<div>' +
                     '<input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" />' +
                 '</div>' +
                 '<div>' +
-                    '<input id="chromeperfectpixel-showHideBtn" type="button" value="Show/Hide" />' +
-                    '<input type="button" value="Render" onclick="renderLayers();setCurrentLayer(GlobalStorage.get_CurrentOverlayId());" />' +
+                    '<input id="chromeperfectpixel-showHideBtn" type="button" value="Show/Hide" />'
                 '</div>' +
             '</div>';
 
@@ -39,30 +38,30 @@ var createPanel = function () {
             ChromePerfectPixel.upload(this.files, this);
         });
 
-        $('input[name="selectedLayer"]').live('click', function () {
+        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function () {
             // Live handler called.
-            var overlayId = $(this).parents('.layer').data('Id');
+            var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
             ChromePerfectPixel.setCurrentLayer(overlayId);
         });
 
-        $('.ppbutton').live("click", function (event) {
+        $('.chromeperfectpixel-ppbutton').live("click", function (event) {
             event.preventDefault();
-            if ($(this).attr('id') == "opless" || $(this).attr('id') == "opmore") {
+            if ($(this).attr('id') == "chromeperfectpixel-opless" || $(this).attr('id') == "chromeperfectpixel-opmore") {
                 ChromePerfectPixel.opacity($(this));
             }
-            if ($(this).attr('id') == "xless" || $(this).attr('id') == "xmore") {
+            if ($(this).attr('id') == "chromeperfectpixel-xless" || $(this).attr('id') == "chromeperfectpixel-xmore") {
                 ChromePerfectPixel.xleft($(this));
             }
-            if ($(this).attr('id') == "yless" || $(this).attr('id') == "ymore") {
+            if ($(this).attr('id') == "chromeperfectpixel-yless" || $(this).attr('id') == "chromeperfectpixel-ymore") {
                 ChromePerfectPixel.xtop($(this));
             }
         });
 
-        $('.coords').live("keypress", function (event) {
+        $('.chromeperfectpixel-coords').live("keypress", function (event) {
             if (event.which == 13) {
-                if ($(this).attr("id") == "coordX")
+                if ($(this).attr("id") == "chromeperfectpixel-coordX")
                     ChromePerfectPixel.change(false, $(this).val(), false);
-                if ($(this).attr("id") == "coordY")
+                if ($(this).attr("id") == "chromeperfectpixel-coordY")
                     ChromePerfectPixel.change(false, false, $(this).val());
             }
         });
@@ -98,7 +97,7 @@ var ChromePerfectPixel = new function () {
     var default_width_px = 300;
     var default_height_px = 300;
     var default_zIndex = 1000;
-    var overlayUniqueId = 'overlay_3985123731465987';
+    var overlayUniqueId = 'chromeperfectpixel-overlay_3985123731465987';
 
     // Overlay
     this.createOverlay = function () {
@@ -126,7 +125,9 @@ var ChromePerfectPixel = new function () {
 
             overlay.draggable({
                 drag: ChromePerfectPixel.onOverlayUpdate,
-                stop: ChromePerfectPixel.onOverlayUpdate
+                stop: function () {
+                    ChromePerfectPixel.onOverlayUpdate(true);
+                }
             });
         }
 
@@ -158,18 +159,23 @@ var ChromePerfectPixel = new function () {
         }
     }
 
-    this.onOverlayUpdate = function () {
+    this.onOverlayUpdate = function (isStop) {
         var overlay = $('#' + overlayUniqueId);
-        var X = overlay[0].offsetLeft;
-        var Y = overlay[0].offsetTop;
-        var Opacity = overlay.css('opacity');
+        var x = overlay[0].offsetLeft;
+        var y = overlay[0].offsetTop;
+        var opacity = overlay.css('opacity');
 
-        chrome.extension.sendRequest({ Type: 'OverlayChanged', X: X, Y: Y, Opacity: Opacity });
+        ChromePerfectPixel.updateCoordsUI(x, y, opacity);
+
+        if (isStop) {
+            // update storage
+            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity });
+        }
     }
 
     // Layers
     this.renderLayers = function () {
-        var container = $('#layers');
+        var container = $('#chromeperfectpixel-layers');
         container.empty();
         var overlays = PPStorage.GetOverlays();
         for (var i = 0; i < overlays.length; i++) {
@@ -179,9 +185,9 @@ var ChromePerfectPixel = new function () {
     }
 
     this.renderLayer = function (overlay) {
-        var container = $('#layers');
+        var container = $('#chromeperfectpixel-layers');
         var layer = $('<div></div>', {
-            class: 'layer',
+            class: 'chromeperfectpixel-layer',
             data: {
                 Id: overlay.Id
             }
@@ -190,7 +196,7 @@ var ChromePerfectPixel = new function () {
         var coeff = overlay.Height / thumbHeight;
         var thumbWidth = Math.ceil(overlay.Width / coeff);
         var thumb = $('<img />', {
-            class: 'thumb',
+            class: 'chromeperfectpixel-thumb',
             src: overlay.Url,
             css: {
                 width: thumbWidth + 'px',
@@ -198,11 +204,11 @@ var ChromePerfectPixel = new function () {
             }
         });
 
-        layer.append($('<input type=checkbox name="selectedLayer" />'));
+        layer.append($('<input type=checkbox name="chromeperfectpixel-selectedLayer" />'));
         layer.append(thumb);
-        var deleteBtn = ($('<input type=button class="delete" value="X" />'));
+        var deleteBtn = ($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
         deleteBtn.bind('click', function () {
-            ChromePerfectPixel.deleteLayer($(this).parents('.layer'));
+            ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
         });
         layer.append(deleteBtn);
         container.append(layer);
@@ -233,26 +239,18 @@ var ChromePerfectPixel = new function () {
         if (!overlayId || overlayId == null)
             overlayId = 0;
 
-        $('input[name="selectedLayer"]').removeAttr('checked');
-        $('input[name="selectedLayer"]').filter(function () {
-            return $(this).parents('.layer').data("Id") == overlayId
+        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').removeAttr('checked');
+        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').filter(function () {
+            return $(this).parents('.chromeperfectpixel-layer').data("Id") == overlayId
         }).attr('checked', 'checked');
 
         GlobalStorage.set_CurrentOverlayId(overlayId);
-        ChromePerfectPixel.refreshCoords();
+        var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
+        ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity);
         ChromePerfectPixel.createOverlay();
     }
 
     // end Layers
-
-    this.refreshCoords = function () {
-        var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
-        if (overlay != null) {
-            $('#coordX').val(overlay.X);
-            $('#coordY').val(overlay.Y);
-            $('#opacity').val(Number(overlay.Opacity).toFixed(1));
-        }
-    }
 
     this.upload = function (files, uploadElem) {
         file = files[0];
@@ -284,50 +282,60 @@ var ChromePerfectPixel = new function () {
     }
 
     // UI
+
+    this.updateCoordsUI = function (x, y, opacity) {
+        //        var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
+        //        if (overlay != null) {
+        $('#chromeperfectpixel-coordX').val(x);
+        $('#chromeperfectpixel-coordY').val(y);
+        $('#chromeperfectpixel-opacity').val(Number(opacity).toFixed(1));
+        //}
+    }
+
     this.opacity = function (button) {
         var offset = 0;
-        if (button.attr('id') == "opless") {
-            if ($('input#opacity').val() >= 0.11)
+        if (button.attr('id') == "chromeperfectpixel-opless") {
+            if ($('input#chromeperfectpixel-opacity').val() >= 0.11)
                 offset = 0.1;
             else offset = 0;
         }
         else {
-            if ($('input#opacity').val() <= 0.99)
+            if ($('input#chromeperfectpixel-opacity').val() <= 0.99)
                 offset = -0.1;
             else offset = 0;
         }
-        var thisOpacity = Number($('input#opacity').val() - offset).toFixed(1);
-        $('input#opacity').val(thisOpacity);
+        var thisOpacity = Number($('input#chromeperfectpixel-opacity').val() - offset).toFixed(1);
+        $('input#chromeperfectpixel-opacity').val(thisOpacity);
         ChromePerfectPixel.change(thisOpacity, false, false);
     }
 
     this.xleft = function (button) {
         var offset = 0;
-        if (button.attr('id') == "xless") {
-            if ($('input#coordX').val() >= 0)
+        if (button.attr('id') == "chromeperfectpixel-xless") {
+            if ($('input#chromeperfectpixel-coordX').val() >= 0)
                 offset = 1;
             else offset = 0;
         }
         else {
             offset = -1;
         }
-        var thisX = $('input#coordX').val() - offset;
-        $('input#coordX').val(thisX);
+        var thisX = $('input#chromeperfectpixel-coordX').val() - offset;
+        $('input#chromeperfectpixel-coordX').val(thisX);
         ChromePerfectPixel.change(false, thisX, false);
     }
 
     this.xtop = function (button) {
         var offset = 0;
-        if (button.attr('id') == "yless") {
-            if ($('input#coordY').val() >= 0)
+        if (button.attr('id') == "chromeperfectpixel-yless") {
+            if ($('input#chromeperfectpixel-coordY').val() >= 0)
                 offset = 1;
             else offset = 0;
         }
         else {
             offset = -1;
         }
-        var thisY = $('input#coordY').val() - offset;
-        $('input#coordY').val(thisY);
+        var thisY = $('input#chromeperfectpixel-coordY').val() - offset;
+        $('input#chromeperfectpixel-coordY').val(thisY);
         ChromePerfectPixel.change(false, false, thisY);
     }
 

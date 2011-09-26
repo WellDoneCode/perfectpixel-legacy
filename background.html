@@ -1,13 +1,6 @@
 ﻿<script src="images.js" type="text/javascript"></script>
 <script src="shared.js" type="text/javascript"></script>
 <script type="text/javascript">
-    chrome.extension.onRequest.addListener(function(request, sender, sendResponse)
-    {
-        if(request.Type == 'OverlayChanged')
-        {
-            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), request);
-        }
-    });
     
     //React when a browser action's icon is clicked.
     chrome.browserAction.onClicked.addListener(function(tab) {

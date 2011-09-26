@@ -51,19 +51,19 @@
     font-weight:bold;
 }
 
-#chromeperfectpixel-panel #layers {
+#chromeperfectpixel-panel #chromeperfectpixel-layers {
     border: 1px solid blue;
 }
             
-#chromeperfectpixel-panel .layer {
+#chromeperfectpixel-panel .chromeperfectpixel-layer {
     border: 1px solid black;
     padding: 5px;
 }
             
-#chromeperfectpixel-panel .layer checkbox {
+#chromeperfectpixel-panel .chromeperfectpixel-layer checkbox {
     padding-right: 10px;
 }
             
-#chromeperfectpixel-panel .layer .delete {
+#chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {
     float: right;
 }
