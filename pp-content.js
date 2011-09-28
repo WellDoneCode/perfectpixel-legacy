@@ -84,7 +84,6 @@ var createPanel = function () {
         });
 
         // On load
-
         $('#chromeperfectpixel-panel').draggable({handle: "h1"});
         $('#chromeperfectpixel-panel button').button();
         ChromePerfectPixel.renderLayers();
@@ -117,6 +116,10 @@ var ChromePerfectPixel = new function () {
     var default_zIndex = 1000;
     var overlayUniqueId = 'chromeperfectpixel-overlay_3985123731465987';
 
+    this.get_KeyboardEnabled = function () {
+        return true;
+    }
+
     // Overlay
     this.createOverlay = function () {
         if ($('#' + overlayUniqueId).length > 0) {
@@ -141,6 +144,22 @@ var ChromePerfectPixel = new function () {
             });
             $('body').append(overlay);
 
+            overlay.bind('mousewheel', function (event) {
+                if (event.wheelDelta < 0) {
+                    overlay.css('opacity', Number(overlay.css('opacity')) - 0.05);
+                } else {
+                    overlay.css('opacity', Number(overlay.css('opacity')) + 0.05);
+                }
+                event.stopPropagation();
+                event.preventDefault();
+                ChromePerfectPixel.onOverlayUpdate(true);
+            });
+
+            if (ChromePerfectPixel.get_KeyboardEnabled()) {
+                $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
+                document.body.onkeydown = ChromePerfectPixel.onKeyDown;
+            }
+
             overlay.draggable({
                 drag: ChromePerfectPixel.onOverlayUpdate,
                 stop: function () {
@@ -162,8 +181,17 @@ var ChromePerfectPixel = new function () {
     }
 
     this.removeOverlay = function () {
+        if (ChromePerfectPixel.get_KeyboardEnabled()) {
+            var oldonkeydown = $(document.body).attr('data-chromeperfectpixel-oldonkeydown');
+            if (!oldonkeydown)
+                oldonkeydown = null;
+            document.body.onkeydown = oldonkeydown;
+            $(document.body).removeAttr('data-chromeperfectpixel-oldonkeydown');
+        }
+
         if ($('#' + overlayUniqueId).length > 0) {
             $('#' + overlayUniqueId).attr('src', '');
+            $('#' + overlayUniqueId).unbind();
             $('#' + overlayUniqueId).remove();
         }
     }
@@ -187,8 +215,30 @@ var ChromePerfectPixel = new function () {
 
         if (isStop) {
             // update storage
-            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), {X: x, Y: y, Opacity: opacity});
+            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity });
         }
+    }
+
+    this.onKeyDown = function (event) {
+        var overlay = $('#' + overlayUniqueId);
+        if (event.which == 37) { // left
+            overlay.css('left', parseFloat(overlay.css('left')) - 1 + 'px');
+        }
+        else if (event.which == 38) { // up
+            overlay.css('top', parseFloat(overlay.css('top')) - 1 + 'px');
+        }
+        else if (event.which == 39) { // right
+            overlay.css('left', parseFloat(overlay.css('left')) + 1 + 'px');
+        }
+        else if (event.which == 40) { // down
+            overlay.css('top', parseFloat(overlay.css('top')) + 1 + 'px');
+        }
+        else
+            return;
+
+        event.stopPropagation();
+        event.preventDefault();
+        ChromePerfectPixel.onOverlayUpdate(true);
     }
 
     // Layers
@@ -237,16 +287,17 @@ var ChromePerfectPixel = new function () {
             var overlayId = $(layer).data('Id');
             PPStorage.DeleteOverlay(overlayId);
 
-            ChromePerfectPixel.renderLayers();
-
             var overlaysCount = PPStorage.GetOverlaysCount();
-            if (overlaysCount > 0 && overlaysCount <= GlobalStorage.get_CurrentOverlayId()) {
+            if ((overlaysCount > 0 && overlaysCount <= GlobalStorage.get_CurrentOverlayId())
+                || overlayId < GlobalStorage.get_CurrentOverlayId()) {
                 ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId() - 1);
             }
             else if (overlaysCount == 0) {
                 ChromePerfectPixel.removeOverlay();
                 GlobalStorage.set_CurrentOverlayId(null);
             }
+
+            ChromePerfectPixel.renderLayers();
         }
     }
 
@@ -288,7 +339,12 @@ var ChromePerfectPixel = new function () {
 
         PPStorage.SaveOverlayFromFile(file,
         function (overlay) {
-            $($(uploadElem).parent()).html($(uploadElem).parent().html()); // Hack Clear file upload
+            // Hack Clear file upload
+            $('#chromeperfectpixel-fileUploader').unbind('change');
+            $($(uploadElem).parent()).html($(uploadElem).parent().html());
+            $('#chromeperfectpixel-fileUploader').bind('change', function () {
+                ChromePerfectPixel.upload(this.files, this);
+            });
 
             if (overlay == null)
                 return;
@@ -302,25 +358,22 @@ var ChromePerfectPixel = new function () {
     // UI
 
     this.updateCoordsUI = function (x, y, opacity) {
-        //        var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
-        //        if (overlay != null) {
         $('#chromeperfectpixel-coordX').val(x);
         $('#chromeperfectpixel-coordY').val(y);
         $('#chromeperfectpixel-opacity').val(Number(opacity).toFixed(1));
-        //}
     }
 
     this.opacity = function (input) {
         /*var offset = 0;
         if (button.attr('id') == "chromeperfectpixel-opless") {
-            if ($('input#chromeperfectpixel-opacity').val() >= 0.11)
-                offset = 0.1;
-            else offset = 0;
+        if ($('input#chromeperfectpixel-opacity').val() >= 0.11)
+        offset = 0.1;
+        else offset = 0;
         }
         else {
-            if ($('input#chromeperfectpixel-opacity').val() <= 0.99)
-                offset = -0.1;
-            else offset = 0;
+        if ($('input#chromeperfectpixel-opacity').val() <= 0.99)
+        offset = -0.1;
+        else offset = 0;
         }
         var thisOpacity = Number($('input#chromeperfectpixel-opacity').val() - offset).toFixed(1);
         $('input#chromeperfectpixel-opacity').val(thisOpacity);*/
