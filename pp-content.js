@@ -18,28 +18,27 @@ var createPanel = function () {
                         '<button id="chromeperfectpixel-xmore">&rarr;</button>' +
                         '<div>' +
                             '<div>' +
-                                '<span>X:</span>' +
+                                '<div class="chromeperfectpixel-coords-label">X:</div>' +
                                 '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
                             '</div>' +
                             '<div>' +
-                                '<span>Y:</span>' +
+                                '<div class="chromeperfectpixel-coords-label">Y:</div>' +
                                 '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
-                
-                
 
                 '<div>Layers:</div>' +
                 '<div id="chromeperfectpixel-layers"></div>' +
 
-                'Add new layer:' +
-                '<div>' +
-                    '<input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" />' +
-                '</div>' +
-                '<div>' +
-                    '<input id="chromeperfectpixel-showHideBtn" type="button" value="Show/Hide" />' +
+                '<div id="chromeperfectpixel-buttons">' +
+                    '<button id="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
+
+                    '<div id="chromeperfectpixel-upload-area">' +
+                        '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
+                        '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
+                    '</div>' +
                 '</div>' +
             '</div>';
 
@@ -50,6 +49,9 @@ var createPanel = function () {
             ChromePerfectPixel.toggleOverlay();
         });
 
+        $('#chromeperfectpixel-fakefile').bind('click', function () {
+            $(this).parent().find('input[type=file]').click();
+        });
         $('#chromeperfectpixel-fileUploader').bind('change', function () {
             ChromePerfectPixel.upload(this.files, this);
         });
@@ -59,8 +61,8 @@ var createPanel = function () {
             var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
             ChromePerfectPixel.setCurrentLayer(overlayId);
         });
-        
-        $('#chromeperfectpixel-opacity').change(function() {
+
+        $('#chromeperfectpixel-opacity').change(function () {
             ChromePerfectPixel.opacity($(this));
         });
 
@@ -84,7 +86,7 @@ var createPanel = function () {
         });
 
         // On load
-        $('#chromeperfectpixel-panel').draggable({handle: "h1"});
+        $('#chromeperfectpixel-panel').draggable({ handle: "h1" });
         $('#chromeperfectpixel-panel button').button();
         ChromePerfectPixel.renderLayers();
     }
@@ -274,10 +276,12 @@ var ChromePerfectPixel = new function () {
 
         layer.append($('<input type=checkbox name="chromeperfectpixel-selectedLayer" />'));
         layer.append(thumb);
-        var deleteBtn = ($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
+        var deleteBtn = ($('<button class="chromeperfectpixel-delete">X</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
         deleteBtn.bind('click', function () {
             ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
         });
+        deleteBtn.button(); // apply css
+
         layer.append(deleteBtn);
         container.append(layer);
     }

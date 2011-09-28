@@ -81,7 +81,7 @@
             width:30px;
             height:30px;
             position:absolute;
-            
+            padding: 0;
         }
             #chromeperfectpixel-panel #chromeperfectpixel-origin-controls button span {
                 text-align:center;
@@ -109,14 +109,23 @@
             left:0;
         }
 
+#chromeperfectpixel-panel button {
+    padding: 5px;    
+}
+
+#chromeperfectpixel-panel button span {
+    text-align:center;
+}
 
 #chromeperfectpixel-panel #chromeperfectpixel-layers {
-    border: 1px solid blue;
+    /*border: 1px solid blue;*/
+    padding: 5px 0 5px 0;
 }
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer {
-    border: 1px solid black;
+    border: 1px dashed black;
     padding: 5px;
+    margin-top: 1px;
 }
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer checkbox {
@@ -125,4 +134,36 @@
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {
     float: right;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-buttons
+{
+    padding-top: 5px;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-upload-area
+{
+    float: left;
+    position: relative;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-upload-area input[type=file] {
+	position: relative;
+	text-align: right;
+	width: 95px;
+	opacity: 0;
+	z-index: 1;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-upload-area #chromeperfectpixel-fakefile {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	z-index: 2;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-coords-label
+{
+    display: inline-block;
+    width:15px;
 }
