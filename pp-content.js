@@ -275,8 +275,8 @@ var ChromePerfectPixel = new function () {
         });
 
         layer.append($('<input type=checkbox name="chromeperfectpixel-selectedLayer" />'));
-        layer.append(thumb);
-        var deleteBtn = ($('<button class="chromeperfectpixel-delete">X</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
+        layer.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
+        var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
         deleteBtn.bind('click', function () {
             ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
         });

@@ -59,7 +59,7 @@
 
 #chromeperfectpixel-panel #chromeperfectpixel-section-opacity span  {
     position:relative;
-    top:-3px;
+    top:-2px;
     padding-right:20px;
 }
 #chromeperfectpixel-panel #chromeperfectpixel-section-opacity input[type=range] {
@@ -127,13 +127,25 @@
     padding: 5px;
     margin-top: 1px;
 }
-            
-#chromeperfectpixel-panel .chromeperfectpixel-layer checkbox {
-    padding-right: 10px;
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer > * {
+    vertical-align: middle;
+}
+          
+#chromeperfectpixel-panel .chromeperfectpixel-layer input[type=checkbox] {
+    margin: 0 15px 0 9px;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-thumbwrapper {
+    display: inline-block;
+    width:203px;
+    text-align:center;
 }
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {
-    float: right;
+    margin: 0 0 0 15px;
+    width:25px;
+    height:25px;
 }
 
 #chromeperfectpixel-panel #chromeperfectpixel-buttons
