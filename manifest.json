@@ -11,11 +11,5 @@
           "128": "icons/128.png" },
   "permissions": [
       "tabs", "http://*/*", "https://*/*"
-  ],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["pp-content.js", "pp-storage.js", "pp-shared.js"]
-    }
   ]
 }
