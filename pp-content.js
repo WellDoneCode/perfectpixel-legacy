@@ -245,11 +245,23 @@ var ChromePerfectPixel = new function () {
 
     // Layers
     this.renderLayers = function () {
+        // disable controls
+        ChromePerfectPixel.updateCoordsUI(default_left_px, default_top_px, default_opacity);
+        $('.chromeperfectpixel-coords').attr('disabled', true);
+        $('#chromeperfectpixel-opacity').attr('disabled', true);
+        $('#chromeperfectpixel-showHideBtn').button("option", "disabled", true);
+        $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
+
         var container = $('#chromeperfectpixel-layers');
         container.empty();
         var overlays = PPStorage.GetOverlays();
         for (var i = 0; i < overlays.length; i++) {
             ChromePerfectPixel.renderLayer(overlays[i]);
+        }
+
+        // enable controls
+        if (overlays.length > 0) {
+            ChromePerfectPixel.enableLayerControls();
         }
         ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
     }
@@ -274,7 +286,8 @@ var ChromePerfectPixel = new function () {
             }
         });
 
-        layer.append($('<input type=checkbox name="chromeperfectpixel-selectedLayer" />'));
+        var checkbox = ($('<input type=checkbox name="chromeperfectpixel-selectedLayer" />'));
+        layer.append(checkbox);
         layer.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
         deleteBtn.bind('click', function () {
@@ -284,6 +297,13 @@ var ChromePerfectPixel = new function () {
 
         layer.append(deleteBtn);
         container.append(layer);
+    }
+
+    this.enableLayerControls = function () {
+        $('.chromeperfectpixel-coords').attr('disabled', false);
+        $('#chromeperfectpixel-opacity').attr('disabled', false);
+        $('#chromeperfectpixel-showHideBtn').button("option", "disabled", false);
+        $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
     }
 
     this.deleteLayer = function (layer) {
@@ -353,6 +373,7 @@ var ChromePerfectPixel = new function () {
             if (overlay == null)
                 return;
             ChromePerfectPixel.renderLayer(overlay);
+            ChromePerfectPixel.enableLayerControls();
 
             if (!GlobalStorage.get_CurrentOverlayId() || PPStorage.GetOverlaysCount() == 1)
                 ChromePerfectPixel.setCurrentLayer(overlay.Id);
@@ -381,6 +402,8 @@ var ChromePerfectPixel = new function () {
         }
         var thisOpacity = Number($('input#chromeperfectpixel-opacity').val() - offset).toFixed(1);
         $('input#chromeperfectpixel-opacity').val(thisOpacity);*/
+        if (input.is(":disabled")) // chrome bug if version < 15.0; opacity input isn't actually disabled
+            return;
         ChromePerfectPixel.change(input.val(), false, false);
     }
 
@@ -388,7 +411,7 @@ var ChromePerfectPixel = new function () {
         var offset = 0;
         if (button.attr('id') == "chromeperfectpixel-xless") {
             //if ($('input#chromeperfectpixel-coordX').val() >= 0)
-                offset = 1;
+            offset = 1;
             //else offset = 0;
         }
         else {
@@ -403,7 +426,7 @@ var ChromePerfectPixel = new function () {
         var offset = 0;
         if (button.attr('id') == "chromeperfectpixel-yless") {
             //if ($('input#chromeperfectpixel-coordY').val() >= 0)
-                offset = 1;
+            offset = 1;
             //else offset = 0;
         }
         else {
