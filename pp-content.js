@@ -4,40 +4,44 @@ var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {
         var panelHtml =
             '<div id="chromeperfectpixel-panel">' +
-                '<h1>ChromePerfectPixel</h1>' +
-                '<div id="chromeperfectpixel-section-opacity">' +
-                    '<span>Opacity:</span>' +
-                    '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
+                '<div id="chromeperfectpixel-panel-header">' +
+                    '<h1>ChromePerfectPixel</h1>' +
                 '</div>' +
-                '<div id="chromeperfectpixel-section-origin">' +
-                    '<span>Origin:</span>' +
-                    '<div id="chromeperfectpixel-origin-controls">' +
-                        '<button id="chromeperfectpixel-ymore">&darr;</button>' +
-                        '<button id="chromeperfectpixel-yless">&uarr;</button>' +
-                        '<button id="chromeperfectpixel-xless">&larr;</button>' +
-                        '<button id="chromeperfectpixel-xmore">&rarr;</button>' +
-                        '<div>' +
+                '<div id="chromeperfectpixel-panel-body">' +
+                    '<div id="chromeperfectpixel-section-opacity">' +
+                        '<span>Opacity:</span>' +
+                        '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
+                    '</div>' +
+                    '<div id="chromeperfectpixel-section-origin">' +
+                        '<span>Origin:</span>' +
+                        '<div id="chromeperfectpixel-origin-controls">' +
+                            '<button id="chromeperfectpixel-ymore">&darr;</button>' +
+                            '<button id="chromeperfectpixel-yless">&uarr;</button>' +
+                            '<button id="chromeperfectpixel-xless">&larr;</button>' +
+                            '<button id="chromeperfectpixel-xmore">&rarr;</button>' +
                             '<div>' +
-                                '<div class="chromeperfectpixel-coords-label">X:</div>' +
-                                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
-                            '</div>' +
-                            '<div>' +
-                                '<div class="chromeperfectpixel-coords-label">Y:</div>' +
-                                '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
+                                '<div>' +
+                                    '<div class="chromeperfectpixel-coords-label">X:</div>' +
+                                    '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
+                                '</div>' +
+                                '<div>' +
+                                    '<div class="chromeperfectpixel-coords-label">Y:</div>' +
+                                    '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
+                                '</div>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                '</div>' +
 
-                '<div>Layers:</div>' +
-                '<div id="chromeperfectpixel-layers"></div>' +
+                    '<div>Layers:</div>' +
+                    '<div id="chromeperfectpixel-layers"></div>' +
 
-                '<div id="chromeperfectpixel-buttons">' +
-                    '<button id="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
+                    '<div id="chromeperfectpixel-buttons">' +
+                        '<button id="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
 
-                    '<div id="chromeperfectpixel-upload-area">' +
-                        '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
-                        '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
+                        '<div id="chromeperfectpixel-upload-area">' +
+                            '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
+                            '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
+                        '</div>' +
                     '</div>' +
                 '</div>' +
             '</div>';
@@ -86,7 +90,11 @@ var createPanel = function () {
         });
 
         // On load
-        $('#chromeperfectpixel-panel').draggable({ handle: "h1" });
+        $('#chromeperfectpixel-panel').draggable({ handle: "#chromeperfectpixel-panel-header" });
+        $('#chromeperfectpixel-panel-header').dblclick(function () {
+            $('#chromeperfectpixel-panel-body').toggle();
+        });
+
         $('#chromeperfectpixel-panel button').button();
         ChromePerfectPixel.renderLayers();
     }
