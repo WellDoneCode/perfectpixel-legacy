@@ -1,7 +1,7 @@
 ﻿{
   "name": "ChromePerfectPixel",
   "version": "1.0",
-  "description": "Tool for designed image and developed HTML comparison. Develop your website with per pixel accuracy!",
+  "description": "The extension helps to develop your website with per pixel accuracy!",
   "background_page": "background.html",
   "browser_action": {
     "default_icon": "icons/icon.png"
