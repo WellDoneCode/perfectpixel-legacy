@@ -132,7 +132,9 @@
     vertical-align: middle;
 }
           
-#chromeperfectpixel-panel .chromeperfectpixel-layer input[type=checkbox] {
+#chromeperfectpixel-panel .chromeperfectpixel-layer input[type=checkbox],
+#chromeperfectpixel-panel .chromeperfectpixel-layer input[type=radio]
+{
     margin: 0 15px 0 9px;
 }
 

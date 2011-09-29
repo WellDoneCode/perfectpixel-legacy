@@ -294,7 +294,7 @@ var ChromePerfectPixel = new function () {
             }
         });
 
-        var checkbox = ($('<input type=checkbox name="chromeperfectpixel-selectedLayer" />'));
+        var checkbox = ($('<input type=radio name="chromeperfectpixel-selectedLayer" />'));
         layer.append(checkbox);
         layer.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
