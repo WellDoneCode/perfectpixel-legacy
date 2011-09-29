@@ -387,9 +387,9 @@ var ChromePerfectPixel = new function () {
     this.xleft = function (button) {
         var offset = 0;
         if (button.attr('id') == "chromeperfectpixel-xless") {
-            if ($('input#chromeperfectpixel-coordX').val() >= 0)
+            //if ($('input#chromeperfectpixel-coordX').val() >= 0)
                 offset = 1;
-            else offset = 0;
+            //else offset = 0;
         }
         else {
             offset = -1;
@@ -402,9 +402,9 @@ var ChromePerfectPixel = new function () {
     this.xtop = function (button) {
         var offset = 0;
         if (button.attr('id') == "chromeperfectpixel-yless") {
-            if ($('input#chromeperfectpixel-coordY').val() >= 0)
+            //if ($('input#chromeperfectpixel-coordY').val() >= 0)
                 offset = 1;
-            else offset = 0;
+            //else offset = 0;
         }
         else {
             offset = -1;
@@ -418,13 +418,13 @@ var ChromePerfectPixel = new function () {
         var overlay = $('#' + overlayUniqueId);
         if (opacity != false)
             overlay.css('opacity', opacity);
-        if (left != false) {
+        if (left != false || Number(left) == 0) {
             overlay.css('left', left + "px");
         }
-        if (top != false) {
+        if (top != false || Number(top) == 0) {
             overlay.css('top', top + "px");
         }
-        ChromePerfectPixel.onOverlayUpdate();
+        ChromePerfectPixel.onOverlayUpdate(true);
     }
 }
 

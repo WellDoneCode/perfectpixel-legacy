@@ -139,6 +139,7 @@
 #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-thumbwrapper {
     display: inline-block;
     width:203px;
+    overflow: hidden;
     text-align:center;
 }
             
