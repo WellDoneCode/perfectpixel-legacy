@@ -5,7 +5,7 @@ var createPanel = function () {
         var panelHtml =
             '<div id="chromeperfectpixel-panel">' +
                 '<div id="chromeperfectpixel-panel-header">' +
-                    '<h1>ChromePerfectPixel</h1>' +
+                    '<h1>PerfectPixel</h1>' +
                 '</div>' +
                 '<div id="chromeperfectpixel-panel-body">' +
                     '<div id="chromeperfectpixel-section-opacity">' +
