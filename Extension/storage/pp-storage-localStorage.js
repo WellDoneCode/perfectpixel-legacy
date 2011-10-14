@@ -1,3 +1,5 @@
+// Defend on pp-shared.js (PPOverlay class)
+
 // --------------------------------------------------------------------
 // PPStogare - place where images are stored permanently. Static object
 // --------------------------------------------------------------------
