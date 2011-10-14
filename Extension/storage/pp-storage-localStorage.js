@@ -1,22 +1,7 @@
-// -----------------------------------
-// PPOverlay - abstraction for overlay
-// -----------------------------------
-var PPOverlay = function () {
-    this.Id;
-    this.Url = null;
-    this.Width = 0;
-    this.Height = 0;
-
-    // Position
-    this.X = 50;
-    this.Y = 50;
-    this.Opacity = 0.5;
-}
-
 // --------------------------------------------------------------------
 // PPStogare - place where images are stored permanently. Static object
 // --------------------------------------------------------------------
-var PPStorage = new function () {
+var PPStorage_localStorage = function () {
 
     // -------------------------------
     // Get all PPOverlays from storage

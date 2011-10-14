@@ -1,5 +1,8 @@
 /// <reference path="vs/chrome_extensions.js" />
 
+// Global variables
+var PPStorage = new PPStorage_localStorage();
+
 var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {
         var panelHtml =
