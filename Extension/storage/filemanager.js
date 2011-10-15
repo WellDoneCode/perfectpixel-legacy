@@ -33,7 +33,7 @@ var PPFileManager = new function () {
         else {
             window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
             window.requestFileSystem(window.PERSISTENT, 500 * 1024 * 1024 /*500MB*/, function (filesystem) {
-                console.log('Opened file system: ' + filesystem.name);
+                console.log('PP Opened file system: ' + filesystem.name);
                 PPFileManager.fs = filesystem;
                 callback();
             }, function (e) { PPFileManager._errorHandler(e); callback(); });
@@ -78,11 +78,11 @@ var PPFileManager = new function () {
         var file = ppFile.ToBlob();
 
         this.fs.root.getFile(newFileName, { create: true }, function (fileEntry) {
-            console.log('SaveFile file created');
+            console.log('PP file created');
 
             fileEntry.createWriter(function (fileWriter) {
                 fileWriter.onwriteend = function () {
-                    console.log('SaveFile data written');
+                    console.log('PP data written');
                     ppFile.Name = newFileName;
                     ppFile.Date = fileEntry.lastModifiedDate;
                     callback(ppFile);
@@ -101,7 +101,7 @@ var PPFileManager = new function () {
         this.fs.root.getFile(fileName, { create: false }, function (fileEntry) {
 
             fileEntry.remove(function () {
-                console.log('File removed.');
+                console.log('PP File removed');
                 callback();
             }, function (e) { PPFileManager._errorHandler(e); callback(); });
 
@@ -124,11 +124,11 @@ var PPFileManager = new function () {
         var dirReader = this.fs.root.createReader();
         dirReader.readEntries(function (entries) {
             if (entries.length == 0)
-                console.log('No files to remove.');
+                console.log('PP No files to remove');
 
             for (var i = 0, entry; entry = entries[i]; ++i) {
                 entry.remove(function () {
-                    console.log('File removed.');
+                    console.log('PP File removed');
                 }, PPFileManager._errorHandler);
             }
         }, PPFileManager._errorHandler);

@@ -56,7 +56,7 @@ var PPStorage_filesystem = function () {
             callback(overlay);
         }
         else {
-            console.log("Get file operation");
+            console.log("PP Get file operation");
             var self = this;
             chrome.extension.sendRequest(
             {
@@ -64,7 +64,7 @@ var PPStorage_filesystem = function () {
                 fileName: overlay.FileName
             },
             function (response) {
-                console.log(response.status);
+                console.log("PP " + response.status);
                 if (response.status == "OK") {
                     var bb = new window.WebKitBlobBuilder();
                     bb.append(stringToBuffer(response.arrayBuffer));
@@ -84,7 +84,7 @@ var PPStorage_filesystem = function () {
                     overlay.Url = url;
                     self._cacheOverlaysBlobUrls[overlay.FileName] = url;
                 }
-                
+
                 callback(overlay);
             });
         }
@@ -106,7 +106,7 @@ var PPStorage_filesystem = function () {
         var overlayData = JSON.parse(overlayDataAsStr);
 
         // Delete physical file
-        console.log("Delete file operation");
+        console.log("PP Delete file operation");
         var self = this;
         chrome.extension.sendRequest(
             {
@@ -114,7 +114,7 @@ var PPStorage_filesystem = function () {
                 fileName: overlayData.FileName
             },
             function (response) {
-                console.log(response.status);
+                console.log("PP " + response.status);
 
                 if (response.status == "OK") {
                     for (var i = overlayId; i < overlaysCount - 1; i++) {
@@ -132,6 +132,16 @@ var PPStorage_filesystem = function () {
                     localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
                     localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
 
+                    var blobUrl = self._cacheOverlaysBlobUrls[overlayData.FileName];
+                    if (window.revokeObjectURL) {
+                        window.revokeObjectURL(blobUrl);
+                    } else if (window.revokeBlobURL) {
+                        window.revokeBlobURL(blobUrl);
+                    } else if (window.URL && window.URL.revokeObjectURL) {
+                        window.URL.revokeObjectURL(blobUrl);
+                    } else if (window.webkitURL && window.webkitURL.revokeObjectURL) {
+                        window.webkitURL.revokeObjectURL(blobUrl);
+                    }
                     self._cacheOverlaysBlobUrls[overlayData.FileName] = null;
                 }
 
@@ -150,7 +160,7 @@ var PPStorage_filesystem = function () {
 
         var reader = new FileReader();
         reader.onload = function (e) {
-            console.log("Add file operation");
+            console.log("PP Add file operation");
             chrome.extension.sendRequest(
             {
                 type: PP_RequestType.ADDFILE,
@@ -159,7 +169,7 @@ var PPStorage_filesystem = function () {
                 fileType: file.type
             },
             function (response) {
-                console.log(response.status);
+                console.log("PP " + response.status);
 
                 if (response.status == "OK") {
                     var bb = new window.WebKitBlobBuilder();
@@ -205,7 +215,7 @@ var PPStorage_filesystem = function () {
             });
         }
         reader.onerror = function (stuff) {
-            console.log("error", stuff)
+            console.log("PP error", stuff)
             console.log(stuff.getMessage())
             callback();
         }
