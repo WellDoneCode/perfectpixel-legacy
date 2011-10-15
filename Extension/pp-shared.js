@@ -1,4 +1,5 @@
 /// <reference path="vs/chrome_extensions.js" />
+/// <reference path="vs/webkit_console.js" />
 
 // -----------------------------------
 // PPOverlay - abstraction for overlay

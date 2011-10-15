@@ -44,33 +44,8 @@ var PPStorage_localStorage = function () {
     };
 
     // ----------------------------------
-    // Save PPOverlay object into storage
+    // Save overlay position into storage
     // ----------------------------------
-    this.SaveOverlay = function (overlay) {
-        if (!(overlay instanceof PPOverlay))
-            alert("Object of type PPOverlay should be provided");
-
-        if (!overlay.Id) {
-            // New overlay
-            overlay.Id = this.GetOverlaysCount();
-        }
-
-        var overlayData = { Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
-        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
-
-        try {
-            localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
-            localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
-        } catch (e) {
-            if (e.name == "QUOTA_EXCEEDED_ERR") { //data wasn't successfully saved due to quota exceed
-                alert('Image cannot be uploaded because there are no free space. Please remove other layers or try to upload image with less size');
-                return null;
-            }
-            throw e;
-        }
-        return overlay;
-    };
-
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
@@ -128,7 +103,7 @@ var PPStorage_localStorage = function () {
                     overlay.Width = img[0].offsetWidth;
                     overlay.Height = img[0].offsetHeight;
 
-                    overlay = PPStorage.SaveOverlay(overlay);
+                    overlay = PPStorage._SaveOverlay(overlay);
 
                     span.remove();
                     callback(overlay);
@@ -151,6 +126,32 @@ var PPStorage_localStorage = function () {
         return count;
     }
 
+
+    // Save PPOverlay object into storage
+    this._SaveOverlay = function (overlay) {
+        if (!(overlay instanceof PPOverlay))
+            alert("Object of type PPOverlay should be provided");
+
+        if (!overlay.Id) {
+            // New overlay
+            overlay.Id = this.GetOverlaysCount();
+        }
+
+        var overlayData = { Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
+        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
+
+        try {
+            localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
+            localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
+        } catch (e) {
+            if (e.name == "QUOTA_EXCEEDED_ERR") { //data wasn't successfully saved due to quota exceed
+                alert('Image cannot be uploaded because there are no free space. Please remove other layers or try to upload image with less size');
+                return null;
+            }
+            throw e;
+        }
+        return overlay;
+    };
 };
 //            var getBase64Image = function (img) {
 //                // Create an empty canvas element

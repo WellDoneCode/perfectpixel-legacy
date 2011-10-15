@@ -4,7 +4,7 @@
 <script type="text/javascript">
 
 //    PPFileManager.Init(function () {
-//        PPFileManager.DeleteAllFiles();
+//            PPFileManager._DeleteAllFiles();
 //    });
     
     //React when a browser action's icon is clicked.
@@ -16,12 +16,10 @@
         chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
             chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function () {
                 //chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                    //chrome.tabs.executeScript(null, { file: "storage/filemanager.js" }, function () {
-                        //chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                            //chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                                //chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                                    chrome.tabs.executeScript(null, { code: "togglePanel();" });
-                                //});
+                    //chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
+                        //chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
+                            //chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
+                                chrome.tabs.executeScript(null, { code: "togglePanel();" });
                             //});
                         //});
                     //});
@@ -32,13 +30,10 @@
 
     chrome.extension.onRequest.addListener(
         function (request, sender, sendResponse) {
-            console.log(sender.tab ?
-                    "from a content script:" + sender.tab.url :
-                    "from the extension");
 
             PPFileManager.Init(function () {
                 if (request.type == PP_RequestType.GETFILE) {
-                    // GETGILE handler
+                    // GETFILE handler
 
                     var fileName = request.fileName;
 
@@ -72,13 +67,19 @@
             });
         });
 
-      function sendPPFileResponse(ppFile, sendResponse) {
-          sendResponse(
-            {
-                status: "OK",
-                fileName: ppFile.Name,
-                fileType: ppFile.MimeType,
-                arrayBuffer: bufferToString(ppFile.ArrayBuffer)
-            });
-      }
+        function sendPPFileResponse(ppFile, sendResponse) {
+            if(ppFile)
+                sendResponse(
+                {
+                    status: "OK",
+                    fileName: ppFile.Name,
+                    fileType: ppFile.MimeType,
+                    arrayBuffer: bufferToString(ppFile.ArrayBuffer)
+                });
+            else
+                sendResponse(
+                {
+                    status: "FAIL"
+                });
+        }
  </script>

@@ -1,4 +1,5 @@
 /// <reference path="vs/chrome_extensions.js" />
+/// <reference path="vs/webkit_console.js" />
 
 // Global variables
 var PPStorage = new PPStorage_filesystem();
@@ -261,11 +262,19 @@ var ChromePerfectPixel = new function () {
         $('.chromeperfectpixel-coords').attr('disabled', true);
         $('#chromeperfectpixel-opacity').attr('disabled', true);
         $('#chromeperfectpixel-showHideBtn').button("option", "disabled", true);
+        $('#chromeperfectpixel-fakefile').button("option", "disabled", true);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
 
         var container = $('#chromeperfectpixel-layers');
         container.empty();
+
+        if (PPStorage.GetOverlaysCount() > 0) {
+            container.append("<p>Loading...</p>");
+        }
+
         PPStorage.GetOverlays(function (overlays) {
+            container.empty();
+
             for (var i = 0; i < overlays.length; i++) {
                 ChromePerfectPixel.renderLayer(overlays[i]);
             }
@@ -274,6 +283,9 @@ var ChromePerfectPixel = new function () {
             if (overlays.length > 0) {
                 ChromePerfectPixel.enableLayerControls();
             }
+            else
+                $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
+
             ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
         });
     }
@@ -315,6 +327,7 @@ var ChromePerfectPixel = new function () {
         $('.chromeperfectpixel-coords').attr('disabled', false);
         $('#chromeperfectpixel-opacity').attr('disabled', false);
         $('#chromeperfectpixel-showHideBtn').button("option", "disabled", false);
+        $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
     }
 

@@ -1,9 +1,7 @@
-/// <reference path="vs/chrome_extensions.js" />
+/// <reference path="../vs/chrome_extensions.js" />
+/// <reference path="../vs/webkit_console.js" />
 
 var PPFile = function () {
-//    if (!(fileEntry instanceof File))
-//            alert("Object of type File should be provided to PPFile constructor");
-
     this.ArrayBuffer = null;
     this.Name = null;
     this.MimeType = null;
@@ -17,8 +15,11 @@ var PPFile = function () {
     }
 };
 
+// --------------------------------------------------------------
+// PPFileManager - local filesystem management
 // Must be used only in context of Extension (no content script!)
-var PPFileManagerClass = function () {
+// --------------------------------------------------------------
+var PPFileManager = new function () {
 
     this.fs = null;
 
@@ -31,17 +32,17 @@ var PPFileManagerClass = function () {
         }
         else {
             window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-            window.requestFileSystem(window.PERSISTENT, 50 * 1024 * 1024 /*50MB*/, function (filesystem) {
+            window.requestFileSystem(window.PERSISTENT, 500 * 1024 * 1024 /*500MB*/, function (filesystem) {
                 console.log('Opened file system: ' + filesystem.name);
                 PPFileManager.fs = filesystem;
                 callback();
-            }, PPFileManager.errorHandler);
+            }, function (e) { PPFileManager._errorHandler(e); callback(); });
         }
     }
 
-    // ------------------------------------------
+    // ---------------------------------------------------------------------
     // Read file from filesystem. Returns PPFile object to callback function
-    // ------------------------------------------
+    // ---------------------------------------------------------------------
     this.GetFile = function (fileName, callback) {
         this.fs.root.getFile(fileName, {}, function (fileEntry) {
 
@@ -50,7 +51,7 @@ var PPFileManagerClass = function () {
             fileEntry.file(function (file) {
 
                 var reader = new FileReader();
-                reader.onerror = PPFileManager.errorHandler;
+                reader.onerror = function (e) { PPFileManager._errorHandler(e); callback(); };
                 reader.onloadend = function (e) {
 
                     var ppFile = new PPFile();
@@ -64,14 +65,14 @@ var PPFileManagerClass = function () {
 
                 reader.readAsArrayBuffer(file);
 
-            }, PPFileManager.errorHandler);
+            }, function (e) { PPFileManager._errorHandler(e); callback(); });
 
-        }, PPFileManager.errorHandler);
+        }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
-    // ------------------------------------------
+    // ----------------------------------------------
     // Save file to filesystem. Accepts PPFile object
-    // ------------------------------------------
+    // ----------------------------------------------
     this.SaveFile = function (ppFile, callback) {
         var newFileName = Math.floor(Math.random() * 100000000000000) + '_' + ppFile.Name;
         var file = ppFile.ToBlob();
@@ -89,37 +90,37 @@ var PPFileManagerClass = function () {
 
                 fileWriter.write(file); // Note: write() can take a File or Blob object.
 
-            }, PPFileManager.errorHandler);
-        }, PPFileManager.errorHandler);
+            }, function (e) { PPFileManager._errorHandler(e); callback(); });
+        }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
-    // ------------------------------------------
+    // ---------------------------
     // Delete file from filesystem
-    // ------------------------------------------
+    // ---------------------------
     this.DeleteFile = function (fileName, callback) {
         this.fs.root.getFile(fileName, { create: false }, function (fileEntry) {
 
             fileEntry.remove(function () {
                 console.log('File removed.');
                 callback();
-            }, PPFileManager.errorHandler);
+            }, function (e) { PPFileManager._errorHandler(e); callback(); });
 
-        }, PPFileManager.errorHandler);
+        }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
 
     // Alpha version. For test purposes only
     // TODO return array of PPFile objects
-    this.GetAllFiles = function (callback) {
+    this._GetAllFiles = function (callback) {
         var dirReader = this.fs.root.createReader();
         dirReader.readEntries(function (entries) {
             callback(entries);
-        }, PPFileManager.errorHandler);
+        }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
     // Alpha version. For test purposes only
     // TODO add callback
-    this.DeleteAllFiles = function () {
+    this._DeleteAllFiles = function () {
         var dirReader = this.fs.root.createReader();
         dirReader.readEntries(function (entries) {
             if (entries.length == 0)
@@ -128,13 +129,12 @@ var PPFileManagerClass = function () {
             for (var i = 0, entry; entry = entries[i]; ++i) {
                 entry.remove(function () {
                     console.log('File removed.');
-                }, PPFileManager.errorHandler);
+                }, PPFileManager._errorHandler);
             }
-        }, PPFileManager.errorHandler);
+        }, PPFileManager._errorHandler);
     };
 
-
-    this.errorHandler = function (e) {
+    this._errorHandler = function (e) {
         var msg = '';
 
         switch (e.code) {
@@ -157,10 +157,6 @@ var PPFileManagerClass = function () {
                 msg = 'Unknown Error';
                 break;
         };
-
         console.log('PPFileManager error: ' + msg);
-        alert('PPFileManager error: ' + msg);
-    }
+    };
 };
-
-var PPFileManager = new PPFileManagerClass();

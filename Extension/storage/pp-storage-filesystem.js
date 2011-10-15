@@ -5,6 +5,8 @@
 // --------------------------------------------------------------------
 var PPStorage_filesystem = function () {
 
+    this._cacheOverlaysBlobUrls = [];
+
     // -------------------------------
     // Get all PPOverlays from storage
     // -------------------------------
@@ -28,9 +30,9 @@ var PPStorage_filesystem = function () {
         });
     }
 
-    // -------------------------------
+    // ---------------------------------
     // Get PPOverlay object from storage
-    // -------------------------------
+    // ---------------------------------
     this.GetOverlay = function (id, callback) {
         var overlayDataAsStr = localStorage["overlay" + id + "_data"];
         var overlayPositionAsStr = localStorage["overlay" + id + "_position"];
@@ -48,9 +50,15 @@ var PPStorage_filesystem = function () {
         overlay.Y = overlayPosition.Y;
         overlay.Opacity = overlayPosition.Opacity;
 
-        // TODO get from cache
-        console.log("get overlay operation");
-        chrome.extension.sendRequest(
+        // Lookup in cache for blob Url
+        if (this._cacheOverlaysBlobUrls[overlay.FileName]) {
+            overlay.Url = this._cacheOverlaysBlobUrls[overlay.FileName];
+            callback(overlay);
+        }
+        else {
+            console.log("Get file operation");
+            var self = this;
+            chrome.extension.sendRequest(
             {
                 type: PP_RequestType.GETFILE,
                 fileName: overlay.FileName
@@ -74,39 +82,17 @@ var PPStorage_filesystem = function () {
                     }
 
                     overlay.Url = url;
-                    callback(overlay);
+                    self._cacheOverlaysBlobUrls[overlay.FileName] = url;
                 }
+                
+                callback(overlay);
             });
+        }
     };
 
     // ----------------------------------
-    // Save PPOverlay object into storage
+    // Save overlay position into storage
     // ----------------------------------
-    this.SaveOverlay = function (overlay) {
-        if (!(overlay instanceof PPOverlay))
-            alert("Object of type PPOverlay should be provided");
-
-        if (!overlay.Id) {
-            // New overlay
-            overlay.Id = this.GetOverlaysCount();
-        }
-
-        var overlayData = { Url: overlay.Url, FileName: overlay.FileName, Height: overlay.Height, Width: overlay.Width };
-        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
-
-        try {
-            localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
-            localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
-        } catch (e) {
-            if (e.name == "QUOTA_EXCEEDED_ERR") { //data wasn't successfully saved due to quota exceed
-                alert('Image cannot be uploaded because there are no free space. Please remove other layers or try to upload image with less size');
-                return null;
-            }
-            throw e;
-        }
-        return overlay;
-    };
-
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
@@ -120,7 +106,8 @@ var PPStorage_filesystem = function () {
         var overlayData = JSON.parse(overlayDataAsStr);
 
         // Delete physical file
-        console.log("delete overlay operation");
+        console.log("Delete file operation");
+        var self = this;
         chrome.extension.sendRequest(
             {
                 type: PP_RequestType.DELETEFILE,
@@ -145,8 +132,10 @@ var PPStorage_filesystem = function () {
                     localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
                     localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
 
-                    callback();
+                    self._cacheOverlaysBlobUrls[overlayData.FileName] = null;
                 }
+
+                callback();
             });
     }
 
@@ -161,7 +150,7 @@ var PPStorage_filesystem = function () {
 
         var reader = new FileReader();
         reader.onload = function (e) {
-            console.log("add overlay operation");
+            console.log("Add file operation");
             chrome.extension.sendRequest(
             {
                 type: PP_RequestType.ADDFILE,
@@ -205,52 +194,22 @@ var PPStorage_filesystem = function () {
                         overlay.Width = img[0].offsetWidth;
                         overlay.Height = img[0].offsetHeight;
 
-                        overlay = PPStorage.SaveOverlay(overlay);
+                        overlay = PPStorage._SaveOverlay(overlay);
 
                         span.remove();
                         callback(overlay);
                     });
                 }
+                else
+                    callback();
             });
         }
         reader.onerror = function (stuff) {
             console.log("error", stuff)
             console.log(stuff.getMessage())
-            alert(stuff.getMessage());
+            callback();
         }
         reader.readAsArrayBuffer(file);
-
-        //        var reader = new FileReader();
-
-        //        // Closure to capture the file information.
-        //        reader.onload = (function (theFile) {
-        //            return function (e) {
-        //                var overlay = new PPOverlay();
-        //                overlay.Url = e.target.result;
-
-        //                // Render invisible thumbnail to obtain image width and height.
-        //                var span = $('<span></span>').css('position', 'absolute').css('opacity', 0);
-        //                var img = $('<img />').attr({
-        //                    src: e.target.result,
-        //                    title: theFile.name
-        //                });
-        //                span.append(img);
-        //                $(document.body).append(span);
-
-        //                img.load(function () {
-        //                    overlay.Width = img[0].offsetWidth;
-        //                    overlay.Height = img[0].offsetHeight;
-
-        //                    overlay = PPStorage.SaveOverlay(overlay);
-
-        //                    span.remove();
-        //                    callback(overlay);
-        //                });
-        //            };
-        //        })(file);
-
-        //        // Read in the image file as a data URL.
-        //        reader.readAsDataURL(file);
     };
 
     // ---------------------------------------------------
@@ -264,4 +223,29 @@ var PPStorage_filesystem = function () {
         return count;
     }
 
+    // Save PPOverlay object into storage
+    this._SaveOverlay = function (overlay) {
+        if (!(overlay instanceof PPOverlay))
+            alert("Object of type PPOverlay should be provided");
+
+        if (!overlay.Id) {
+            // New overlay
+            overlay.Id = this.GetOverlaysCount();
+        }
+
+        var overlayData = { Url: overlay.Url, FileName: overlay.FileName, Height: overlay.Height, Width: overlay.Width };
+        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
+
+        try {
+            localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
+            localStorage["overlay" + overlay.Id + "_position"] = JSON.stringify(overlayPosition);
+        } catch (e) {
+            if (e.name == "QUOTA_EXCEEDED_ERR") { //data wasn't successfully saved due to quota exceed
+                alert('Image cannot be uploaded because there are no free space. Please remove other layers or try to upload image with less size');
+                return null;
+            }
+            throw e;
+        }
+        return overlay;
+    };
 };
