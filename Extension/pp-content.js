@@ -182,15 +182,15 @@ var ChromePerfectPixel = new function () {
         }
 
         // Set overlay data
-        var overlayObj = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
-
-        if (overlayObj != null) {
-            $('#' + overlayUniqueId).attr('src', '');
-            $('#' + overlayUniqueId).attr('src', overlayObj.Url)
+        PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlayObj) {
+            if (overlayObj != null) {
+                $('#' + overlayUniqueId).attr('src', '');
+                $('#' + overlayUniqueId).attr('src', overlayObj.Url)
                 .css('width', overlayObj.Width + 'px').css('height', overlayObj.Height + 'px')
                 .css('left', overlayObj.X + 'px').css('top', overlayObj.Y + 'px')
                 .css('opacity', overlayObj.Opacity);
-        }
+            }
+        });
     }
 
     this.removeOverlay = function () {
@@ -265,16 +265,17 @@ var ChromePerfectPixel = new function () {
 
         var container = $('#chromeperfectpixel-layers');
         container.empty();
-        var overlays = PPStorage.GetOverlays();
-        for (var i = 0; i < overlays.length; i++) {
-            ChromePerfectPixel.renderLayer(overlays[i]);
-        }
+        PPStorage.GetOverlays(function (overlays) {
+            for (var i = 0; i < overlays.length; i++) {
+                ChromePerfectPixel.renderLayer(overlays[i]);
+            }
 
-        // enable controls
-        if (overlays.length > 0) {
-            ChromePerfectPixel.enableLayerControls();
-        }
-        ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
+            // enable controls
+            if (overlays.length > 0) {
+                ChromePerfectPixel.enableLayerControls();
+            }
+            ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
+        });
     }
 
     this.renderLayer = function (overlay) {
@@ -320,19 +321,19 @@ var ChromePerfectPixel = new function () {
     this.deleteLayer = function (layer) {
         if (confirm('Are you sure want to delete layer?')) {
             var overlayId = $(layer).data('Id');
-            PPStorage.DeleteOverlay(overlayId);
-
-            var overlaysCount = PPStorage.GetOverlaysCount();
-            if ((overlaysCount > 0 && overlaysCount <= GlobalStorage.get_CurrentOverlayId())
+            PPStorage.DeleteOverlay(overlayId, function () {
+                var overlaysCount = PPStorage.GetOverlaysCount();
+                if ((overlaysCount > 0 && overlaysCount <= GlobalStorage.get_CurrentOverlayId())
                 || overlayId < GlobalStorage.get_CurrentOverlayId()) {
-                ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId() - 1);
-            }
-            else if (overlaysCount == 0) {
-                ChromePerfectPixel.removeOverlay();
-                GlobalStorage.set_CurrentOverlayId(null);
-            }
+                    ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId() - 1);
+                }
+                else if (overlaysCount == 0) {
+                    ChromePerfectPixel.removeOverlay();
+                    GlobalStorage.set_CurrentOverlayId(null);
+                }
 
-            ChromePerfectPixel.renderLayers();
+                ChromePerfectPixel.renderLayers();
+            });
         }
     }
 
@@ -349,9 +350,10 @@ var ChromePerfectPixel = new function () {
         }).attr('checked', 'checked');
 
         GlobalStorage.set_CurrentOverlayId(overlayId);
-        var overlay = PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId());
-        ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity);
-        ChromePerfectPixel.createOverlay();
+        PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlay) {
+            ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity);
+            ChromePerfectPixel.createOverlay();
+        });
     }
 
     // end Layers

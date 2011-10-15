@@ -1,4 +1,4 @@
-// Defend on pp-shared.js (PPOverlay class)
+// Depend on pp-shared.js (PPOverlay class)
 
 // --------------------------------------------------------------------
 // PPStogare - place where images are stored permanently. Static object
@@ -8,19 +8,19 @@ var PPStorage_localStorage = function () {
     // -------------------------------
     // Get all PPOverlays from storage
     // -------------------------------
-    this.GetOverlays = function () {
+    this.GetOverlays = function (callback) {
         var overlaysCount = this.GetOverlaysCount();
         var overlays = [];
         for (var i = 0; i < overlaysCount; i++) {
             overlays[i] = this.GetOverlay(i);
         }
-        return overlays;
+        callback(overlays);
     }
 
     // -------------------------------
     // Get PPOverlay object from storage
     // -------------------------------
-    this.GetOverlay = function (id) {
+    this.GetOverlay = function (id, callback) {
         var overlayDataAsStr = localStorage["overlay" + id + "_data"];
         var overlayPositionAsStr = localStorage["overlay" + id + "_position"];
         if (overlayDataAsStr == null || overlayPositionAsStr == null)
@@ -37,7 +37,10 @@ var PPStorage_localStorage = function () {
         overlay.Y = overlayPosition.Y;
         overlay.Opacity = overlayPosition.Opacity;
 
-        return overlay;
+        if (callback)
+            callback(overlay);
+        else
+            return overlay;
     };
 
     // ----------------------------------
@@ -75,7 +78,7 @@ var PPStorage_localStorage = function () {
     // ----------------------------------
     // Delete overlay from storage
     // ----------------------------------
-    this.DeleteOverlay = function (overlayId) {
+    this.DeleteOverlay = function (overlayId, callback) {
         var overlaysCount = this.GetOverlaysCount();
 
         for (var i = overlayId; i < overlaysCount - 1; i++) {
@@ -92,6 +95,7 @@ var PPStorage_localStorage = function () {
 
         localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
         localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
+        callback();
     }
 
     // ---------------------------------------------------
