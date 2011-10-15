@@ -2,10 +2,14 @@
 <script src="storage/filemanager.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+
+//    PPFileManager.Init(function () {
+//        PPFileManager.DeleteAllFiles();
+//    });
     
     //React when a browser action's icon is clicked.
     chrome.browserAction.onClicked.addListener(function (tab) {
-        PPFileManager.Init();
+        
 
         chrome.tabs.insertCSS(tab.id, { file: "style.css" });
         chrome.tabs.insertCSS(tab.id, { file: "jquery-ui-1.8.16.custom.css" });
@@ -32,39 +36,40 @@
                     "from a content script:" + sender.tab.url :
                     "from the extension");
 
-            if (request.type == PP_RequestType.GETFILE) {
-                // GETGILE handler
+            PPFileManager.Init(function () {
+                if (request.type == PP_RequestType.GETFILE) {
+                    // GETGILE handler
 
-                var fileName = request.fileName;
+                    var fileName = request.fileName;
 
-                PPFileManager.GetFile(fileName, function (ppFile) {
-                    sendPPFileResponse(ppFile, sendResponse);
-                });
-            }
-            else if (request.type == PP_RequestType.ADDFILE) {
-                // ADDFILE handler
-
-                var ppFile = new PPFile();
-                ppFile.ArrayBuffer = stringToBuffer(request.fileData);
-                ppFile.Name = request.fileName;
-                ppFile.MimeType = request.fileType;
-
-                PPFileManager.SaveFile(ppFile, function (ppFileOut) {
-                    sendPPFileResponse(ppFile, sendResponse);
-                });
-            }
-            else if (request.type == PP_RequestType.DELETEFILE) {
-                // DELETEFILE handler
-
-                var fileName = request.fileName;
-
-                PPFileManager.DeleteFile(fileName, function () {
-                    sendResponse(
-                    {
-                        status: "OK"
+                    PPFileManager.GetFile(fileName, function (ppFile) {
+                        sendPPFileResponse(ppFile, sendResponse);
                     });
-                });
-            }
+                }
+                else if (request.type == PP_RequestType.ADDFILE) {
+                    // ADDFILE handler
+
+                    var ppFile = new PPFile();
+                    ppFile.ArrayBuffer = stringToBuffer(request.fileData);
+                    ppFile.Name = request.fileName;
+                    ppFile.MimeType = request.fileType;
+
+                    PPFileManager.SaveFile(ppFile, function (ppFileOut) {
+                        sendPPFileResponse(ppFileOut, sendResponse);
+                    });
+                }
+                else if (request.type == PP_RequestType.DELETEFILE) {
+                    // DELETEFILE handler
+
+                    var fileName = request.fileName;
+
+                    PPFileManager.DeleteFile(fileName, function () {
+                        sendResponse({
+                            status: "OK"
+                        });
+                    });
+                }
+            });
         });
 
       function sendPPFileResponse(ppFile, sendResponse) {
@@ -72,6 +77,7 @@
             {
                 status: "OK",
                 fileName: ppFile.Name,
+                fileType: ppFile.MimeType,
                 arrayBuffer: bufferToString(ppFile.ArrayBuffer)
             });
       }

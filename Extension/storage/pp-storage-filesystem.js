@@ -12,17 +12,19 @@ var PPStorage_filesystem = function () {
         var overlaysCount = this.GetOverlaysCount();
         var overlays = [];
 
-        this._GetOverlaysRecursion(0, overlays, overlaysCount, callback);
+        if (overlaysCount == 0)
+            callback(overlays);
+        var self = this;
+        this._GetOverlaysRecursion(0, self, overlays, overlaysCount, callback);
     }
 
-    this._GetOverlaysRecursion(index, overlaysArray, overlaysCount, finalCallback)
-    {
+    this._GetOverlaysRecursion = function (index, self, overlaysArray, overlaysCount, finalCallback) {
         this.GetOverlay(index, function (overlay) {
             overlaysArray[index] = overlay;
             if ((index + 1) == overlaysCount)
                 finalCallback(overlaysArray);
             else
-                this._GetOverlaysRecursion(index + 1, overlaysArray, overlaysCount, finalCallback);
+                self._GetOverlaysRecursion(index + 1, self, overlaysArray, overlaysCount, finalCallback);
         });
     }
 
@@ -54,11 +56,11 @@ var PPStorage_filesystem = function () {
                 fileName: overlay.FileName
             },
             function (response) {
-                console.log(response.message);
-                if (response.message == "OK") {
+                console.log(response.status);
+                if (response.status == "OK") {
                     var bb = new window.WebKitBlobBuilder();
                     bb.append(stringToBuffer(response.arrayBuffer));
-                    var blob = bb.getBlob(file.type);
+                    var blob = bb.getBlob(response.fileType);
 
                     var url;
                     if (window.createObjectURL) {
@@ -125,24 +127,26 @@ var PPStorage_filesystem = function () {
                 fileName: overlayData.FileName
             },
             function (response) {
-                console.log(response.message);
+                console.log(response.status);
 
-                for (var i = overlayId; i < overlaysCount - 1; i++) {
-                    // use temp variables to prevent QUOTA_EXCEEDED_ERR during copy
-                    var dataToCopy = localStorage["overlay" + (i + 1) + "_data"];
-                    var positionToCopy = localStorage["overlay" + (i + 1) + "_position"];
+                if (response.status == "OK") {
+                    for (var i = overlayId; i < overlaysCount - 1; i++) {
+                        // use temp variables to prevent QUOTA_EXCEEDED_ERR during copy
+                        var dataToCopy = localStorage["overlay" + (i + 1) + "_data"];
+                        var positionToCopy = localStorage["overlay" + (i + 1) + "_position"];
 
-                    localStorage.removeItem("overlay" + (i + 1) + "_data");
-                    localStorage.removeItem("overlay" + (i + 1) + "_position");
+                        localStorage.removeItem("overlay" + (i + 1) + "_data");
+                        localStorage.removeItem("overlay" + (i + 1) + "_position");
 
-                    localStorage["overlay" + i + "_data"] = dataToCopy;
-                    localStorage["overlay" + i + "_position"] = positionToCopy;
+                        localStorage["overlay" + i + "_data"] = dataToCopy;
+                        localStorage["overlay" + i + "_position"] = positionToCopy;
+                    }
+
+                    localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
+                    localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
+
+                    callback();
                 }
-
-                localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
-                localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
-
-                callback();
             });
     }
 
@@ -166,12 +170,12 @@ var PPStorage_filesystem = function () {
                 fileType: file.type
             },
             function (response) {
-                console.log(response.message);
+                console.log(response.status);
 
-                if (response.message == "OK") {
+                if (response.status == "OK") {
                     var bb = new window.WebKitBlobBuilder();
                     bb.append(stringToBuffer(response.arrayBuffer));
-                    var blob = bb.getBlob(file.type);
+                    var blob = bb.getBlob(response.fileType);
 
                     var url;
                     if (window.createObjectURL) {

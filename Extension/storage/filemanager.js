@@ -18,27 +18,32 @@ var PPFile = function () {
 };
 
 // Must be used only in context of Extension (no content script!)
-var PPFileManager = new function () {
+var PPFileManagerClass = function () {
 
     this.fs = null;
 
     // ------------------------
     // Initialize PPFileManager
     // ------------------------
-    this.Init = function()
-    {
-        window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-        window.requestFileSystem(window.PERSISTENT, 50 * 1024 * 1024 /*50MB*/, function (filesystem) {
-            console.log('Opened file system: ' + fs.name);
-            PPFileManager.fs = filesystem;
-        }, PPFileManager.errorHandler);
+    this.Init = function (callback) {
+        if (this.fs) {
+            callback();
+        }
+        else {
+            window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+            window.requestFileSystem(window.PERSISTENT, 50 * 1024 * 1024 /*50MB*/, function (filesystem) {
+                console.log('Opened file system: ' + filesystem.name);
+                PPFileManager.fs = filesystem;
+                callback();
+            }, PPFileManager.errorHandler);
+        }
     }
 
     // ------------------------------------------
     // Read file from filesystem. Returns PPFile object to callback function
     // ------------------------------------------
     this.GetFile = function (fileName, callback) {
-        fs.root.getFile(fileName, {}, function (fileEntry) {
+        this.fs.root.getFile(fileName, {}, function (fileEntry) {
 
             // Get a File object representing the file,
             // then use FileReader to read its contents.
@@ -49,10 +54,10 @@ var PPFileManager = new function () {
                 reader.onloadend = function (e) {
 
                     var ppFile = new PPFile();
-                    ppFile.ArrayBuffer = e.result;
-                    PPFile.Name = file.name;
-                    PPFile.MimeType = file.type;
-                    PPFile.Date = file.lastModifiedDate;
+                    ppFile.ArrayBuffer = this.result;
+                    ppFile.Name = file.name;
+                    ppFile.MimeType = file.type;
+                    ppFile.Date = file.lastModifiedDate;
 
                     callback(ppFile);
                 };
@@ -68,29 +73,31 @@ var PPFileManager = new function () {
     // Save file to filesystem. Accepts PPFile object
     // ------------------------------------------
     this.SaveFile = function (ppFile, callback) {
-        //var newFileName = Math.floor(Math.random() * 100000000000000) + '_' + ppFile.Name;
+        var newFileName = Math.floor(Math.random() * 100000000000000) + '_' + ppFile.Name;
         var file = ppFile.ToBlob();
 
-        (function (f) {
-            filesystem.root.getFile(ppFile.Name, { create: true, exclusive: true }, function (fileEntry) {
-                fileEntry.createWriter(function (fileWriter) {
-                    fileWriter.onwriteend = function () {
-                        ppFile.Date = fileEntry.lastModifiedDate;
-                        callback(ppFile);
-                    }
+        this.fs.root.getFile(newFileName, { create: true }, function (fileEntry) {
+            console.log('SaveFile file created');
 
-                    fileWriter.write(f); // Note: write() can take a File or Blob object.
+            fileEntry.createWriter(function (fileWriter) {
+                fileWriter.onwriteend = function () {
+                    console.log('SaveFile data written');
+                    ppFile.Name = newFileName;
+                    ppFile.Date = fileEntry.lastModifiedDate;
+                    callback(ppFile);
+                }
 
-                }, errorHandler);
-            }, errorHandler);
-        })(file);
+                fileWriter.write(file); // Note: write() can take a File or Blob object.
+
+            }, PPFileManager.errorHandler);
+        }, PPFileManager.errorHandler);
     }
 
     // ------------------------------------------
     // Delete file from filesystem
     // ------------------------------------------
     this.DeleteFile = function (fileName, callback) {
-        fs.root.getFile(fileName, { create: false }, function (fileEntry) {
+        this.fs.root.getFile(fileName, { create: false }, function (fileEntry) {
 
             fileEntry.remove(function () {
                 console.log('File removed.');
@@ -115,6 +122,9 @@ var PPFileManager = new function () {
     this.DeleteAllFiles = function () {
         var dirReader = this.fs.root.createReader();
         dirReader.readEntries(function (entries) {
+            if (entries.length == 0)
+                console.log('No files to remove.');
+
             for (var i = 0, entry; entry = entries[i]; ++i) {
                 entry.remove(function () {
                     console.log('File removed.');
@@ -152,3 +162,5 @@ var PPFileManager = new function () {
         alert('PPFileManager error: ' + msg);
     }
 };
+
+var PPFileManager = new PPFileManagerClass();
