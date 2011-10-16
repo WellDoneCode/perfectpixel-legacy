@@ -158,6 +158,7 @@ var PPStorage_filesystem = function () {
             alert('File must contain image');
         }
 
+        var self = this;
         var reader = new FileReader();
         reader.onload = function (e) {
             console.log("PP Add file operation");
@@ -205,6 +206,7 @@ var PPStorage_filesystem = function () {
                         overlay.Height = img[0].offsetHeight;
 
                         overlay = PPStorage._SaveOverlay(overlay);
+                        self._cacheOverlaysBlobUrls[overlay.FileName] = overlay.Url;
 
                         span.remove();
                         callback(overlay);
@@ -243,7 +245,8 @@ var PPStorage_filesystem = function () {
             overlay.Id = this.GetOverlaysCount();
         }
 
-        var overlayData = { Url: overlay.Url, FileName: overlay.FileName, Height: overlay.Height, Width: overlay.Width };
+        // Url: overlay.Url
+        var overlayData = { FileName: overlay.FileName, Height: overlay.Height, Width: overlay.Width };
         var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
 
         try {

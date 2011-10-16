@@ -57,6 +57,7 @@ function stringToBuffer(str) {
 // PP_RequestType - enum for content script -> extension requests
 // --------------------------------------------------------------
 var PP_RequestType = new function () {
+    this.GetExtensionOptions = "GETEXTOPTIONS";
     this.ADDFILE = "ADDFILE";
     this.GETFILE = "GETFILE";
     this.DELETEFILE = "DELETEFILE";

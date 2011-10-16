@@ -2,7 +2,15 @@
 /// <reference path="vs/webkit_console.js" />
 
 // Global variables
-var PPStorage = new PPStorage_filesystem();
+var ExtOptions;
+var PPStorage;
+
+$(document).ready(function() {
+  chrome.extension.sendRequest({type: PP_RequestType.GetExtensionOptions}, function(theOptions) {
+    ExtOptions = theOptions;
+    PPStorage = ExtOptions.storageCompatibilityMode == true ? new PPStorage_localStorage() : new PPStorage_filesystem();
+  });
+});
 
 var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {

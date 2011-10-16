@@ -1,5 +1,6 @@
 ﻿<script src="pp-shared.js" type="text/javascript"></script>
 <script src="storage/filemanager.js" type="text/javascript"></script>
+<script src="fancy-settings/source/lib/store.js" type="text/javascript" ></script>
 
 <script type="text/javascript">
 
@@ -13,7 +14,7 @@
 
         chrome.tabs.insertCSS(tab.id, { file: "style.css" });
         chrome.tabs.insertCSS(tab.id, { file: "jquery-ui-1.8.16.custom.css" });
-        chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
+        //chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
             chrome.tabs.executeScript(null, { file: "jquery-ui-1.8.16.custom.min.js" }, function () {
                 //chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
                     //chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
@@ -25,12 +26,22 @@
                     //});
                 //});
             });
-        });
+        //});
+    });
+
+    var settings = new Store("settings", {
+        "storageCompatibilityMode": false
     });
 
     chrome.extension.onRequest.addListener(
         function (request, sender, sendResponse) {
 
+            // Event listener for settings
+            if (request.type == PP_RequestType.GetExtensionOptions) {
+                sendResponse(settings.toObject());
+            }
+
+            // Event listener for file operations
             PPFileManager.Init(function () {
                 if (request.type == PP_RequestType.GETFILE) {
                     // GETFILE handler

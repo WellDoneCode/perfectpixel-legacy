@@ -3,6 +3,7 @@
   "version": "1.0",
   "description": "The extension help develop your websites with per pixel accuracy!",
   "background_page": "background.html",
+  "options_page": "fancy-settings/source/index.html",
   "browser_action": {
     "default_icon": "icons/icon.png"
   },
@@ -14,6 +15,6 @@
   ],
   "content_scripts": [{
       "matches": ["<all_urls>"],
-      "js": [ "pp-shared.js", "storage/pp-storage-filesystem.js", "pp-content.js"]
+      "js": [ "jquery-1.6.2.min.js", "pp-shared.js", "storage/pp-storage-localStorage.js", "storage/pp-storage-filesystem.js", "pp-content.js"]
   }]
 }
