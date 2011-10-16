@@ -12,10 +12,5 @@
           "128": "icons/128.png" },
   "permissions": [
       "tabs", "http://*/*", "https://*/*", "unlimitedStorage"
-  ],
-  "content_scripts": [{
-      "matches": ["<all_urls>"],
-	  "css": [ "style.css", "jquery-ui-1.8.16.custom.css" ],
-      "js": [ "jquery-1.6.2.min.js", "jquery-ui-1.8.16.custom.min.js", "pp-shared.js", "storage/pp-storage-localStorage.js", "storage/pp-storage-filesystem.js", "pp-content.js"]
-  }]
+  ]
 }

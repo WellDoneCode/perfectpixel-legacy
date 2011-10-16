@@ -5,11 +5,21 @@
 var ExtOptions;
 var PPStorage;
 
-$(document).ready(function() {
-  chrome.extension.sendRequest({type: PP_RequestType.GetExtensionOptions}, function(theOptions) {
-    ExtOptions = theOptions;
-    PPStorage = ExtOptions.storageCompatibilityMode == true ? new PPStorage_localStorage() : new PPStorage_filesystem();
-  });
+$(document).ready(function () {
+    chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, function (theOptions) {
+        ExtOptions = theOptions;
+        PPStorage = ExtOptions.storageCompatibilityMode == true ? new PPStorage_localStorage() : new PPStorage_filesystem();
+
+        if (!ExtOptions.debugMode) {
+            // disable console messages
+            if (!window.console) window.console = {};
+            var methods = ["log", "debug", "warn", "info"];
+            for (var i = 0; i < methods.length; i++) {
+                console[methods[i]] = function () { };
+            }
+        }
+
+    });
 });
 
 var createPanel = function () {

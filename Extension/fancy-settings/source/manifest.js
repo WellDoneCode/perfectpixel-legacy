@@ -9,6 +9,13 @@ this.manifest = {
             "name": "storageCompatibilityMode",
             "type": "checkbox",
             "label": "Storage compatilibity mode<br/> Check this if you experience problems with images uploading. <i>Note:</i> file size can be max 1.5Mb in compatilibity mode"
+        },
+        {
+            "tab": "General",
+            "group": "Debug",
+            "name": "debugMode",
+            "type": "checkbox",
+            "label": "DEBUG mode"
         }
 //        {
 //            "tab": i18n.get("information"),
