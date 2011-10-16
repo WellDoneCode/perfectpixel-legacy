@@ -36,7 +36,10 @@ var PPFileManager = new function () {
                 console.log('PP Opened file system: ' + filesystem.name);
                 PPFileManager.fs = filesystem;
                 callback();
-            }, function (e) { PPFileManager._errorHandler(e); callback(); });
+            }, function (e) {
+                PPFileManager._errorHandler(e);
+                callback(PPFileManager._generateFileSystemErrorMsg());
+            });
         }
     }
 
@@ -44,6 +47,12 @@ var PPFileManager = new function () {
     // Read file from filesystem. Returns PPFile object to callback function
     // ---------------------------------------------------------------------
     this.GetFile = function (fileName, callback) {
+        if (!this.fs) {
+            console.log('PP Filesystem is not initialized');
+            callback(PPFileManager._generateFileSystemErrorMsg());
+            return;
+        }
+
         this.fs.root.getFile(fileName, {}, function (fileEntry) {
 
             // Get a File object representing the file,
@@ -74,6 +83,12 @@ var PPFileManager = new function () {
     // Save file to filesystem. Accepts PPFile object
     // ----------------------------------------------
     this.SaveFile = function (ppFile, callback) {
+        if (!this.fs) {
+            console.log('PP Filesystem is not initialized');
+            callback(PPFileManager._generateFileSystemErrorMsg());
+            return;
+        }
+
         var newFileName = Math.floor(Math.random() * 100000000000000) + '_' + ppFile.Name;
         var file = ppFile.ToBlob();
 
@@ -98,6 +113,12 @@ var PPFileManager = new function () {
     // Delete file from filesystem
     // ---------------------------
     this.DeleteFile = function (fileName, callback) {
+        if (!this.fs) {
+            console.log('PP Filesystem is not initialized');
+            callback(PPFileManager._generateFileSystemErrorMsg());
+            return;
+        }
+
         this.fs.root.getFile(fileName, { create: false }, function (fileEntry) {
 
             fileEntry.remove(function () {
@@ -134,7 +155,13 @@ var PPFileManager = new function () {
         }, PPFileManager._errorHandler);
     };
 
+    // Errors handling
     this._errorHandler = function (e) {
+        var msg = PPFileManager._getFileErrorMsg(e);
+        console.log('PPFileManager error: ' + msg);
+    };
+
+    this._getFileErrorMsg = function (e) {
         var msg = '';
 
         switch (e.code) {
@@ -157,6 +184,10 @@ var PPFileManager = new function () {
                 msg = 'Unknown Error';
                 break;
         };
-        console.log('PPFileManager error: ' + msg);
+        return msg;
     };
+
+    this._generateFileSystemErrorMsg = function () {
+        return { showToUser: true, message: 'ERROR: Cannot open filesystem.\r\nPlease use Storage compatibility mode in options.\r\n\r\nPossible reason: user\'s profile directory path contains non-latin characters (http://code.google.com/p/chromium/issues/detail?id=94314)' };
+    }
 };

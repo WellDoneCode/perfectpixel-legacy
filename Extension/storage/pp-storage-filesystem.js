@@ -64,7 +64,7 @@ var PPStorage_filesystem = function () {
                 fileName: overlay.FileName
             },
             function (response) {
-                console.log("PP " + response.status);
+                self._handleResponse(response);
                 if (response.status == "OK") {
                     var bb = new window.WebKitBlobBuilder();
                     bb.append(stringToBuffer(response.arrayBuffer));
@@ -114,7 +114,7 @@ var PPStorage_filesystem = function () {
                 fileName: overlayData.FileName
             },
             function (response) {
-                console.log("PP " + response.status);
+                self._handleResponse(response);
 
                 if (response.status == "OK") {
                     for (var i = overlayId; i < overlaysCount - 1; i++) {
@@ -170,7 +170,7 @@ var PPStorage_filesystem = function () {
                 fileType: file.type
             },
             function (response) {
-                console.log("PP " + response.status);
+                self._handleResponse(response);
 
                 if (response.status == "OK") {
                     var bb = new window.WebKitBlobBuilder();
@@ -260,5 +260,11 @@ var PPStorage_filesystem = function () {
             throw e;
         }
         return overlay;
+    };
+
+    this._handleResponse = function (response) {
+        console.log("PP " + response.status);
+        if (response.message && response.showToUser)
+            alert(response.message);
     };
 };
