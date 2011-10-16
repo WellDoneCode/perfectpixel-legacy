@@ -47,6 +47,8 @@ var createPanel = function () {
                     '<div>Layers:</div>' +
                     '<div id="chromeperfectpixel-layers"></div>' +
 
+                    '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
+
                     '<div id="chromeperfectpixel-buttons">' +
                         '<button id="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
 
@@ -277,7 +279,7 @@ var ChromePerfectPixel = new function () {
         container.empty();
 
         if (PPStorage.GetOverlaysCount() > 0) {
-            container.append("<p>Loading...</p>");
+            $('#chromeperfectpixel-progressbar-area').show();
         }
 
         PPStorage.GetOverlays(function (overlays) {
@@ -337,6 +339,7 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-showHideBtn').button("option", "disabled", false);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
+        $('#chromeperfectpixel-progressbar-area').hide();
     }
 
     this.deleteLayer = function (layer) {
@@ -395,8 +398,12 @@ var ChromePerfectPixel = new function () {
         //                    }
         //                }
 
+        $('#chromeperfectpixel-progressbar-area').show();
+
         PPStorage.SaveOverlayFromFile(file,
         function (overlay) {
+            $('#chromeperfectpixel-progressbar-area').hide();
+
             // Hack Clear file upload
             $('#chromeperfectpixel-fileUploader').unbind('change');
             $($(uploadElem).parent()).html($(uploadElem).parent().html());
