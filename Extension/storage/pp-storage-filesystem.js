@@ -156,6 +156,8 @@ var PPStorage_filesystem = function () {
         // Only process image files.
         if (!file.type.match('image.*')) {
             alert('File must contain image');
+            callback();
+            return;
         }
 
         var self = this;

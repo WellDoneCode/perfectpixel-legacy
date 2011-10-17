@@ -80,6 +80,8 @@ var PPStorage_localStorage = function () {
         // Only process image files.
         if (!file.type.match('image.*')) {
             alert('File must contain image');
+            callback();
+            return;
         }
 
         var reader = new FileReader();

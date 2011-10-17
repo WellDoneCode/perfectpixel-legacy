@@ -395,6 +395,12 @@ var ChromePerfectPixel = new function () {
     this.upload = function (files, uploadElem) {
         file = files[0];
 
+        // Only process image files.
+        if (!file.type.match('image.*')) {
+            alert('File must contain image');
+            return;
+        }
+
         //                for (var i = 0; i < files.length; i++) {
         //                    file = files[i];
         //                    if (window.createObjectURL) {
