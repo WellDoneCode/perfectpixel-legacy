@@ -1,6 +1,6 @@
 ﻿{
   "name": "PerfectPixel by WellDoneCode",
-  "version": "1.1",
+  "version": "1.11",
   "description": "The extension help develop your websites with per pixel accuracy!",
   "background_page": "background.html",
   "options_page": "fancy-settings/source/index.html",
