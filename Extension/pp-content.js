@@ -147,7 +147,7 @@ var ChromePerfectPixel = new function () {
     var default_left_px = 50;
     var default_width_px = 300;
     var default_height_px = 300;
-    var default_zIndex = 1000;
+    var default_zIndex = 2147483646;
     var overlayUniqueId = 'chromeperfectpixel-overlay_3985123731465987';
 
     this.get_KeyboardEnabled = function () {
