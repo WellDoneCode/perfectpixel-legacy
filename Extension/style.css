@@ -64,6 +64,7 @@
 }
 #chromeperfectpixel-panel #chromeperfectpixel-section-opacity input[type=range] {
     width: 230px;
+    border: none;
 }
 
 #chromeperfectpixel-panel #chromeperfectpixel-section-origin {
@@ -111,6 +112,11 @@
 
 #chromeperfectpixel-panel button {
     padding: 5px;    
+}
+
+#chromeperfectpixel-panel button.ui-button-text-only span.ui-button-text
+{
+    padding: 5px;
 }
 
 #chromeperfectpixel-panel button span {
@@ -174,6 +180,7 @@
 	position: absolute;
 	left: 0px;
 	top: 0px;
+        white-space:nowrap;
 	z-index: 2;
 }
 
