@@ -49,7 +49,7 @@
 }
 
 #chromeperfectpixel-panel h1 {
-    text-align:center;
+    text-align:center !important;
     cursor:move;
     padding:0 0 10px;
     margin:0;
@@ -85,7 +85,7 @@
             padding: 0;
         }
             #chromeperfectpixel-panel #chromeperfectpixel-origin-controls button span {
-                text-align:center;
+                text-align:center !important;
                 font-size:1.2em;
             }
         #chromeperfectpixel-panel #chromeperfectpixel-origin-controls > div {
@@ -114,13 +114,8 @@
     padding: 5px;    
 }
 
-#chromeperfectpixel-panel button.ui-button-text-only span.ui-button-text
-{
-    padding: 5px;
-}
-
 #chromeperfectpixel-panel button span {
-    text-align:center;
+    text-align:center !important;
 }
 
 #chromeperfectpixel-panel #chromeperfectpixel-layers {
@@ -148,7 +143,7 @@
     display: inline-block;
     width:203px;
     overflow: hidden;
-    text-align:center;
+    text-align:center !important;
 }
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {

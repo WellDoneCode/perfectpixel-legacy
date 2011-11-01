@@ -25,7 +25,7 @@ $(document).ready(function () {
 var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {
         var panelHtml =
-            '<div id="chromeperfectpixel-panel">' +
+            '<div id="chromeperfectpixel-panel" class="chromeperfectpixel-panel">' +
                 '<div id="chromeperfectpixel-panel-header">' +
                     '<h1>PerfectPixel</h1>' +
                 '</div>' +
