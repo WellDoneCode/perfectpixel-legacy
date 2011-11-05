@@ -219,8 +219,18 @@ var PPStorage_filesystem = function () {
             });
         }
         reader.onerror = function (stuff) {
-            console.log("PP error", stuff)
-            console.log(stuff.getMessage())
+            console.log("PP error", stuff);
+
+            if (stuff.getMessage) {
+                console.log(stuff.getMessage());
+            }
+            else {
+                // it might be the local file secutiry error.
+                // See http://stackoverflow.com/questions/6665457/updateusing-filereader-in-chrome
+                if (stuff.type == 'error' && document.location.protocol == 'file:')
+                    alert('It looks like you are trying to use the extension on a local html page. Unfortunately, due to security reasons, Chrome doesn\'t allow scripts to access the local files from the local pages unless you start the browser with --allow-file-access-from-files flag.');
+            }  
+            
             callback();
         }
         reader.readAsArrayBuffer(file);
