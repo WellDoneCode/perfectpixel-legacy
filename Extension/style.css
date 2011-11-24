@@ -12,6 +12,7 @@
     content:none;
     text-transform:none;
     text-shadow:none;
+    list-style:none;
 }
 
 #chromeperfectpixel-panel *:before,
