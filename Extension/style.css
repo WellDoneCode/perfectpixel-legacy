@@ -60,16 +60,13 @@
     top: 8px;
     height: 16px;
     width: 16px;
-}
-
-#chromeperfectpixel-header-showHideBtn:hover
-{
-    cursor: pointer;
+    border: none;
+    border-radius:0px;
 }
 
 #chromeperfectpixel-header-showHideBtn.chromeperfectpixel-showHideBtn-enabled
 {
-    opacity: 1.5;
+    opacity: 1.0;
 }
 
 #chromeperfectpixel-header-showHideBtn.chromeperfectpixel-showHideBtn-disabled

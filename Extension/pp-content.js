@@ -27,7 +27,7 @@ var createPanel = function () {
         var panelHtml =
             '<div id="chromeperfectpixel-panel" class="chromeperfectpixel-panel" style="background:url(' + chrome.extension.getURL("images/noise.jpg") + ');">' +
                 '<div id="chromeperfectpixel-panel-header">' +
-                    '<div id="chromeperfectpixel-header-showHideBtn" class="chromeperfectpixel-showHideBtn chromeperfectpixel-showHideBtn-disabled" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></div>' +
+                    '<button id="chromeperfectpixel-header-showHideBtn" class="chromeperfectpixel-showHideBtn chromeperfectpixel-showHideBtn-disabled" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></button>' +
                     '<h1>PerfectPixel</h1>' +
                 '</div>' +
                 '<div id="chromeperfectpixel-panel-body">' +
