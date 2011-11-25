@@ -27,6 +27,7 @@ var createPanel = function () {
         var panelHtml =
             '<div id="chromeperfectpixel-panel" class="chromeperfectpixel-panel" style="background:url(' + chrome.extension.getURL("images/noise.jpg") + ');">' +
                 '<div id="chromeperfectpixel-panel-header">' +
+                    '<div id="chromeperfectpixel-header-showHideBtn" class="chromeperfectpixel-showHideBtn chromeperfectpixel-showHideBtn-disabled" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></div>' +
                     '<h1>PerfectPixel</h1>' +
                 '</div>' +
                 '<div id="chromeperfectpixel-panel-body">' +
@@ -60,7 +61,7 @@ var createPanel = function () {
                     '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
 
                     '<div id="chromeperfectpixel-buttons">' +
-                        '<button id="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
+                        '<button class="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
 
                         '<div id="chromeperfectpixel-upload-area">' +
                             '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
@@ -73,7 +74,7 @@ var createPanel = function () {
         $('body').append(panelHtml);
 
         // Set event handlers
-        $('#chromeperfectpixel-showHideBtn').bind('click', function () {
+        $('.chromeperfectpixel-showHideBtn').bind('click', function () {
             ChromePerfectPixel.toggleOverlay();
         });
 
@@ -116,28 +117,32 @@ var createPanel = function () {
         // On load
         $('#chromeperfectpixel-panel').draggable({
             handle: "#chromeperfectpixel-panel-header",
-            stop: function(event, ui) {
+            stop: function (event, ui) {
                 // change left to right
                 if ($(this).css('left')) {
-                    $(this).css('right', (window.innerWidth - $(this).offset().left - $(this).width()).toString() + 'px');
+                    $(this).css('right', ($(document.body).innerWidth() - $(this).offset().left - $(this).outerWidth()).toString() + 'px');
                     $(this).css('left', '');
                 }
-            }
+            },
+            cancel: "#chromeperfectpixel-header-showHideBtn"
         });
 
-        $('#chromeperfectpixel-panel-header').dblclick(function () {
+        $('#chromeperfectpixel-panel-header').dblclick(function (event) {
+            if (event.target.id == "chromeperfectpixel-header-showHideBtn")
+                return;
+
             var panel = $('#chromeperfectpixel-panel');
             var body = $('#chromeperfectpixel-panel-body');
-            var panelWidth =  panel.width();
-            
+            var panelWidth = panel.width();
+
             if (body.hasClass('collapsed')) {
                 body.removeClass('collapsed');
                 var state = body.data('state');
-                panel.animate( { right:state.right }, 'fast', function() {
+                panel.animate({ right: state.right }, 'fast', function () {
                     body.animate(
-                        { 'height':state.height, 'padding-bottom':state.paddingBottom }, 
+                        { 'height': state.height, 'padding-bottom': state.paddingBottom },
                         'fast',
-                        function() {
+                        function () {
                             $(this).removeAttr('style');
                             panel.draggable('option', 'axis', '');
                         }
@@ -146,12 +151,12 @@ var createPanel = function () {
             }
             else {
                 body.addClass('collapsed');
-                body.data('state', { height:body.innerHeight(), paddingBottom:body.css('padding-bottom'), right:panel.css('right') });
+                body.data('state', { height: body.innerHeight(), paddingBottom: body.css('padding-bottom'), right: panel.css('right') });
                 $('#chromeperfectpixel-panel-body').animate(
-                    { 'height':0, 'padding-bottom':0 },
+                    { 'height': 0, 'padding-bottom': 0 },
                     'fast',
-                    function() {
-                        panel.animate({ right:(-panelWidth + 30).toString() + "px" }, function() {
+                    function () {
+                        panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
                             panel.draggable('option', 'axis', 'y');
                         });
                     }
@@ -242,6 +247,8 @@ var ChromePerfectPixel = new function () {
             });
         }
 
+        $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-disabled").addClass("chromeperfectpixel-showHideBtn-enabled");
+
         // Set overlay data
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlayObj) {
             if (overlayObj != null) {
@@ -268,6 +275,8 @@ var ChromePerfectPixel = new function () {
             $('#' + overlayUniqueId).unbind();
             $('#' + overlayUniqueId).remove();
         }
+
+        $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-enabled").addClass("chromeperfectpixel-showHideBtn-disabled");
     }
 
     this.toggleOverlay = function () {
@@ -321,7 +330,7 @@ var ChromePerfectPixel = new function () {
         ChromePerfectPixel.updateCoordsUI(default_left_px, default_top_px, default_opacity);
         $('.chromeperfectpixel-coords').attr('disabled', true);
         $('#chromeperfectpixel-opacity').attr('disabled', true);
-        $('#chromeperfectpixel-showHideBtn').button("option", "disabled", true);
+        $('.chromeperfectpixel-showHideBtn').button("option", "disabled", true);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", true);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
 
@@ -386,7 +395,7 @@ var ChromePerfectPixel = new function () {
     this.enableLayerControls = function () {
         $('.chromeperfectpixel-coords').attr('disabled', false);
         $('#chromeperfectpixel-opacity').attr('disabled', false);
-        $('#chromeperfectpixel-showHideBtn').button("option", "disabled", false);
+        $('.chromeperfectpixel-showHideBtn').button("option", "disabled", false);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
         $('#chromeperfectpixel-progressbar-area').hide();

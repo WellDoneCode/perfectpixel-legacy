@@ -48,6 +48,35 @@
     -webkit-transition-delay:0s;
 }
 
+#chromeperfectpixel-panel-header
+{
+    position: relative;
+}
+
+#chromeperfectpixel-header-showHideBtn
+{
+    position:absolute;
+    left: 8px;
+    top: 8px;
+    height: 16px;
+    width: 16px;
+}
+
+#chromeperfectpixel-header-showHideBtn:hover
+{
+    cursor: pointer;
+}
+
+#chromeperfectpixel-header-showHideBtn.chromeperfectpixel-showHideBtn-enabled
+{
+    opacity: 1.5;
+}
+
+#chromeperfectpixel-header-showHideBtn.chromeperfectpixel-showHideBtn-disabled
+{
+    opacity: 0.5;
+}
+
 #chromeperfectpixel-panel h1 {
     text-align:center !important;
     cursor:move;
