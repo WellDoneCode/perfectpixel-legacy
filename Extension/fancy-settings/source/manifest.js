@@ -16,6 +16,13 @@ this.manifest = {
             "name": "debugMode",
             "type": "checkbox",
             "label": "DEBUG mode"
+        },
+        {
+            "tab": "General",
+            "group": "Mouse and Keyboard",
+            "name": "enableHotkeys",
+            "type": "checkbox",
+            "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Ctrl + S - Show/Hide"
         }
 //        {
 //            "tab": i18n.get("information"),

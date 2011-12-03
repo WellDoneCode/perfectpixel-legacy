@@ -53,9 +53,10 @@
     position: relative;
 }
 
-#chromeperfectpixel-header-showHideBtn
+#chromeperfectpixel-header-logo
 {
     position:absolute;
+    cursor:move;
     left: 8px;
     top: 8px;
     height: 16px;

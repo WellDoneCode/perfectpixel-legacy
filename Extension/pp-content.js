@@ -27,7 +27,7 @@ var createPanel = function () {
         var panelHtml =
             '<div id="chromeperfectpixel-panel" class="chromeperfectpixel-panel" style="background:url(' + chrome.extension.getURL("images/noise.jpg") + ');">' +
                 '<div id="chromeperfectpixel-panel-header">' +
-                    '<button id="chromeperfectpixel-header-showHideBtn" class="chromeperfectpixel-showHideBtn chromeperfectpixel-showHideBtn-disabled" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></button>' +
+                    '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></div>' +
                     '<h1>PerfectPixel</h1>' +
                 '</div>' +
                 '<div id="chromeperfectpixel-panel-body">' +
@@ -123,13 +123,13 @@ var createPanel = function () {
                     $(this).css('right', ($(document.body).innerWidth() - $(this).offset().left - $(this).outerWidth()).toString() + 'px');
                     $(this).css('left', '');
                 }
-            },
-            cancel: "#chromeperfectpixel-header-showHideBtn"
+            }
+            //,cancel: "#chromeperfectpixel-header-logo"
         });
 
         $('#chromeperfectpixel-panel-header').dblclick(function (event) {
-            if (event.target.id == "chromeperfectpixel-header-showHideBtn")
-                return;
+            //if (event.target.id == "chromeperfectpixel-header-logo")
+            //    return;
 
             var panel = $('#chromeperfectpixel-panel');
             var body = $('#chromeperfectpixel-panel-body');
