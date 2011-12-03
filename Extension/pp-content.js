@@ -165,12 +165,29 @@ var createPanel = function () {
         });
 
         $('#chromeperfectpixel-panel button').button();
+
+        // Global hotkeys on
+        if (ChromePerfectPixel.get_KeyboardEnabled()) {
+            $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
+            document.body.onkeydown = ChromePerfectPixel.onKeyDown;
+        }
+
         ChromePerfectPixel.renderLayers();
     }
 }
 
 var removePanel = function () {
     ChromePerfectPixel.removeOverlay();
+
+    // Global hotkeys off
+    if (ChromePerfectPixel.get_KeyboardEnabled()) {
+        var oldonkeydown = $(document.body).attr('data-chromeperfectpixel-oldonkeydown');
+        if (!oldonkeydown)
+            oldonkeydown = null;
+        document.body.onkeydown = oldonkeydown;
+        $(document.body).removeAttr('data-chromeperfectpixel-oldonkeydown');
+    }
+
     if ($('#chromeperfectpixel-panel').length > 0) {
         $('#chromeperfectpixel-panel').remove();
     }
@@ -196,7 +213,7 @@ var ChromePerfectPixel = new function () {
     var overlayUniqueId = 'chromeperfectpixel-overlay_3985123731465987';
 
     this.get_KeyboardEnabled = function () {
-        return true;
+        return ExtOptions.enableHotkeys;
     }
 
     // Overlay
@@ -234,11 +251,6 @@ var ChromePerfectPixel = new function () {
                 ChromePerfectPixel.onOverlayUpdate(true);
             });
 
-            if (ChromePerfectPixel.get_KeyboardEnabled()) {
-                $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
-                document.body.onkeydown = ChromePerfectPixel.onKeyDown;
-            }
-
             overlay.draggable({
                 drag: ChromePerfectPixel.onOverlayUpdate,
                 stop: function () {
@@ -262,14 +274,6 @@ var ChromePerfectPixel = new function () {
     }
 
     this.removeOverlay = function () {
-        if (ChromePerfectPixel.get_KeyboardEnabled()) {
-            var oldonkeydown = $(document.body).attr('data-chromeperfectpixel-oldonkeydown');
-            if (!oldonkeydown)
-                oldonkeydown = null;
-            document.body.onkeydown = oldonkeydown;
-            $(document.body).removeAttr('data-chromeperfectpixel-oldonkeydown');
-        }
-
         if ($('#' + overlayUniqueId).length > 0) {
             $('#' + overlayUniqueId).attr('src', '');
             $('#' + overlayUniqueId).unbind();
@@ -316,12 +320,18 @@ var ChromePerfectPixel = new function () {
         else if (event.which == 40) { // down
             overlay.css('top', parseFloat(overlay.css('top')) + 1 + 'px');
         }
+        else if (event.altKey && event.which == 83) { // Alt + s
+            if (PPStorage.GetOverlaysCount() > 0)
+                ChromePerfectPixel.toggleOverlay();
+        }
         else
             return;
 
         event.stopPropagation();
         event.preventDefault();
-        ChromePerfectPixel.onOverlayUpdate(true);
+
+        if($('#' + overlayUniqueId).length > 0)
+            ChromePerfectPixel.onOverlayUpdate(true);
     }
 
     // Layers
