@@ -1,4 +1,4 @@
-﻿<!--
+﻿/*
 
 Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
 
@@ -17,14 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
 
--->
-
-<script src="jquery-1.6.2.min.js" type="text/javascript"></script>
-<script src="pp-shared.js" type="text/javascript"></script>
-<script src="storage/filemanager.js" type="text/javascript"></script>
-<script src="fancy-settings/source/lib/store.js" type="text/javascript" ></script>
-
-<script type="text/javascript">
+*/
 
 //    PPFileManager.Init(function () {
 //            PPFileManager._DeleteAllFiles();
@@ -148,4 +141,3 @@ along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
                     status: "FAIL"
                 });
         }
- </script>
