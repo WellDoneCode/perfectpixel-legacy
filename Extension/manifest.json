@@ -18,20 +18,33 @@
  */
 
 {
-   "background_page": "background.html",
-   "browser_action": {
-      "default_icon": "icons/icon.png"
-   },
-   "description": "The extension help develop your websites with per pixel accuracy!",
-   "icons": {
-      "128": "icons/128.png",
-      "16": "icons/16.png",
-      "48": "icons/48.png"
-   },
-   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDL3tn13WeiqluDvu7YhowZ+iol6gptyVV01cxZnRcpZJKDrXpGja91HXCBxL2gFrQOYZAwWDfbv3FTsbnhgSZlq6oP1qdxHvsou7lcVldoxK+LItzlRCOjfxYbzzE1DGv+Nhh3ohnN3snMC3807ryu0h+bAKKFrtxRyXfR9RRwPQIDAQAB",
-   "name": "PerfectPixel by WellDoneCode",
-   "options_page": "fancy-settings/source/index.html",
-   "permissions": [ "tabs", "\u003Call_urls\u003E", "unlimitedStorage" ],
-   "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.14"
+    "background":{
+        "scripts":[
+            "jquery-1.6.2.min.js",
+            "pp-shared.js",
+            "storage/filemanager.js",
+            "fancy-settings/source/lib/store.js",
+            "background.js"
+        ]
+    },
+    "browser_action":{
+        "default_icon":"icons/icon.png"
+    },
+    "description":"The extension help develop your websites with per pixel accuracy!",
+    "icons":{
+        "128":"icons/128.png",
+        "16":"icons/16.png",
+        "48":"icons/48.png"
+    },
+    "key":"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDL3tn13WeiqluDvu7YhowZ+iol6gptyVV01cxZnRcpZJKDrXpGja91HXCBxL2gFrQOYZAwWDfbv3FTsbnhgSZlq6oP1qdxHvsou7lcVldoxK+LItzlRCOjfxYbzzE1DGv+Nhh3ohnN3snMC3807ryu0h+bAKKFrtxRyXfR9RRwPQIDAQAB",
+    "name":"PerfectPixel by WellDoneCode",
+    "manifest_version":2,
+    "options_page":"fancy-settings/source/index.html",
+    "permissions":[ "tabs", "\u003Call_urls\u003E", "unlimitedStorage" ],
+    "update_url":"http://clients2.google.com/service/update2/crx",
+    "version":"1.14",
+    "web_accessible_resources":[
+        "images/noise.jpg",
+        "icons/16.png"
+    ]
 }
