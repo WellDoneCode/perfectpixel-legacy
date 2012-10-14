@@ -118,7 +118,7 @@ var PPStorage_localStorage = function () {
                     title: theFile.name
                 });
                 span.append(img);
-                $(document.body).append(span);
+                $('#chromeperfectpixel-panel').append(span);
 
                 img.load(function () {
                     overlay.Width = img[0].offsetWidth;
