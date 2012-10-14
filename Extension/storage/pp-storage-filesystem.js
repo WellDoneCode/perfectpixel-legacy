@@ -85,9 +85,8 @@ var PPStorage_filesystem = function () {
             function (response) {
                 self._handleResponse(response);
                 if (response.status == "OK") {
-                    var bb = new window.WebKitBlobBuilder();
-                    bb.append(stringToBuffer(response.arrayBuffer));
-                    var blob = bb.getBlob(response.fileType);
+                    var dataView = new DataView(stringToBuffer(response.arrayBuffer));
+                    var blob = new Blob([dataView],{type:response.fileType});
 
                     var url;
                     if (window.createObjectURL) {
@@ -194,9 +193,9 @@ var PPStorage_filesystem = function () {
                 self._handleResponse(response);
 
                 if (response.status == "OK") {
-                    var bb = new window.WebKitBlobBuilder();
-                    bb.append(stringToBuffer(response.arrayBuffer));
-                    var blob = bb.getBlob(response.fileType);
+//                    console.log(response);
+                    var dataView = new DataView(stringToBuffer(response.arrayBuffer));
+                    var blob = new Blob([dataView],{type:response.fileType});
 
                     var url;
                     if (window.createObjectURL) {

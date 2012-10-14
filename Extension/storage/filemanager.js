@@ -27,10 +27,8 @@ var PPFile = function () {
     this.Date = null;
 
     this.ToBlob = function () {
-        var bb = new window.WebKitBlobBuilder();
-        bb.append(this.ArrayBuffer);
-        var blob = bb.getBlob(this.MimeType);
-        return blob;
+        var dataView = new DataView(this.ArrayBuffer);
+        return new Blob([dataView],{type: this.MimeType});
     }
 };
 
