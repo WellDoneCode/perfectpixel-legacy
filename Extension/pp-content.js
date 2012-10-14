@@ -80,7 +80,7 @@ var createPanel = function () {
                     '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
 
                     '<div id="chromeperfectpixel-buttons">' +
-                        '<button class="chromeperfectpixel-showHideBtn" style="margin-right: 5px; float:left;">Show/Hide</button>' +
+                        '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show/Hide</button>' +
 
                         '<div id="chromeperfectpixel-upload-area">' +
                             '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
