@@ -17,7 +17,6 @@
         "16":"icons/16.png",
         "48":"icons/48.png"
     },
-    "key":"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDL3tn13WeiqluDvu7YhowZ+iol6gptyVV01cxZnRcpZJKDrXpGja91HXCBxL2gFrQOYZAwWDfbv3FTsbnhgSZlq6oP1qdxHvsou7lcVldoxK+LItzlRCOjfxYbzzE1DGv+Nhh3ohnN3snMC3807ryu0h+bAKKFrtxRyXfR9RRwPQIDAQAB",
     "name":"PerfectPixel by WellDoneCode",
     "manifest_version":2,
     "options_page":"fancy-settings/source/index.html",

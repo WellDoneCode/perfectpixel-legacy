@@ -112,13 +112,13 @@ var PPStorage_localStorage = function () {
                 overlay.Url = e.target.result;
 
                 // Render invisible thumbnail to obtain image width and height.
-                var span = $('<span></span>').css('position', 'absolute').css('opacity', 0);
+                var span = $('<span id="chromeperfectpixel-imgtools"></span>').css('position', 'absolute').css('opacity', 0);
                 var img = $('<img />').attr({
                     src: e.target.result,
                     title: theFile.name
                 });
                 span.append(img);
-                $('#chromeperfectpixel-panel').append(span);
+                $(document.body).append(span);
 
                 img.load(function () {
                     overlay.Width = img[0].offsetWidth;
