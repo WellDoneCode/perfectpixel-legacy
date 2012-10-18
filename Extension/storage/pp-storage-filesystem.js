@@ -213,7 +213,7 @@ var PPStorage_filesystem = function () {
                     overlay.FileName = response.fileName;
 
                     // Render invisible thumbnail to obtain image width and height.
-                    var span = $('<span></span>').css('position', 'absolute').css('opacity', 0);
+                    var span = $('<span id="chromeperfectpixel-imgtools"></span>').css('position', 'absolute').css('opacity', 0);
                     var img = $('<img />').attr({
                         src: overlay.Url,
                         title: file.name

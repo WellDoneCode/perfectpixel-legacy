@@ -18,7 +18,9 @@
  */
 
 #chromeperfectpixel-panel,
-#chromeperfectpixel-panel * {
+#chromeperfectpixel-panel *,
+#chromeperfectpixel-imgtools,
+#chromeperfectpixel-imgtools *{
     color:#000;
     padding:0;
     margin:0;
