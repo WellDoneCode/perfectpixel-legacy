@@ -33,6 +33,7 @@ var PPOverlay = function () {
     this.X = 50;
     this.Y = 50;
     this.Opacity = 0.5;
+    this.Scale = 1.0;
 }
 
 

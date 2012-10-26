@@ -68,6 +68,8 @@ var PPStorage_filesystem = function () {
         overlay.X = overlayPosition.X;
         overlay.Y = overlayPosition.Y;
         overlay.Opacity = overlayPosition.Opacity;
+        overlay.Scale = overlayPosition.Scale;
+        if (! overlay.Scale) overlay.Scale = 1.0; //for old images
 
         // Lookup in cache for blob Url
         if (this._cacheOverlaysBlobUrls[overlay.FileName]) {
@@ -277,7 +279,7 @@ var PPStorage_filesystem = function () {
 
         // Url: overlay.Url
         var overlayData = { FileName: overlay.FileName, Height: overlay.Height, Width: overlay.Width };
-        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
+        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity, Scale: overlay.Scale };
 
         try {
             localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);

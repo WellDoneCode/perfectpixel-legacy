@@ -163,6 +163,20 @@
             left:0;
         }
 
+#chromeperfectpixel-section-scale{
+    float: right;
+    margin-top: -16px;
+}
+
+    #chromeperfectpixel-section-scale label{
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    #chromeperfectpixel-section-scale input{
+        width: 45px;
+    }
+
 #chromeperfectpixel-panel button {
     padding: 5px;    
 }
