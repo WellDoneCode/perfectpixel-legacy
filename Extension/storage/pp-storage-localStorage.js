@@ -55,6 +55,8 @@ var PPStorage_localStorage = function () {
         overlay.X = overlayPosition.X;
         overlay.Y = overlayPosition.Y;
         overlay.Opacity = overlayPosition.Opacity;
+        overlay.Scale = overlayPosition.Scale;
+        if (! overlay.Scale) overlay.Scale = 1.0; //for old images
 
         if (callback)
             callback(overlay);
@@ -159,7 +161,7 @@ var PPStorage_localStorage = function () {
         }
 
         var overlayData = { Url: overlay.Url, Height: overlay.Height, Width: overlay.Width };
-        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity };
+        var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity, Scale: overlay.Scale };
 
         try {
             localStorage["overlay" + overlay.Id + "_data"] = JSON.stringify(overlayData);
