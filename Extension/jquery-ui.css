@@ -59,26 +59,26 @@
 .chromeperfectpixel-panel .ui-widget { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 1.1em; }
 .chromeperfectpixel-panel .ui-widget .ui-widget { font-size: 1em; }
 .chromeperfectpixel-panel .ui-widget input, .chromeperfectpixel-panel .ui-widget select, .chromeperfectpixel-panel .ui-widget textarea, .chromeperfectpixel-panel .ui-widget button { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 1em; }
-.chromeperfectpixel-panel .ui-widget-content { border: 1px solid #7e7783; background: #3d3644 url(images/ui-bg_gloss-wave_30_3d3644_500x100.png) 50% top repeat-x; color: #ffffff; }
+.chromeperfectpixel-panel .ui-widget-content { border: 1px solid #7e7783; background: #3d3644 50% top repeat-x; color: #ffffff; }
 .chromeperfectpixel-panel .ui-widget-content a { color: #ffffff; }
-.chromeperfectpixel-panel .ui-widget-header { border: 1px solid #231d2b; background: #30273a url(images/ui-bg_highlight-soft_25_30273a_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
+.chromeperfectpixel-panel .ui-widget-header { border: 1px solid #231d2b; background: #30273a 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
 .chromeperfectpixel-panel .ui-widget-header a { color: #ffffff; }
 
 /* Interaction states
 ----------------------------------*/
-.chromeperfectpixel-panel .ui-state-default, .chromeperfectpixel-panel .ui-widget-content .ui-state-default, .chromeperfectpixel-panel .ui-widget-header .ui-state-default { border: 1px solid #dcd9de; background: #dcd9de url(images/ui-bg_highlight-soft_100_dcd9de_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #665874; }
+.chromeperfectpixel-panel .ui-state-default, .chromeperfectpixel-panel .ui-widget-content .ui-state-default, .chromeperfectpixel-panel .ui-widget-header .ui-state-default { border: 1px solid #dcd9de; background: #dcd9de 50% 50% repeat-x; font-weight: bold; color: #665874; }
 .chromeperfectpixel-panel .ui-state-default a, .chromeperfectpixel-panel .ui-state-default a:link, .chromeperfectpixel-panel .ui-state-default a:visited { color: #665874; text-decoration: none; }
-.chromeperfectpixel-panel .ui-state-hover, .chromeperfectpixel-panel .ui-widget-content .ui-state-hover, .chromeperfectpixel-panel .ui-widget-header .ui-state-hover, .chromeperfectpixel-panel .ui-state-focus, .chromeperfectpixel-panel .ui-widget-content .ui-state-focus, .chromeperfectpixel-panel .ui-widget-header .ui-state-focus { border: 1px solid #d1c5d8; background: #eae6ea url(images/ui-bg_highlight-soft_100_eae6ea_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #734d99; }
+.chromeperfectpixel-panel .ui-state-hover, .chromeperfectpixel-panel .ui-widget-content .ui-state-hover, .chromeperfectpixel-panel .ui-widget-header .ui-state-hover, .chromeperfectpixel-panel .ui-state-focus, .chromeperfectpixel-panel .ui-widget-content .ui-state-focus, .chromeperfectpixel-panel .ui-widget-header .ui-state-focus { border: 1px solid #d1c5d8; background: #eae6ea 50% 50% repeat-x; font-weight: bold; color: #734d99; }
 .chromeperfectpixel-panel .ui-state-hover a, .chromeperfectpixel-panel .ui-state-hover a:hover { color: #734d99; text-decoration: none; }
-.chromeperfectpixel-panel .ui-state-active, .chromeperfectpixel-panel .ui-widget-content .ui-state-active, .chromeperfectpixel-panel .ui-widget-header .ui-state-active { border: 1px solid #7e7783; background: #5f5964 url(images/ui-bg_highlight-soft_45_5f5964_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #ffffff; }
+.chromeperfectpixel-panel .ui-state-active, .chromeperfectpixel-panel .ui-widget-content .ui-state-active, .chromeperfectpixel-panel .ui-widget-header .ui-state-active { border: 1px solid #7e7783; background: #5f5964 50% 50% repeat-x; font-weight: bold; color: #ffffff; }
 .chromeperfectpixel-panel .ui-state-active a, .chromeperfectpixel-panel .ui-state-active a:link, .chromeperfectpixel-panel .ui-state-active a:visited { color: #ffffff; text-decoration: none; }
 .chromeperfectpixel-panel .ui-widget :active { outline: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.chromeperfectpixel-panel .ui-state-highlight, .chromeperfectpixel-panel .ui-widget-content .ui-state-highlight, .chromeperfectpixel-panel .ui-widget-header .ui-state-highlight  {border: 1px solid #ffdb1f; background: #fafafa url(images/ui-bg_flat_55_fafafa_40x100.png) 50% 50% repeat-x; color: #333333; }
+.chromeperfectpixel-panel .ui-state-highlight, .chromeperfectpixel-panel .ui-widget-content .ui-state-highlight, .chromeperfectpixel-panel .ui-widget-header .ui-state-highlight  {border: 1px solid #ffdb1f; background: #fafafa 50% 50% repeat-x; color: #333333; }
 .chromeperfectpixel-panel .ui-state-highlight a, .chromeperfectpixel-panel .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #333333; }
-.chromeperfectpixel-panel .ui-state-error, .chromeperfectpixel-panel .ui-widget-content .ui-state-error, .chromeperfectpixel-panel .ui-widget-header .ui-state-error {border: 1px solid #994d53; background: #994d53 url(images/ui-bg_flat_55_994d53_40x100.png) 50% 50% repeat-x; color: #ffffff; }
+.chromeperfectpixel-panel .ui-state-error, .chromeperfectpixel-panel .ui-widget-content .ui-state-error, .chromeperfectpixel-panel .ui-widget-header .ui-state-error {border: 1px solid #994d53; background: #994d53 50% 50% repeat-x; color: #ffffff; }
 .chromeperfectpixel-panel .ui-state-error a, .chromeperfectpixel-panel .ui-widget-content .ui-state-error a, .chromeperfectpixel-panel .ui-widget-header .ui-state-error a { color: #ffffff; }
 .chromeperfectpixel-panel .ui-state-error-text, .chromeperfectpixel-panel .ui-widget-content .ui-state-error-text, .chromeperfectpixel-panel .ui-widget-header .ui-state-error-text { color: #ffffff; }
 .chromeperfectpixel-panel .ui-priority-primary, .chromeperfectpixel-panel .ui-widget-content .ui-priority-primary, .chromeperfectpixel-panel .ui-widget-header .ui-priority-primary { font-weight: bold; }
@@ -89,14 +89,7 @@
 ----------------------------------*/
 
 /* states and images */
-.chromeperfectpixel-panel .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_ffffff_256x240.png); }
-.chromeperfectpixel-panel .ui-widget-content .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
-.chromeperfectpixel-panel .ui-widget-header .ui-icon {background-image: url(images/ui-icons_a8a3ae_256x240.png); }
-.chromeperfectpixel-panel .ui-state-default .ui-icon { background-image: url(images/ui-icons_8d78a5_256x240.png); }
-.chromeperfectpixel-panel .ui-state-hover .ui-icon, .chromeperfectpixel-panel .ui-state-focus .ui-icon {background-image: url(images/ui-icons_734d99_256x240.png); }
-.chromeperfectpixel-panel .ui-state-active .ui-icon {background-image: url(images/ui-icons_454545_256x240.png); }
-.chromeperfectpixel-panel .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_8d78a5_256x240.png); }
-.chromeperfectpixel-panel .ui-state-error .ui-icon, .chromeperfectpixel-panel .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_ebccce_256x240.png); }
+.chromeperfectpixel-panel .ui-icon { width: 16px; height: 16px; }
 
 /* positioning */
 .chromeperfectpixel-panel .ui-icon-carat-1-n { background-position: 0 0; }
@@ -286,8 +279,8 @@
 .chromeperfectpixel-panel .ui-corner-all, .chromeperfectpixel-panel .ui-corner-bottom, .chromeperfectpixel-panel .ui-corner-right, .chromeperfectpixel-panel .ui-corner-br { -moz-border-radius-bottomright: 6px; -webkit-border-bottom-right-radius: 6px; -khtml-border-bottom-right-radius: 6px; border-bottom-right-radius: 6px; }
 
 /* Overlays */
-.chromeperfectpixel-panel .ui-widget-overlay { background: #eeeeee url(images/ui-bg_flat_0_eeeeee_40x100.png) 50% 50% repeat-x; opacity: .80;filter:Alpha(Opacity=80); }
-.chromeperfectpixel-panel .ui-widget-shadow { margin: -4px 0 0 -4px; padding: 4px; background: #aaaaaa url(images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 0px; -khtml-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; }/*
+.chromeperfectpixel-panel .ui-widget-overlay { background: #eeeeee 50% 50% repeat-x; opacity: .80;filter:Alpha(Opacity=80); }
+.chromeperfectpixel-panel .ui-widget-shadow { margin: -4px 0 0 -4px; padding: 4px; background: #aaaaaa 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 0px; -khtml-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; }/*
  * jQuery UI Button 1.8.16
  *
  * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
