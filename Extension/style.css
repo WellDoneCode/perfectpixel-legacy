@@ -36,6 +36,39 @@
     list-style:none;
 }
 
+/* Chrome default style values */
+#chromeperfectpixel-panel textarea:disabled,
+#chromeperfectpixel-panel input[type="color"]:disabled,
+#chromeperfectpixel-panel input[type="date"]:disabled,
+#chromeperfectpixel-panel input[type="datetime"]:disabled,
+#chromeperfectpixel-panel input[type="datetime-local"]:disabled,
+#chromeperfectpixel-panel input[type="email"]:disabled,
+#chromeperfectpixel-panel input[type="month"]:disabled,
+#chromeperfectpixel-panel input[type="password"]:disabled,
+#chromeperfectpixel-panel input[type="number"]:disabled,
+#chromeperfectpixel-panel input[type="search"]:disabled,
+#chromeperfectpixel-panel input[type="tel"]:disabled,
+#chromeperfectpixel-panel input[type="text"]:disabled,
+#chromeperfectpixel-panel input[type="time"]:disabled,
+#chromeperfectpixel-panel input[type="url"]:disabled,
+#chromeperfectpixel-panel input[type="week"]:disabled {
+    background-color: #EBEBE4;
+}
+
+/* Chrome default style values */
+#chromeperfectpixel-panel input,
+#chromeperfectpixel-panel input[type="password"],
+#chromeperfectpixel-panel input[type="search"] {
+    border: 2px inset;
+}
+
+/* Chrome default style values */
+#chromeperfectpixel-panel input, input[type="password"],
+#chromeperfectpixel-panel input[type="search"] {
+    background-color: white;
+    border: 2px inset;
+}
+
 #chromeperfectpixel-panel *:before,
 #chromeperfectpixel-panel *:after {
     content:none;
