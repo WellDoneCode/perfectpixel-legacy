@@ -76,7 +76,7 @@ var createPanel = function () {
 
                     '<div>Layers:</div>' +
                 '<div id="chromeperfectpixel-section-scale">' +
-                '<label for="chromeperfectpixel-scale" id="chromeperfectpixel-scale-label">Scale:</label>' +
+                '<div id="chromeperfectpixel-section-scale-label">Scale:</div>' +
                 '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
                 '</div>' +
                     '<div id="chromeperfectpixel-layers"></div>' +
