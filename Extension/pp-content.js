@@ -324,16 +324,19 @@ var ChromePerfectPixel = new function () {
 
     this.onOverlayUpdate = function (isStop) {
         var overlay = $('#' + overlayUniqueId);
-        var x = overlay[0].offsetLeft;
-        var y = overlay[0].offsetTop;
-        var opacity = overlay.css('opacity');
-        var scale = overlay.data('scale');
+        if(overlay && overlay.length > 0)
+        {
+            var x = overlay[0].offsetLeft;
+            var y = overlay[0].offsetTop;
+            var opacity = overlay.css('opacity');
+            var scale = overlay.data('scale');
 
-        ChromePerfectPixel.updateCoordsUI(x, y, opacity, scale);
+            ChromePerfectPixel.updateCoordsUI(x, y, opacity, scale);
 
-        if (isStop) {
-            // update storage
-            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity, Scale: scale });
+            if (isStop) {
+                // update storage
+                PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity, Scale: scale });
+            }
         }
     }
 
