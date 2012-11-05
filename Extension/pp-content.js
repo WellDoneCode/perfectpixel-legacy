@@ -75,6 +75,10 @@ var createPanel = function () {
                     '</div>' +
 
                     '<div>Layers:</div>' +
+                '<div id="chromeperfectpixel-section-scale">' +
+                '<div id="chromeperfectpixel-section-scale-label">Scale:</div>' +
+                '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
+                '</div>' +
                     '<div id="chromeperfectpixel-layers"></div>' +
 
                     '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
@@ -112,6 +116,10 @@ var createPanel = function () {
 
         $('#chromeperfectpixel-opacity').change(function () {
             ChromePerfectPixel.opacity($(this));
+        });
+
+        $('#chromeperfectpixel-scale').change(function () {
+            ChromePerfectPixel.change(false, false, false, $(this).val());
         });
 
         $('#chromeperfectpixel-origin-controls button').live("click", function (event) {
@@ -224,6 +232,7 @@ var togglePanel = function () {
 var ChromePerfectPixel = new function () {
     // temporary hardcoded
     var default_opacity = 0.5;
+    var default_scale = 1.0;
     var default_top_px = 50;
     var default_left_px = 50;
     var default_width_px = 300;
@@ -285,7 +294,9 @@ var ChromePerfectPixel = new function () {
             if (overlayObj != null) {
                 $('#' + overlayUniqueId).attr('src', '');
                 $('#' + overlayUniqueId).attr('src', overlayObj.Url)
-                .css('width', overlayObj.Width + 'px').css('height', overlayObj.Height + 'px')
+                .css('width', (overlayObj.Width * overlayObj.Scale) + 'px').css('height', 'auto')
+                .data('originalWidth',overlayObj.Width)
+                .data('scale',overlayObj.Scale)
                 .css('left', overlayObj.X + 'px').css('top', overlayObj.Y + 'px')
                 .css('opacity', overlayObj.Opacity);
             }
@@ -313,15 +324,19 @@ var ChromePerfectPixel = new function () {
 
     this.onOverlayUpdate = function (isStop) {
         var overlay = $('#' + overlayUniqueId);
-        var x = overlay[0].offsetLeft;
-        var y = overlay[0].offsetTop;
-        var opacity = overlay.css('opacity');
+        if(overlay && overlay.length > 0)
+        {
+            var x = overlay[0].offsetLeft;
+            var y = overlay[0].offsetTop;
+            var opacity = overlay.css('opacity');
+            var scale = overlay.data('scale');
 
-        ChromePerfectPixel.updateCoordsUI(x, y, opacity);
+            ChromePerfectPixel.updateCoordsUI(x, y, opacity, scale);
 
-        if (isStop) {
-            // update storage
-            PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity });
+            if (isStop) {
+                // update storage
+                PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity, Scale: scale });
+            }
         }
     }
 
@@ -356,9 +371,10 @@ var ChromePerfectPixel = new function () {
     // Layers
     this.renderLayers = function () {
         // disable controls
-        ChromePerfectPixel.updateCoordsUI(default_left_px, default_top_px, default_opacity);
+        ChromePerfectPixel.updateCoordsUI(default_left_px, default_top_px, default_opacity, default_scale);
         $('.chromeperfectpixel-coords').attr('disabled', true);
         $('#chromeperfectpixel-opacity').attr('disabled', true);
+        $('#chromeperfectpixel-scale').attr('disabled', true);
         $('.chromeperfectpixel-showHideBtn').button("option", "disabled", true);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", true);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
@@ -424,6 +440,7 @@ var ChromePerfectPixel = new function () {
     this.enableLayerControls = function () {
         $('.chromeperfectpixel-coords').attr('disabled', false);
         $('#chromeperfectpixel-opacity').attr('disabled', false);
+        $('#chromeperfectpixel-scale').attr('disabled', false);
         $('.chromeperfectpixel-showHideBtn').button("option", "disabled", false);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
@@ -463,7 +480,7 @@ var ChromePerfectPixel = new function () {
 
         GlobalStorage.set_CurrentOverlayId(overlayId);
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlay) {
-            ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity);
+            ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity, overlay.Scale);
             ChromePerfectPixel.createOverlay();
         });
     }
@@ -517,10 +534,11 @@ var ChromePerfectPixel = new function () {
 
     // UI
 
-    this.updateCoordsUI = function (x, y, opacity) {
+    this.updateCoordsUI = function (x, y, opacity, scale) {
         $('#chromeperfectpixel-coordX').val(x);
         $('#chromeperfectpixel-coordY').val(y);
         $('#chromeperfectpixel-opacity').val(Number(opacity).toFixed(1));
+        $('#chromeperfectpixel-scale').val(Number(scale).toFixed(1));
     }
 
     this.opacity = function (input) {
@@ -572,7 +590,7 @@ var ChromePerfectPixel = new function () {
         ChromePerfectPixel.change(false, false, thisY);
     }
 
-    this.change = function (opacity, left, top) {
+    this.change = function (opacity, left, top, scale) {
         var overlay = $('#' + overlayUniqueId);
         if (opacity != false)
             overlay.css('opacity', opacity);
@@ -581,6 +599,11 @@ var ChromePerfectPixel = new function () {
         }
         if (top != false || Number(top) == 0) {
             overlay.css('top', top + "px");
+        }
+        if (scale) {
+            overlay.data('scale', scale);
+            overlay.css('height', 'auto');
+            overlay.css('width', Number(overlay.data('originalWidth')) * scale);
         }
         ChromePerfectPixel.onOverlayUpdate(true);
     }

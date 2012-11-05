@@ -1,0 +1,1221 @@
+/*
+ * The default style sheet used to render HTML.
+ *
+ * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Apple Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this library; see the file COPYING.LIB.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
+ *
+ */
+
+@namespace "http://www.w3.org/1999/xhtml";
+
+#chromeperfectpixel-panel html {
+    display: block
+}
+
+/* children of the <head> element all have display:none */
+#chromeperfectpixel-panel head {
+    display: none
+}
+
+#chromeperfectpixel-panel meta {
+    display: none
+}
+
+#chromeperfectpixel-panel title {
+    display: none
+}
+
+#chromeperfectpixel-panel link {
+    display: none
+}
+
+#chromeperfectpixel-panel style {
+    display: none
+}
+
+#chromeperfectpixel-panel script {
+    display: none
+}
+
+/* generic block-level elements */
+
+#chromeperfectpixel-panel body {
+    display: block;
+    margin: 8px
+}
+
+#chromeperfectpixel-panel p {
+    display: block;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1__qem;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+}
+
+#chromeperfectpixel-panel div {
+    display: block
+}
+
+#chromeperfectpixel-panel layer {
+    display: block
+}
+
+#chromeperfectpixel-panel article, #chromeperfectpixel-panel aside, #chromeperfectpixel-panel footer, #chromeperfectpixel-panel header, #chromeperfectpixel-panel hgroup, #chromeperfectpixel-panel nav, #chromeperfectpixel-panel section {
+    display: block
+}
+
+#chromeperfectpixel-panel marquee {
+    display: inline-block;
+    overflow: -webkit-marquee
+}
+
+#chromeperfectpixel-panel address {
+    display: block
+}
+
+#chromeperfectpixel-panel blockquote {
+    display: block;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 40px;
+    -webkit-margin-end: 40px;
+}
+
+#chromeperfectpixel-panel figcaption {
+    display: block
+}
+
+#chromeperfectpixel-panel figure {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 40px;
+    -webkit-margin-end: 40px;
+}
+
+#chromeperfectpixel-panel q {
+    display: inline
+}
+
+#chromeperfectpixel-panel q:before {
+    content: open-quote;
+}
+
+#chromeperfectpixel-panel q:after {
+    content: close-quote;
+}
+
+#chromeperfectpixel-panel center {
+    display: block;
+    /* special centering to be able to emulate the html4/netscape behaviour */
+    text-align: -webkit-center
+}
+
+#chromeperfectpixel-panel hr {
+    display: block;
+    -webkit-margin-before: 0.5em;
+    -webkit-margin-after: 0.5em;
+    -webkit-margin-start: auto;
+    -webkit-margin-end: auto;
+    border-style: inset;
+    border-width: 1px
+}
+
+#chromeperfectpixel-panel map {
+    display: inline
+}
+
+#if defined(ENABLE_DIALOG_ELEMENT) && ENABLE_DIALOG_ELEMENT
+#chromeperfectpixel-panel dialog:not([open]) { display: none; }
+#chromeperfectpixel-panel dialog {
+    position: absolute;
+    left: 0; right: 0;
+    margin: auto;
+    border: solid;
+    padding: 1em;
+    background: white;
+    color: black;
+}
+#endif
+
+/* heading elements */
+
+#chromeperfectpixel-panel h1 {
+    display: block;
+    font-size: 2em;
+    -webkit-margin-before: 0.67__qem;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel :-webkit-any(article,aside,nav,section) h1 {
+    font-size: 1.5em;
+    -webkit-margin-before: 0.83__qem;
+    -webkit-margin-after: 0.83em;
+}
+
+#chromeperfectpixel-panel :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) h1 {
+    font-size: 1.17em;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1em;
+}
+
+#chromeperfectpixel-panel :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) h1 {
+    font-size: 1.00em;
+    -webkit-margin-before: 1.33__qem;
+    -webkit-margin-after: 1.33em;
+}
+
+#chromeperfectpixel-panel :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) h1 {
+    font-size: .83em;
+    -webkit-margin-before: 1.67__qem;
+    -webkit-margin-after: 1.67em;
+}
+
+#chromeperfectpixel-panel :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) :-webkit-any(article,aside,nav,section) h1 {
+    font-size: .67em;
+    -webkit-margin-before: 2.33__qem;
+    -webkit-margin-after: 2.33em;
+}
+
+#chromeperfectpixel-panel h2 {
+    display: block;
+    font-size: 1.5em;
+    -webkit-margin-before: 0.83__qem;
+    -webkit-margin-after: 0.83em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel h3 {
+    display: block;
+    font-size: 1.17em;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel h4 {
+    display: block;
+    -webkit-margin-before: 1.33__qem;
+    -webkit-margin-after: 1.33em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel h5 {
+    display: block;
+    font-size: .83em;
+    -webkit-margin-before: 1.67__qem;
+    -webkit-margin-after: 1.67em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel h6 {
+    display: block;
+    font-size: .67em;
+    -webkit-margin-before: 2.33__qem;
+    -webkit-margin-after: 2.33em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+/* tables */
+
+#chromeperfectpixel-panel table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+    border-color: gray
+}
+
+#chromeperfectpixel-panel thead {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit
+}
+
+#chromeperfectpixel-panel tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit
+}
+
+#chromeperfectpixel-panel tfoot {
+    display: table-footer-group;
+    vertical-align: middle;
+    border-color: inherit
+}
+
+/* for tables without table section elements (can happen with XHTML or dynamically created tables) */
+#chromeperfectpixel-panel table > tr {
+    vertical-align: middle;
+}
+
+#chromeperfectpixel-panel col {
+    display: table-column
+}
+
+#chromeperfectpixel-panel colgroup {
+    display: table-column-group
+}
+
+#chromeperfectpixel-panel tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit
+}
+
+#chromeperfectpixel-panel td, #chromeperfectpixel-panel th {
+    display: table-cell;
+    vertical-align: inherit
+}
+
+#chromeperfectpixel-panel th {
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel caption {
+    display: table-caption;
+    text-align: -webkit-center
+}
+
+/* lists */
+
+#chromeperfectpixel-panel ul, #chromeperfectpixel-panel menu, #chromeperfectpixel-panel dir {
+    display: block;
+    list-style-type: disc;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 40px
+}
+
+#chromeperfectpixel-panel ol {
+    display: block;
+    list-style-type: decimal;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 40px
+}
+
+#chromeperfectpixel-panel li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+#chromeperfectpixel-panel ul ul, #chromeperfectpixel-panel ol ul {
+    list-style-type: circle
+}
+
+#chromeperfectpixel-panel ol ol ul, #chromeperfectpixel-panel ol ul ul, #chromeperfectpixel-panel ul ol ul, #chromeperfectpixel-panel ul ul ul {
+    list-style-type: square
+}
+
+#chromeperfectpixel-panel dd {
+    display: block;
+    -webkit-margin-start: 40px
+}
+
+#chromeperfectpixel-panel dl {
+    display: block;
+    -webkit-margin-before: 1__qem;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+}
+
+#chromeperfectpixel-panel dt {
+    display: block
+}
+
+#chromeperfectpixel-panel ol ul, #chromeperfectpixel-panel ul ol, #chromeperfectpixel-panel ul ul, #chromeperfectpixel-panel ol ol {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0
+}
+
+/* form elements */
+
+#chromeperfectpixel-panel form {
+    display: block;
+    margin-top: 0__qem;
+}
+
+#chromeperfectpixel-panel label {
+    cursor: default;
+}
+
+#chromeperfectpixel-panel legend {
+    display: block;
+    -webkit-padding-start: 2px;
+    -webkit-padding-end: 2px;
+    border: none
+}
+
+#chromeperfectpixel-panel fieldset {
+    display: block;
+    -webkit-margin-start: 2px;
+    -webkit-margin-end: 2px;
+    -webkit-padding-before: 0.35em;
+    -webkit-padding-start: 0.75em;
+    -webkit-padding-end: 0.75em;
+    -webkit-padding-after: 0.625em;
+    border: 2px groove ThreeDFace
+}
+
+#chromeperfectpixel-panel button {
+    -webkit-appearance: button;
+}
+
+/* Form controls don't go vertical. */
+#chromeperfectpixel-panel input, #chromeperfectpixel-panel textarea, #chromeperfectpixel-panel keygen, #chromeperfectpixel-panel select, #chromeperfectpixel-panel button, #chromeperfectpixel-panel isindex, #chromeperfectpixel-panel meter, #chromeperfectpixel-panel progress {
+    -webkit-writing-mode: horizontal-tb !important;
+}
+
+#chromeperfectpixel-panel input, #chromeperfectpixel-panel textarea, #chromeperfectpixel-panel keygen, #chromeperfectpixel-panel select, #chromeperfectpixel-panel button, #chromeperfectpixel-panel isindex {
+    margin: 0__qem;
+    font: -webkit-small-control;
+    color: initial;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+}
+
+#chromeperfectpixel-panel input[type="hidden"] {
+    display: none
+}
+
+#chromeperfectpixel-panel input, #chromeperfectpixel-panel input[type="password"], #chromeperfectpixel-panel input[type="search"], #chromeperfectpixel-panel isindex {
+    -webkit-appearance: textfield;
+    padding: 1px;
+    background-color: white;
+    border: 2px inset;
+    -webkit-rtl-ordering: logical;
+    -webkit-user-select: text;
+    cursor: auto;
+}
+
+#chromeperfectpixel-panel input[type="search"] {
+    -webkit-appearance: searchfield;
+    box-sizing: border-box;
+}
+
+#chromeperfectpixel-panel input::-webkit-textfield-decoration-container {
+    display: -webkit-box;
+    -webkit-box-align: center;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel input[type="search"]::-webkit-textfield-decoration-container {
+    direction: ltr;
+}
+
+#chromeperfectpixel-panel input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield-cancel-button;
+    display: block;
+    -webkit-box-flex: 0;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: searchfield-decoration;
+    display: block;
+    -webkit-box-flex: 0;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: searchfield-results-decoration;
+    display: block;
+    -webkit-box-flex: 0;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel input[type="search"]::-webkit-search-results-button {
+    -webkit-appearance: searchfield-results-button;
+    display: block;
+    -webkit-box-flex: 0;
+    -webkit-user-modify: read-only !important;
+}
+
+#if defined(ENABLE_DATALIST_ELEMENT) && ENABLE_DATALIST_ELEMENT
+#chromeperfectpixel-panel datalist {
+    display: none;
+}
+#endif
+
+#if defined(ENABLE_INPUT_MULTIPLE_FIELDS_UI) && ENABLE_INPUT_MULTIPLE_FIELDS_UI
+#if defined(ENABLE_INPUT_TYPE_DATE) && ENABLE_INPUT_TYPE_DATE
+#chromeperfectpixel-panel input[type="date"] {
+    -webkit-align-items: stretch;
+    display: -webkit-inline-flex;
+    font-family: monospace;
+    padding: 0;
+    -webkit-padding-start: 1px;
+}
+#endif
+#if defined(ENABLE_INPUT_TYPE_DATETIME) && ENABLE_INPUT_TYPE_DATETIME
+#chromeperfectpixel-panel input[type="datetime"] {
+    -webkit-align-items: stretch;
+    display: -webkit-inline-flex;
+    font-family: monospace;
+    padding: 0;
+    -webkit-padding-start: 1px;
+}
+#endif
+#if defined(ENABLE_INPUT_TYPE_DATETIMELOCAL) && ENABLE_INPUT_TYPE_DATETIMELOCAL
+#chromeperfectpixel-panel input[type="datetime-local"] {
+    -webkit-align-items: stretch;
+    display: -webkit-inline-flex;
+    font-family: monospace;
+    padding: 0;
+    -webkit-padding-start: 1px;
+}
+#endif
+#if defined(ENABLE_INPUT_TYPE_MONTH) && ENABLE_INPUT_TYPE_MONTH
+#chromeperfectpixel-panel input[type="month"] {
+    -webkit-align-items: stretch;
+    display: -webkit-inline-flex;
+    font-family: monospace;
+    padding: 0;
+    -webkit-padding-start: 1px;
+}
+#endif
+#if defined(ENABLE_INPUT_TYPE_TIME) && ENABLE_INPUT_TYPE_TIME
+#chromeperfectpixel-panel input[type="time"] {
+    -webkit-align-items: stretch;
+    display: -webkit-inline-flex;
+    font-family: monospace;
+    padding: 0;
+    -webkit-padding-start: 1px;
+}
+#endif
+#if defined(ENABLE_INPUT_TYPE_WEEK) && ENABLE_INPUT_TYPE_WEEK
+#chromeperfectpixel-panel input[type="week"] {
+    -webkit-align-items: stretch;
+    display: -webkit-inline-flex;
+    font-family: monospace;
+    padding: 0;
+    -webkit-padding-start: 1px;
+}
+#endif
+
+#chromeperfectpixel-panel input::-webkit-datetime-edit {
+    -webkit-flex: 1;
+    -webkit-user-modify: read-only !important;
+    display: inline-block;
+    white-space: pre;
+}
+
+#chromeperfectpixel-panel input::-webkit-datetime-edit-ampm-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-day-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-hour-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-millisecond-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-minute-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-month-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-second-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-week-field,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-year-field {
+    -webkit-user-modify: read-only !important;
+    border: none;
+    display: inline-block;
+    margin: 1px;
+    text-align: center;
+}
+
+/* Remove focus ring from fields and use highlight color */
+#chromeperfectpixel-panel input::-webkit-datetime-edit-ampm-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-day-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-hour-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-millisecond-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-minute-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-month-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-second-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-week-field:focus,
+#chromeperfectpixel-panel input::-webkit-datetime-edit-year-field:focus {
+    background-color: highlight;
+    color: highlighttext;
+    outline: none;
+}
+
+/* This selector is used when step >= 3600 second but format contains minute field. */
+#chromeperfectpixel-panel input::-webkit-datetime-edit-minute-field[readonly] {
+    color: GrayText;
+}
+
+/* This selector is used when step >= 60 second but format contains second field. */
+#chromeperfectpixel-panel input::-webkit-datetime-edit-second-field[readonly] {
+    color: GrayText;
+}
+
+#chromeperfectpixel-panel input::-webkit-datetime-edit-text {
+    -webkit-user-modify: read-only !important;
+    display: inline-block;
+}
+
+#chromeperfectpixel-panel input::-webkit-date-and-time-container {
+    -webkit-align-items: center;
+    -webkit-flex: 1;
+    display: -webkit-inline-flex;
+}
+
+#chromeperfectpixel-panel input[type="date"]::-webkit-inner-spin-button,
+#chromeperfectpixel-panel input[type="datetime"]::-webkit-inner-spin-button,
+#chromeperfectpixel-panel input[type="datetime-local"]::-webkit-inner-spin-button,
+#chromeperfectpixel-panel input[type="month"]::-webkit-inner-spin-button,
+#chromeperfectpixel-panel input[type="time"]::-webkit-inner-spin-button,
+#chromeperfectpixel-panel input[type="week"]::-webkit-inner-spin-button {
+    display: inline-block;
+    position: static;
+    -webkit-margin-start: 2px;
+}
+#endif
+
+#chromeperfectpixel-panel input::-webkit-inner-spin-button {
+    -webkit-appearance: inner-spin-button;
+    display: block;
+    position: relative;
+    cursor: default;
+    /* This height property is ignored for input type "number" and others which
+     * use RenderTextControlSingleLine as renderer which sets height of spin
+     * button in layout(). */
+    height: 1.5em;
+    vertical-align: top;
+    -webkit-box-flex: 0;
+    -webkit-user-select: none;
+    -webkit-user-modify: read-only !important;
+}
+
+#if defined(ENABLE_INPUT_SPEECH) && ENABLE_INPUT_SPEECH
+#chromeperfectpixel-panel input::-webkit-input-speech-button {
+    -webkit-appearance: -webkit-input-speech-button;
+    display: block;
+    vertical-align: top;
+    -webkit-box-flex: 0;
+    -webkit-user-modify: read-only !important;
+}
+#endif
+
+#chromeperfectpixel-panel keygen, #chromeperfectpixel-panel select {
+    border-radius: 5px;
+}
+
+#chromeperfectpixel-panel keygen::-webkit-keygen-select {
+    margin: 0px;
+}
+
+#chromeperfectpixel-panel textarea {
+    -webkit-appearance: textarea;
+    background-color: white;
+    border: 1px solid;
+    -webkit-rtl-ordering: logical;
+    -webkit-user-select: text;
+    -webkit-box-orient: vertical;
+    resize: auto;
+    cursor: auto;
+    padding: 2px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#chromeperfectpixel-panel ::-webkit-input-placeholder {
+    -webkit-text-security: none;
+    color: darkGray;
+    display: block !important;
+    pointer-events: none !important;
+}
+
+#chromeperfectpixel-panel input::-webkit-input-placeholder, #chromeperfectpixel-panel isindex::-webkit-input-placeholder {
+    white-space: pre;
+    word-wrap: normal;
+    overflow: hidden;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel input[type="password"] {
+    -webkit-text-security: disc !important;
+}
+
+#chromeperfectpixel-panel input[type="hidden"], #chromeperfectpixel-panel input[type="image"], #chromeperfectpixel-panel input[type="file"] {
+    -webkit-appearance: initial;
+    padding: initial;
+    background-color: initial;
+    border: initial;
+}
+
+#chromeperfectpixel-panel input[type="file"] {
+    -webkit-box-align: baseline;
+    color: inherit;
+    text-align: start !important;
+}
+
+#chromeperfectpixel-panel input:-webkit-autofill {
+    background-color: #FAFFBD !important;
+    background-image:none !important;
+    color: #000000 !important;
+}
+
+#chromeperfectpixel-panel input[type="radio"], #chromeperfectpixel-panel input[type="checkbox"] {
+    margin: 3px 0.5ex;
+    padding: initial;
+    background-color: initial;
+    border: initial;
+}
+
+#chromeperfectpixel-panel input[type="button"], #chromeperfectpixel-panel input[type="submit"], #chromeperfectpixel-panel input[type="reset"] {
+    -webkit-appearance: push-button;
+    white-space: pre
+}
+
+#chromeperfectpixel-panel input[type="file"]::-webkit-file-upload-button {
+    -webkit-appearance: push-button;
+    -webkit-user-modify: read-only !important;
+    white-space: nowrap;
+    margin: 0;
+    font-size: inherit;
+}
+
+#chromeperfectpixel-panel input[type="button"], #chromeperfectpixel-panel input[type="submit"], #chromeperfectpixel-panel input[type="reset"], #chromeperfectpixel-panel input[type="file"]::-webkit-file-upload-button, #chromeperfectpixel-panel button {
+    -webkit-box-align: center;
+    text-align: center;
+    cursor: default;
+    color: ButtonText;
+    padding: 2px 6px 3px 6px;
+    border: 2px outset ButtonFace;
+    background-color: ButtonFace;
+    box-sizing: border-box
+}
+
+#chromeperfectpixel-panel input[type="range"] {
+    -webkit-appearance: slider-horizontal;
+    padding: initial;
+    border: initial;
+    margin: 2px;
+    color: #909090;
+}
+
+#chromeperfectpixel-panel input[type="range"]::-webkit-slider-container, #chromeperfectpixel-panel input[type="range"]::-webkit-media-slider-container {
+    -webkit-flex: 1;
+    min-width: 0;
+
+    box-sizing: border-box;
+    -webkit-user-modify: read-only !important;
+    display: -webkit-flex;
+    -webkit-align-contents: center;
+}
+
+#chromeperfectpixel-panel input[type="range"]::-webkit-slider-runnable-track {
+    -webkit-flex: 1;
+    min-width: 0;
+    -webkit-align-self: center;
+
+    box-sizing: border-box;
+    -webkit-user-modify: read-only !important;
+    display: block;
+}
+
+#chromeperfectpixel-panel input[type="range"]::-webkit-slider-thumb, #chromeperfectpixel-panel input[type="range"]::-webkit-media-slider-thumb {
+    -webkit-appearance: sliderthumb-horizontal;
+    box-sizing: border-box;
+    -webkit-user-modify: read-only !important;
+    display: block;
+}
+
+#chromeperfectpixel-panel input[type="button"]:disabled, #chromeperfectpixel-panel input[type="submit"]:disabled, #chromeperfectpixel-panel input[type="reset"]:disabled,
+#chromeperfectpixel-panel input[type="file"]:disabled::-webkit-file-upload-button, #chromeperfectpixel-panel button:disabled,
+#chromeperfectpixel-panel select:disabled, keygen:disabled, #chromeperfectpixel-panel optgroup:disabled, #chromeperfectpixel-panel option:disabled,
+#chromeperfectpixel-panel select[disabled]>option {
+    color: GrayText
+}
+
+#chromeperfectpixel-panel input[type="button"]:active, #chromeperfectpixel-panel input[type="submit"]:active, #chromeperfectpixel-panel input[type="reset"]:active, #chromeperfectpixel-panel input[type="file"]:active::-webkit-file-upload-button, #chromeperfectpixel-panel button:active {
+    border-style: inset
+}
+
+#chromeperfectpixel-panel input[type="button"]:active:disabled, #chromeperfectpixel-panel input[type="submit"]:active:disabled, #chromeperfectpixel-panel input[type="reset"]:active:disabled, #chromeperfectpixel-panel input[type="file"]:active:disabled::-webkit-file-upload-button, #chromeperfectpixel-panel button:active:disabled {
+    border-style: outset
+}
+
+#chromeperfectpixel-panel area, #chromeperfectpixel-panel param {
+    display: none
+}
+
+#chromeperfectpixel-panel input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    box-sizing: border-box;
+}
+
+#chromeperfectpixel-panel input[type="radio"] {
+    -webkit-appearance: radio;
+    box-sizing: border-box;
+}
+
+#if defined(ENABLE_INPUT_TYPE_COLOR) && ENABLE_INPUT_TYPE_COLOR
+
+#chromeperfectpixel-panel input[type="color"] {
+    -webkit-appearance: square-button;
+    width: 44px;
+    height: 23px;
+}
+
+#chromeperfectpixel-panel input[type="color"]::-webkit-color-swatch-wrapper {
+    display:-webkit-box;
+    padding: 4px 2px;
+    box-sizing: border-box;
+    -webkit-user-modify: read-only !important;
+    width: 100%;
+    height: 100%
+}
+
+#chromeperfectpixel-panel input[type="color"]::-webkit-color-swatch {
+    background-color: #000000;
+    border: 1px solid #777777;
+    -webkit-box-flex: 1;
+    -webkit-user-modify: read-only !important;
+}
+
+#if defined(ENABLE_DATALIST_ELEMENT) && ENABLE_DATALIST_ELEMENT
+
+#chromeperfectpixel-panel input[type="color"][list] {
+    -webkit-appearance: menulist;
+    width: 88px;
+    height: 23px;
+}
+
+#chromeperfectpixel-panel input[type="color"][list]::-webkit-color-swatch-wrapper {
+    padding-left: 8px;
+    padding-right: 24px;
+}
+
+#chromeperfectpixel-panel input[type="color"][list]::-webkit-color-swatch {
+    border-color: #000000;
+}
+
+#endif // defined(ENABLE_DATALIST_ELEMENT) && ENABLE_DATALIST_ELEMENT
+
+#endif // defined(ENABLE_INPUT_TYPE_COLOR) && ENABLE_INPUT_TYPE_COLOR
+
+#if defined(ENABLE_CALENDAR_PICKER) && ENABLE_CALENDAR_PICKER
+#chromeperfectpixel-panel input::-webkit-calendar-picker-indicator {
+    width: 0.66em;
+    height: 0.66em;
+    padding: 0.17em 0.34em;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel input::-webkit-calendar-picker-indicator:hover {
+    background-color: #eee;
+}
+#endif // ENABLE_CALENDAR_PICKER
+
+#chromeperfectpixel-panel select {
+    -webkit-appearance: menulist;
+    box-sizing: border-box;
+    -webkit-box-align: center;
+    border: 1px solid;
+    white-space: pre;
+    -webkit-rtl-ordering: logical;
+    color: black;
+    background-color: white;
+    cursor: default;
+}
+
+#chromeperfectpixel-panel select[size],
+#chromeperfectpixel-panel select[multiple],
+#chromeperfectpixel-panel select[size][multiple] {
+    -webkit-appearance: listbox;
+    -webkit-box-align: start;
+    border: 1px inset gray;
+    border-radius: initial;
+    white-space: initial;
+}
+
+#chromeperfectpixel-panel select[size="0"],
+#chromeperfectpixel-panel select[size="1"] {
+    -webkit-appearance: menulist;
+    -webkit-box-align: center;
+    border: 1px solid;
+    border-radius: 5px;
+    white-space: pre;
+}
+
+#chromeperfectpixel-panel optgroup {
+    font-weight: bolder;
+}
+
+#chromeperfectpixel-panel option {
+    font-weight: normal;
+}
+
+#chromeperfectpixel-panel output {
+    display: inline;
+}
+
+/* form validation message bubble */
+
+#chromeperfectpixel-panel ::-webkit-validation-bubble {
+    display: inline-block;
+    z-index: 2147483647;
+    position: absolute;
+    opacity: 0.95;
+    line-height: 0;
+    margin: 0;
+    -webkit-text-security: none;
+    -webkit-transition: opacity 05.5s ease;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel ::-webkit-validation-bubble-message {
+    display: -webkit-box;
+    position: relative;
+    top: -4px;
+    font: message-box;
+    color: black;
+    min-width: 50px;
+    max-width: 200px;
+    border: solid 2px #400;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f8ecec), to(#e8cccc));
+    padding: 8px;
+    border-radius: 8px;
+    -webkit-box-shadow: 4px 4px 4px rgba(100,100,100,0.6),
+        inset -2px -2px 1px #d0c4c4,
+        inset 2px 2px 1px white;
+    -webkit-user-modify: read-only !important;
+    line-height: normal;
+    white-space: normal;
+    z-index: 2147483644;
+}
+
+#chromeperfectpixel-panel ::-webkit-validation-bubble-text-block {
+    -webkit-box-flex: 1;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel ::-webkit-validation-bubble-heading {
+    font-weight: bold;
+    -webkit-user-modify: read-only !important;
+}
+
+#chromeperfectpixel-panel ::-webkit-validation-bubble-arrow {
+    display: inline-block;
+    position: relative;
+    left: 32px;
+    width: 16px;
+    height: 16px;
+    background-color: #f8ecec;
+    border-width: 2px 0 0 2px;
+    border-style: solid;
+    border-color: #400;
+    box-shadow: inset 2px 2px 1px white;
+    -webkit-transform-origin: 0 0;
+    -webkit-transform: rotate(45deg);
+    -webkit-user-modify: read-only !important;
+    z-index: 2147483645;
+}
+
+#chromeperfectpixel-panel ::-webkit-validation-bubble-arrow-clipper {
+    display: block;
+    overflow: hidden;
+    height: 16px;
+    -webkit-user-modify: read-only !important;
+}
+
+#if defined(ENABLE_METER_ELEMENT) && ENABLE_METER_ELEMENT
+/* meter */
+
+#chromeperfectpixel-panel meter {
+    -webkit-appearance: meter;
+    box-sizing: border-box;
+    display: inline-block;
+    height: 1em;
+    width: 5em;
+    vertical-align: -0.2em;
+}
+
+#chromeperfectpixel-panel meter::-webkit-meter-inner-element {
+    -webkit-appearance: inherit;
+    box-sizing: inherit;
+    -webkit-user-modify: read-only !important;
+    height: 100%;
+    width: 100%;
+}
+
+#chromeperfectpixel-panel meter::-webkit-meter-bar {
+    background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#ddd), color-stop(0.20, #eee), color-stop(0.45, #ccc), color-stop(0.55, #ccc));
+    height: 100%;
+    width: 100%;
+    -webkit-user-modify: read-only !important;
+    box-sizing: border-box;
+}
+
+#chromeperfectpixel-panel meter::-webkit-meter-optimum-value {
+    background: -webkit-gradient(linear, left top, left bottom, from(#ad7), to(#ad7), color-stop(0.20, #cea), color-stop(0.45, #7a3), color-stop(0.55, #7a3));
+    height: 100%;
+    -webkit-user-modify: read-only !important;
+    box-sizing: border-box;
+}
+
+#chromeperfectpixel-panel meter::-webkit-meter-suboptimum-value {
+    background: -webkit-gradient(linear, left top, left bottom, from(#fe7), to(#fe7), color-stop(0.20, #ffc), color-stop(0.45, #db3), color-stop(0.55, #db3));
+    height: 100%;
+    -webkit-user-modify: read-only !important;
+    box-sizing: border-box;
+}
+
+#chromeperfectpixel-panel meter::-webkit-meter-even-less-good-value {
+    background: -webkit-gradient(linear, left top, left bottom, from(#f77), to(#f77), color-stop(0.20, #fcc), color-stop(0.45, #d44), color-stop(0.55, #d44));
+    height: 100%;
+    -webkit-user-modify: read-only !important;
+    box-sizing: border-box;
+}
+#endif
+
+#if defined(ENABLE_PROGRESS_ELEMENT) && ENABLE_PROGRESS_ELEMENT
+/* progress */
+
+#chromeperfectpixel-panel progress {
+    -webkit-appearance: progress-bar;
+    box-sizing: border-box;
+    display: inline-block;
+    height: 1em;
+    width: 10em;
+    vertical-align: -0.2em;
+}
+
+#chromeperfectpixel-panel progress::-webkit-progress-inner-element {
+    -webkit-appearance: inherit;
+    box-sizing: inherit;
+    -webkit-user-modify: read-only;
+    height: 100%;
+    width: 100%;
+}
+
+#chromeperfectpixel-panel progress::-webkit-progress-bar {
+    background-color: gray;
+    height: 100%;
+    width: 100%;
+    -webkit-user-modify: read-only !important;
+    box-sizing: border-box;
+}
+
+#chromeperfectpixel-panel progress::-webkit-progress-value {
+    background-color: green;
+    height: 100%;
+    width: 50%; /* should be removed later */
+    -webkit-user-modify: read-only !important;
+    box-sizing: border-box;
+}
+#endif
+
+/* inline elements */
+
+#chromeperfectpixel-panel img {
+    display: inline-block;
+}
+
+#chromeperfectpixel-panel u, #chromeperfectpixel-panel ins {
+    text-decoration: underline
+}
+
+#chromeperfectpixel-panel strong, #chromeperfectpixel-panel b {
+    font-weight: bold
+}
+
+#chromeperfectpixel-panel i, #chromeperfectpixel-panel cite, #chromeperfectpixel-panel em, #chromeperfectpixel-panel var, #chromeperfectpixel-panel address, #chromeperfectpixel-panel dfn {
+    font-style: italic
+}
+
+#chromeperfectpixel-panel tt, #chromeperfectpixel-panel code, #chromeperfectpixel-panel kbd, #chromeperfectpixel-panel samp {
+    font-family: monospace
+}
+
+#chromeperfectpixel-panel pre, #chromeperfectpixel-panel xmp, #chromeperfectpixel-panel plaintext, #chromeperfectpixel-panel listing {
+    display: block;
+    font-family: monospace;
+    white-space: pre;
+    margin: 1__qem 0
+}
+
+#chromeperfectpixel-panel mark {
+    background-color: yellow;
+    color: black
+}
+
+#chromeperfectpixel-panel big {
+    font-size: larger
+}
+
+#chromeperfectpixel-panel small {
+    font-size: smaller
+}
+
+#chromeperfectpixel-panel s, #chromeperfectpixel-panel strike, #chromeperfectpixel-panel del {
+    text-decoration: line-through
+}
+
+#chromeperfectpixel-panel sub {
+    vertical-align: sub;
+    font-size: smaller
+}
+
+#chromeperfectpixel-panel sup {
+    vertical-align: super;
+    font-size: smaller
+}
+
+#chromeperfectpixel-panel nobr {
+    white-space: nowrap
+}
+
+/* states */
+
+#chromeperfectpixel-panel :focus { 
+    outline: auto 5px -webkit-focus-ring-color
+}
+
+/* Read-only text fields do not show a focus ring but do still receive focus */
+#chromeperfectpixel-panel html:focus, #chromeperfectpixel-panel body:focus, #chromeperfectpixel-panel input[readonly]:focus { 
+    outline: none
+}
+
+#chromeperfectpixel-panel applet:focus, #chromeperfectpixel-panel embed:focus, #chromeperfectpixel-panel iframe:focus, #chromeperfectpixel-panel object:focus {
+    outline: none
+}
+  
+#chromeperfectpixel-panel input:focus, #chromeperfectpixel-panel textarea:focus, #chromeperfectpixel-panel isindex:focus, #chromeperfectpixel-panel keygen:focus, #chromeperfectpixel-panel select:focus {
+    outline-offset: -2px
+}
+
+#chromeperfectpixel-panel input[type="button"]:focus,
+#chromeperfectpixel-panel input[type="checkbox"]:focus,
+#chromeperfectpixel-panel input[type="file"]:focus,
+#chromeperfectpixel-panel input[type="hidden"]:focus,
+#chromeperfectpixel-panel input[type="image"]:focus,
+#chromeperfectpixel-panel input[type="radio"]:focus,
+#chromeperfectpixel-panel input[type="reset"]:focus,
+#chromeperfectpixel-panel input[type="search"]:focus,
+#chromeperfectpixel-panel input[type="submit"]:focus,
+#chromeperfectpixel-panel input[type="file"]:focus::-webkit-file-upload-button {
+    outline-offset: 0
+}
+    
+#chromeperfectpixel-panel a:-webkit-any-link {
+    color: -webkit-link;
+    text-decoration: underline;
+    cursor: auto;
+}
+
+#chromeperfectpixel-panel a:-webkit-any-link:active {
+    color: -webkit-activelink
+}
+
+/* HTML5 ruby elements */
+
+#chromeperfectpixel-panel ruby, #chromeperfectpixel-panel rt {
+    text-indent: 0; /* blocks used for ruby rendering should not trigger this */
+}
+
+#chromeperfectpixel-panel rt {
+    line-height: normal;
+    -webkit-text-emphasis: none;
+}
+
+#chromeperfectpixel-panel ruby > rt {
+    display: block;
+    font-size: 50%;
+    text-align: start;
+}
+
+#chromeperfectpixel-panel ruby > rp {
+    display: none;
+}
+
+/* other elements */
+
+#chromeperfectpixel-panel noframes {
+    display: none
+}
+
+#chromeperfectpixel-panel frameset, #chromeperfectpixel-panel frame {
+    display: block
+}
+
+#chromeperfectpixel-panel frameset {
+    border-color: inherit
+}
+
+#chromeperfectpixel-panel iframe:not([seamless]) {
+    border: 2px inset
+}
+
+#chromeperfectpixel-panel iframe[seamless] {
+    display: block
+}
+
+#chromeperfectpixel-panel details {
+    display: block
+}
+
+#chromeperfectpixel-panel summary {
+    display: block
+}
+
+#chromeperfectpixel-panel summary::-webkit-details-marker {
+    display: inline-block;
+    width: 0.66em;
+    height: 0.66em;
+    margin-right: 0.4em;
+}
+
+#chromeperfectpixel-panel bdi, #chromeperfectpixel-panel output {
+    unicode-bidi: -webkit-isolate;
+}
+
+#chromeperfectpixel-panel bdo {
+    unicode-bidi: bidi-override;
+}
+
+/* page */
+
+#chromeperfectpixel-panel @page {
+    /* FIXME: Define the right default values for page properties. */
+    size: auto;
+    margin: auto;
+    padding: 0px;
+    border-width: 0px;
+}
+
+/* noscript is handled internally, as it depends on settings. */
+
