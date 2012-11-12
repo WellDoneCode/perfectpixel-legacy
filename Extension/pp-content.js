@@ -85,7 +85,7 @@ var createPanel = function () {
 
                     '<div id="chromeperfectpixel-buttons">' +
                         '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show/Hide</button>' +
-
+                        '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">Lock</button>' +
                         '<div id="chromeperfectpixel-upload-area">' +
                             '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
                             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
@@ -99,6 +99,10 @@ var createPanel = function () {
         // Set event handlers
         $('.chromeperfectpixel-showHideBtn').bind('click', function () {
             ChromePerfectPixel.toggleOverlay();
+        });
+
+        $('.chromeperfectpixel-lockBtn').bind('click', function () {
+            ChromePerfectPixel.toggleLock();
         });
 
         $('#chromeperfectpixel-fakefile').bind('click', function () {
@@ -288,6 +292,7 @@ var ChromePerfectPixel = new function () {
         }
 
         $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-disabled").addClass("chromeperfectpixel-showHideBtn-enabled");
+        $('.chromeperfectpixel-lockBtn').removeClass("chromeperfectpixel-lockBtn-disabled").addClass("chromeperfectpixel-lockBtn-enabled");
 
         // Set overlay data
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlayObj) {
@@ -311,6 +316,7 @@ var ChromePerfectPixel = new function () {
         }
 
         $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-enabled").addClass("chromeperfectpixel-showHideBtn-disabled");
+        $('.chromeperfectpixel-lockBtn').removeClass("chromeperfectpixel-lockBtn-enabled").addClass("chromeperfectpixel-lockBtn-disabled");
     }
 
     this.toggleOverlay = function () {
@@ -320,6 +326,25 @@ var ChromePerfectPixel = new function () {
         else {
             ChromePerfectPixel.createOverlay();
         }
+    }
+
+    this.lockOverlay = function () {
+        $('#' + overlayUniqueId).data('locked', 'true').css('pointer-events', 'none');
+        $('.chromeperfectpixel-lockBtn').text('Unlock');
+    }
+
+    this.unlockOverlay = function () {
+        $('#' + overlayUniqueId).data('locked', 'false').css('pointer-events', 'auto');
+        $('.chromeperfectpixel-lockBtn').text('Lock');
+    }
+
+    this.toggleLock = function () {
+        if ($('#' + overlayUniqueId).data('locked') === 'true') {
+            ChromePerfectPixel.unlockOverlay();
+        }
+        else {
+            ChromePerfectPixel.lockOverlay();
+        }   
     }
 
     this.onOverlayUpdate = function (isStop) {
@@ -358,6 +383,10 @@ var ChromePerfectPixel = new function () {
             if (PPStorage.GetOverlaysCount() > 0)
                 ChromePerfectPixel.toggleOverlay();
         }
+        else if (event.altKey && event.which == 67) { // Alt + c
+            if (PPStorage.GetOverlaysCount() > 0)
+                ChromePerfectPixel.toggleLock();
+        }
         else
             return;
 
@@ -376,6 +405,7 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-opacity').attr('disabled', true);
         $('#chromeperfectpixel-scale').attr('disabled', true);
         $('.chromeperfectpixel-showHideBtn').button("option", "disabled", true);
+        $('.chromeperfectpixel-lockBtn').button("option", "disabled", true);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", true);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
 
@@ -442,6 +472,7 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-opacity').attr('disabled', false);
         $('#chromeperfectpixel-scale').attr('disabled', false);
         $('.chromeperfectpixel-showHideBtn').button("option", "disabled", false);
+        $('.chromeperfectpixel-lockBtn').button("option", "disabled", false);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
         $('#chromeperfectpixel-progressbar-area').hide();
