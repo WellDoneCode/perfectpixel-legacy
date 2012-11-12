@@ -49,14 +49,14 @@ $(document).ready(function () {
     
 //React when a browser action's icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
-    chrome.tabs.insertCSS(tab.id, { file: "style.css" });
-    chrome.tabs.insertCSS(tab.id, { file: "jquery-ui.css" });
-    chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
-        chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
-            chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                        chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
+    chrome.tabs.insertCSS(tab.id, { file: "./style.css" });
+    chrome.tabs.insertCSS(tab.id, { file: "./jquery-ui.css" });
+    chrome.tabs.executeScript(null, { file: "./jquery-1.6.2.min.js" }, function () {
+        chrome.tabs.executeScript(null, { file: "./jquery-ui.js" }, function () {
+            chrome.tabs.executeScript(null, { file: "./pp-shared.js" }, function () {
+                chrome.tabs.executeScript(null, { file: "./storage/pp-storage-filesystem.js" }, function () {
+                    chrome.tabs.executeScript(null, { file: "./storage/pp-storage-localStorage.js" }, function () {
+                        chrome.tabs.executeScript(null, { file: "./pp-content.js" }, function () {
                             chrome.tabs.executeScript(null, { code: "togglePanel();" });
                         });
                     });
