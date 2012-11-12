@@ -436,7 +436,7 @@ var ChromePerfectPixel = new function () {
 
     this.renderLayer = function (overlay) {
         var container = $('#chromeperfectpixel-layers');
-        var layer = $('<div></div>', {
+        var layer = $('<label></label>', {
             class: 'chromeperfectpixel-layer',
             data: {
                 Id: overlay.Id
