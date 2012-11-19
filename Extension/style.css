@@ -255,9 +255,13 @@
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {
     margin: 0 0 0 15px;
-    width:25px;
-    height:25px;
 }
+
+    #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete > span {
+        display: inline-block;
+        width:13px;
+        height:13px;
+    }
 
 #chromeperfectpixel-panel #chromeperfectpixel-buttons
 {
