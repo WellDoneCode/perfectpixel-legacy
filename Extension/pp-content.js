@@ -84,7 +84,7 @@ var createPanel = function () {
                     '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
 
                     '<div id="chromeperfectpixel-buttons">' +
-                        '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show/Hide</button>' +
+                        '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show</button>' +
                         '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">Lock</button>' +
                         '<div id="chromeperfectpixel-upload-area">' +
                             '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
@@ -249,7 +249,8 @@ var ChromePerfectPixel = new function () {
     }
 
     // Overlay
-    this.createOverlay = function () {
+    this.createOverlay = function (options) {
+        var options = options || GlobalStorage.getOptions();
         if ($('#' + overlayUniqueId).length > 0) {
         }
         else {
@@ -268,7 +269,8 @@ var ChromePerfectPixel = new function () {
                 'background-color': 'transparent',
                 'opacity': default_opacity,
                 'display': 'block',
-                'cursor': 'all-scroll'
+                'cursor': 'all-scroll',
+                'pointer-events' : (options['locked']) ? 'none' : 'auto'
             });
             $('body').append(overlay);
 
@@ -306,6 +308,12 @@ var ChromePerfectPixel = new function () {
                 .css('opacity', overlayObj.Opacity);
             }
         });
+
+        GlobalStorage.setOptions({
+            'visible' : true
+        });
+
+        $('.chromeperfectpixel-showHideBtn').text('Hide');
     }
 
     this.removeOverlay = function () {
@@ -317,6 +325,12 @@ var ChromePerfectPixel = new function () {
 
         $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-enabled").addClass("chromeperfectpixel-showHideBtn-disabled");
         $('.chromeperfectpixel-lockBtn').removeClass("chromeperfectpixel-lockBtn-enabled").addClass("chromeperfectpixel-lockBtn-disabled");
+
+        $('.chromeperfectpixel-showHideBtn').text('Show');
+
+        GlobalStorage.setOptions({
+            'visible' : false
+        });
     }
 
     this.toggleOverlay = function () {
@@ -329,22 +343,29 @@ var ChromePerfectPixel = new function () {
     }
 
     this.lockOverlay = function () {
-        $('#' + overlayUniqueId).data('locked', 'true').css('pointer-events', 'none');
+        $('#' + overlayUniqueId).css('pointer-events', 'none');
+        GlobalStorage.setOptions({
+            'locked' : true
+        });
         $('.chromeperfectpixel-lockBtn').text('Unlock');
     }
 
     this.unlockOverlay = function () {
-        $('#' + overlayUniqueId).data('locked', 'false').css('pointer-events', 'auto');
+        $('#' + overlayUniqueId).css('pointer-events', 'auto');
+        GlobalStorage.setOptions({
+            'locked' : false
+        });
         $('.chromeperfectpixel-lockBtn').text('Lock');
     }
 
     this.toggleLock = function () {
-        if ($('#' + overlayUniqueId).data('locked') === 'true') {
+        var options = GlobalStorage.getOptions();
+        if (options['locked'] === true) {
             ChromePerfectPixel.unlockOverlay();
         }
         else {
             ChromePerfectPixel.lockOverlay();
-        }   
+        }
     }
 
     this.onOverlayUpdate = function (isStop) {
@@ -512,7 +533,17 @@ var ChromePerfectPixel = new function () {
         GlobalStorage.set_CurrentOverlayId(overlayId);
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlay) {
             ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity, overlay.Scale);
-            ChromePerfectPixel.createOverlay();
+
+            var options = GlobalStorage.getOptions();
+
+            if (options['visible']) {
+                ChromePerfectPixel.createOverlay(options);
+            }
+
+            // Update the lock button text if necessary
+            if (options['locked']) {
+                $('.chromeperfectpixel-lockBtn').text('Unlock');
+            }
         });
     }
 
