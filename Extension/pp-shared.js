@@ -54,6 +54,35 @@ var GlobalStorage = new function () {
         else
             localStorage.removeItem("currentOverlayId");
     }
+
+    this.getOptions = function () {
+        var options = {};
+        try {
+            options = JSON.parse(localStorage['options']);
+        } catch (e) {
+            console.log('Error loading options from localStorage: object not set');
+        }
+
+        return options;
+    }
+
+    this.setOptions = function (newOptions) {
+        var index = 0;
+        if (newOptions) {
+            var options = this.getOptions();
+            
+            for (var attrname in newOptions) { 
+                options[attrname] = newOptions[attrname]; 
+            }
+
+            localStorage['options'] = JSON.stringify(options);
+
+            return options;
+        } else {
+            localStorage.removeItem['options'];
+            return {};
+        }
+    }
 }
 
 // Converts any ArrayBuffer to a string
