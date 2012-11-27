@@ -22,7 +22,7 @@ this.manifest = {
             "group": "Mouse and Keyboard",
             "name": "enableHotkeys",
             "type": "checkbox",
-            "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right"
+            "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right"
         }
 //        {
 //            "tab": i18n.get("information"),
