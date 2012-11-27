@@ -231,6 +231,7 @@
 }
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer {
+    display: block;
     border: 1px dashed black;
     padding: 5px;
     margin-top: 1px;

@@ -84,8 +84,8 @@ var createPanel = function () {
                     '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
 
                     '<div id="chromeperfectpixel-buttons">' +
-                        '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show/Hide</button>' +
-
+                        '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show</button>' +
+                        '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">Lock</button>' +
                         '<div id="chromeperfectpixel-upload-area">' +
                             '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
                             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
@@ -99,6 +99,10 @@ var createPanel = function () {
         // Set event handlers
         $('.chromeperfectpixel-showHideBtn').bind('click', function () {
             ChromePerfectPixel.toggleOverlay();
+        });
+
+        $('.chromeperfectpixel-lockBtn').bind('click', function () {
+            ChromePerfectPixel.toggleLock();
         });
 
         $('#chromeperfectpixel-fakefile').bind('click', function () {
@@ -245,7 +249,8 @@ var ChromePerfectPixel = new function () {
     }
 
     // Overlay
-    this.createOverlay = function () {
+    this.createOverlay = function (options) {
+        var options = options || GlobalStorage.getOptions();
         if ($('#' + overlayUniqueId).length > 0) {
         }
         else {
@@ -264,7 +269,8 @@ var ChromePerfectPixel = new function () {
                 'background-color': 'transparent',
                 'opacity': default_opacity,
                 'display': 'block',
-                'cursor': 'all-scroll'
+                'cursor': 'all-scroll',
+                'pointer-events' : (options['locked']) ? 'none' : 'auto'
             });
             $('body').append(overlay);
 
@@ -288,6 +294,7 @@ var ChromePerfectPixel = new function () {
         }
 
         $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-disabled").addClass("chromeperfectpixel-showHideBtn-enabled");
+        $('.chromeperfectpixel-lockBtn').removeClass("chromeperfectpixel-lockBtn-disabled").addClass("chromeperfectpixel-lockBtn-enabled");
 
         // Set overlay data
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlayObj) {
@@ -301,6 +308,12 @@ var ChromePerfectPixel = new function () {
                 .css('opacity', overlayObj.Opacity);
             }
         });
+
+        GlobalStorage.setOptions({
+            'visible' : true
+        });
+
+        $('.chromeperfectpixel-showHideBtn').text('Hide');
     }
 
     this.removeOverlay = function () {
@@ -311,6 +324,13 @@ var ChromePerfectPixel = new function () {
         }
 
         $('.chromeperfectpixel-showHideBtn').removeClass("chromeperfectpixel-showHideBtn-enabled").addClass("chromeperfectpixel-showHideBtn-disabled");
+        $('.chromeperfectpixel-lockBtn').removeClass("chromeperfectpixel-lockBtn-enabled").addClass("chromeperfectpixel-lockBtn-disabled");
+
+        $('.chromeperfectpixel-showHideBtn').text('Show');
+
+        GlobalStorage.setOptions({
+            'visible' : false
+        });
     }
 
     this.toggleOverlay = function () {
@@ -319,6 +339,32 @@ var ChromePerfectPixel = new function () {
         }
         else {
             ChromePerfectPixel.createOverlay();
+        }
+    }
+
+    this.lockOverlay = function () {
+        $('#' + overlayUniqueId).css('pointer-events', 'none');
+        GlobalStorage.setOptions({
+            'locked' : true
+        });
+        $('.chromeperfectpixel-lockBtn').text('Unlock');
+    }
+
+    this.unlockOverlay = function () {
+        $('#' + overlayUniqueId).css('pointer-events', 'auto');
+        GlobalStorage.setOptions({
+            'locked' : false
+        });
+        $('.chromeperfectpixel-lockBtn').text('Lock');
+    }
+
+    this.toggleLock = function () {
+        var options = GlobalStorage.getOptions();
+        if (options['locked'] === true) {
+            ChromePerfectPixel.unlockOverlay();
+        }
+        else {
+            ChromePerfectPixel.lockOverlay();
         }
     }
 
@@ -358,6 +404,10 @@ var ChromePerfectPixel = new function () {
             if (PPStorage.GetOverlaysCount() > 0)
                 ChromePerfectPixel.toggleOverlay();
         }
+        else if (event.altKey && event.which == 67) { // Alt + c
+            if (PPStorage.GetOverlaysCount() > 0)
+                ChromePerfectPixel.toggleLock();
+        }
         else
             return;
 
@@ -376,6 +426,7 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-opacity').attr('disabled', true);
         $('#chromeperfectpixel-scale').attr('disabled', true);
         $('.chromeperfectpixel-showHideBtn').button("option", "disabled", true);
+        $('.chromeperfectpixel-lockBtn').button("option", "disabled", true);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", true);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
 
@@ -406,7 +457,7 @@ var ChromePerfectPixel = new function () {
 
     this.renderLayer = function (overlay) {
         var container = $('#chromeperfectpixel-layers');
-        var layer = $('<div></div>', {
+        var layer = $('<label></label>', {
             class: 'chromeperfectpixel-layer',
             data: {
                 Id: overlay.Id
@@ -442,6 +493,7 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-opacity').attr('disabled', false);
         $('#chromeperfectpixel-scale').attr('disabled', false);
         $('.chromeperfectpixel-showHideBtn').button("option", "disabled", false);
+        $('.chromeperfectpixel-lockBtn').button("option", "disabled", false);
         $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
         $('#chromeperfectpixel-progressbar-area').hide();
@@ -481,7 +533,17 @@ var ChromePerfectPixel = new function () {
         GlobalStorage.set_CurrentOverlayId(overlayId);
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlay) {
             ChromePerfectPixel.updateCoordsUI(overlay.X, overlay.Y, overlay.Opacity, overlay.Scale);
-            ChromePerfectPixel.createOverlay();
+
+            var options = GlobalStorage.getOptions();
+
+            if (options['visible']) {
+                ChromePerfectPixel.createOverlay(options);
+            }
+
+            // Update the lock button text if necessary
+            if (options['locked']) {
+                $('.chromeperfectpixel-lockBtn').text('Unlock');
+            }
         });
     }
 
