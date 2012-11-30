@@ -257,7 +257,8 @@ var ChromePerfectPixel = new function () {
             var overlay = $('<img />');
             overlay.attr({
                 'id': overlayUniqueId
-            }).css({
+            }).addClass('chromeperfectpixel-overlay')
+            .css({
                 'z-index': default_zIndex,
                 'width': default_width_px + 'px',
                 'height': default_height_px + 'px',
