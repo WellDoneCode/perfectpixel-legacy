@@ -30,6 +30,13 @@ this.manifest = {
             "name": "compactLayersSection",
             "type": "checkbox",
             "label": "Enable compact displaying layers"
+        },
+        {
+            "tab": "General",
+            "group": "Design",
+            "name": "customCssCode",
+            "type": "textarea",
+            "label": "Custom CSS Code"
         }
 //        {
 //            "tab": i18n.get("information"),
