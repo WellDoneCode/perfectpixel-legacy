@@ -466,18 +466,25 @@ var ChromePerfectPixel = new function () {
         var thumbHeight = 50;
         var coeff = overlay.Height / thumbHeight;
         var thumbWidth = Math.ceil(overlay.Width / coeff);
-        var thumb = $('<img />', {
-            class: 'chromeperfectpixel-thumb',
-            src: overlay.Url,
-            css: {
-                width: thumbWidth + 'px',
-                height: thumbHeight + 'px'
-            }
-        });
 
         var checkbox = ($('<input type=radio name="chromeperfectpixel-selectedLayer" />'));
         layer.append(checkbox);
-        layer.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
+
+        if (ExtOptions.compactLayersSection){
+            layer.css({'background-image':  'url(' +overlay.Url + ')'});
+        }
+        else{
+            var thumb = $('<img />', {
+                class: 'chromeperfectpixel-thumb',
+                src: overlay.Url,
+                css: {
+                    width: thumbWidth + 'px',
+                    height: thumbHeight + 'px'
+                }
+            });
+            layer.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
+        }
+
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
         deleteBtn.bind('click', function () {
             ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
@@ -525,10 +532,12 @@ var ChromePerfectPixel = new function () {
         if (!overlayId || overlayId == null)
             overlayId = 0;
 
-        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').removeAttr('checked');
-        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').filter(function () {
+        $('.chromeperfectpixel-layer').removeClass('current');
+        var selectedLayerCheckboxes = $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]');
+        selectedLayerCheckboxes.removeAttr('checked');
+        selectedLayerCheckboxes.filter(function () {
             return $(this).parents('.chromeperfectpixel-layer').data("Id") == overlayId
-        }).attr('checked', 'checked');
+        }).attr('checked', 'checked').closest('.chromeperfectpixel-layer').addClass('current');
 
         GlobalStorage.set_CurrentOverlayId(overlayId);
         PPStorage.GetOverlay(GlobalStorage.get_CurrentOverlayId(), function (overlay) {

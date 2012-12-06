@@ -26,6 +26,7 @@ along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
 var settings = new Store("settings", {
     "storageCompatibilityMode": false,
     "debugMode": false,
+    "compactLayersSection": false,
     "enableHotkeys": true
 });
 
@@ -51,6 +52,7 @@ $(document).ready(function () {
 chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.tabs.insertCSS(tab.id, { file: "style.css" });
     chrome.tabs.insertCSS(tab.id, { file: "jquery-ui.css" });
+    if (settings.get("compactLayersSection")) chrome.tabs.insertCSS(tab.id, { file: "compact-layers-section.css" });
     chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
         chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
             chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
