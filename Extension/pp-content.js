@@ -471,7 +471,7 @@ var ChromePerfectPixel = new function () {
         var checkbox = ($('<input type=radio name="chromeperfectpixel-selectedLayer" />'));
         layer.append(checkbox);
 
-        if (ExtOptions.compactLayersSection){
+        if (!ExtOptions.classicLayersSection){
             layer.css({'background-image':  'url(' +overlay.Url + ')'});
         }
         else{

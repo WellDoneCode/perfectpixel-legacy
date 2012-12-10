@@ -25,14 +25,14 @@ this.manifest = {
             "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right"
         },
         {
-            "tab": "General",
+            "tab": "Appearance",
             "group": "Design",
-            "name": "compactLayersSection",
+            "name": "classicLayersSection",
             "type": "checkbox",
-            "label": "Enable compact displaying layers"
+            "label": "Enable classic layers display mode"
         },
         {
-            "tab": "General",
+            "tab": "Appearance",
             "group": "Design",
             "name": "customCssCode",
             "type": "textarea",
