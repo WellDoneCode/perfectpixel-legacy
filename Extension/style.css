@@ -20,7 +20,9 @@
 #chromeperfectpixel-panel,
 #chromeperfectpixel-panel *,
 #chromeperfectpixel-imgtools,
-#chromeperfectpixel-imgtools *{
+#chromeperfectpixel-imgtools img,
+#chromeperfectpixel-imgtools *,
+.chromeperfectpixel-overlay {
     color:#000;
     padding:0;
     margin:0;
@@ -34,6 +36,8 @@
     text-transform:none;
     text-shadow:none;
     list-style:none;
+    max-width:none;
+    max-height:none;
 }
 
 /* Chrome default style values */
@@ -67,6 +71,10 @@
 #chromeperfectpixel-panel input[type="search"] {
     background-color: white;
     border: 2px inset;
+}
+
+#chromeperfectpixel-panel label input, label textarea, label select {
+    display: inline;
 }
 
 #chromeperfectpixel-panel *:before,

@@ -1,0 +1,62 @@
+#chromeperfectpixel-panel #chromeperfectpixel-layers {
+    /*text-align: justify;*/
+    width:306px;
+}
+#chromeperfectpixel-panel .chromeperfectpixel-layer {
+    background-position: left top;
+    background-size: cover;
+    cursor: pointer;
+    text-align: center;
+    opacity: 0.5;
+    display: inline-block;
+    /*width: auto;*/
+    position: relative;
+    height: 60px;
+    width: 94px;
+    padding: 0;
+    margin: 6px 6px 0 0;
+}
+#chromeperfectpixel-panel .chromeperfectpixel-layer:hover{
+    opacity: .8;
+}
+#chromeperfectpixel-panel .chromeperfectpixel-layer.current{
+    border-style: solid;
+    opacity: 1;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer img{
+    max-width: 90px;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer input[type="radio"] {
+    display: none;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-thumbwrapper {
+    width:auto;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {
+    padding: 4px;
+    margin: 0;
+    position: absolute;
+    display: none;
+    background: red;
+    border-radius: 50px;
+    border: none;
+    opacity: 0.9;
+    left: -5px;
+    top: -5px;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete:hover {
+    opacity: 1;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete span{
+    color: white;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer:hover .chromeperfectpixel-delete{
+    display: block;
+}
