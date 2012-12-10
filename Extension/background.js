@@ -28,6 +28,7 @@ var settings = new Store("settings", {
     "debugMode": false,
     "classicLayersSection": false,
     "customCssCode": '',
+    "rememberPanelOpenClosedState": false,
     "enableHotkeys": true
 });
 
@@ -42,33 +43,62 @@ $(document).ready(function () {
 });
 
 
+// here we store panel' state for every tab
+var PP_state = [];
+
 // For debug add these lines to manifest
 //  "content_scripts": [{
 //      "matches": ["<all_urls>"],
 //	  "css": [ "style.css", "jquery-ui.css" ],
 //      "js": [ "jquery-1.6.2.min.js", "jquery-ui.js", "pp-shared.js", "storage/pp-storage-localStorage.js", "storage/pp-storage-filesystem.js", "pp-content.js"]
 //  }]
-    
-//React when a browser action's icon is clicked.
-chrome.browserAction.onClicked.addListener(function (tab) {
-    chrome.tabs.insertCSS(tab.id, { file: "style.css" });
-    chrome.tabs.insertCSS(tab.id, { file: "jquery-ui.css" });
-    if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tab.id, { file: "compact-layers-section.css" });
+
+function togglePanel(){
+    chrome.tabs.executeScript(null, { code: "togglePanel();" });
+}
+
+function injectIntoTab(tabId){
+    chrome.tabs.insertCSS(tabId, { file: "style.css" });
+    chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
+    if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
-    if (customCssCode) chrome.tabs.insertCSS(tab.id, { code: customCssCode});
+    if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
     chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
         chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
             chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
                 chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
                     chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
                         chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                            chrome.tabs.executeScript(null, { code: "togglePanel();" });
+                            togglePanel();
                         });
                     });
                 });
             });
         });
     });
+}
+    
+//React when a browser' action icon is clicked.
+chrome.browserAction.onClicked.addListener(function (tab) {
+    var pp_tab_state = PP_state[tab.id];
+    if (! pp_tab_state || pp_tab_state == 'closed'){
+        PP_state[tab.id] = 'open';
+        injectIntoTab(tab.id);
+    }
+    else {
+        PP_state[tab.id] = 'closed';
+        togglePanel();
+    }
+});
+
+// On tab (re)load check if we need to open panel
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
+    var pp_tab_state = PP_state[tabId];
+    if (!settings.get('rememberPanelOpenClosedState') || ! pp_tab_state || pp_tab_state == 'closed') return;
+    if (changeInfo.status === 'complete') { //this means that tab was loaded
+        PP_state[tabId] = 'open';
+        injectIntoTab(tabId);
+    }
 });
 
 chrome.extension.onRequest.addListener(

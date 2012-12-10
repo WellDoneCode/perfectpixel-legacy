@@ -25,6 +25,13 @@ this.manifest = {
             "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right"
         },
         {
+            "tab": "General",
+            "group": "Behavior",
+            "name": "rememberPanelOpenClosedState",
+            "type": "checkbox",
+            "label": "Remember panel state<br>When enabled panel will be re-opened when you browse to another page or reload current if it was opened before that."
+        },
+        {
             "tab": "Appearance",
             "group": "Design",
             "name": "classicLayersSection",
