@@ -63,7 +63,7 @@
             return this;
         }
     });
-    
+
     Bundle.Description = new Class({
         // text
         "Extends": Bundle,
@@ -160,6 +160,63 @@
             this.element.addEvent("click", (function () {
                 this.fireEvent("action");
             }).bind(this));
+        }
+    });
+
+    Bundle.Textarea = new Class({
+        // label, text, value
+        // action -> change & keyup
+        "Extends": Bundle,
+
+        "createDOM": function () {
+            this.bundle = new Element("div", {
+                "class": "setting bundle textarea"
+            });
+
+            this.container = new Element("div", {
+                "class": "setting container textarea"
+            });
+
+            this.element = new Element("textarea", {
+                "class": "setting element textarea"
+            });
+
+            this.label = new Element("label", {
+                "class": "setting label textarea"
+            });
+        },
+
+        "setupDOM": function () {
+            if (this.params.label !== undefined) {
+                this.label.set("html", this.params.label);
+                this.label.inject(this.container);
+                this.params.searchString += this.params.label + "•";
+            }
+
+            if (this.params.text !== undefined) {
+                this.element.set("placeholder", this.params.text);
+                this.params.searchString += this.params.text + "•";
+            }
+
+            if (this.params.value !== undefined) {
+                this.element.appendText(this.params.text);
+            }
+
+            this.element.inject(this.container);
+            this.container.inject(this.bundle);
+        },
+
+        "addEvents": function () {
+            var change = (function (event) {
+                if (this.params.name !== undefined) {
+                    settings.set(this.params.name, this.get());
+                }
+
+                this.fireEvent("action", this.get());
+            }).bind(this);
+
+            this.element.addEvent("change", change);
+            this.element.addEvent("keyup", change);
         }
     });
     
@@ -625,6 +682,7 @@
                 "description": "Description",
                 "button": "Button",
                 "text": "Text",
+                "textarea": "Textarea",
                 "checkbox": "Checkbox",
                 "slider": "Slider",
                 "popupButton": "PopupButton",
