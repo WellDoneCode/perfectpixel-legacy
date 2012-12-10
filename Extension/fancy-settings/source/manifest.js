@@ -23,6 +23,20 @@ this.manifest = {
             "name": "enableHotkeys",
             "type": "checkbox",
             "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right"
+        },
+        {
+            "tab": "General",
+            "group": "Design",
+            "name": "compactLayersSection",
+            "type": "checkbox",
+            "label": "Enable compact displaying layers"
+        },
+        {
+            "tab": "General",
+            "group": "Design",
+            "name": "customCssCode",
+            "type": "textarea",
+            "label": "Custom CSS Code"
         }
 //        {
 //            "tab": i18n.get("information"),
