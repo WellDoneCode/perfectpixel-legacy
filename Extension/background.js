@@ -32,6 +32,9 @@ var settings = new Store("settings", {
     "enableHotkeys": true
 });
 
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-26666773-2']);
+
 $(document).ready(function () {
     if (!settings.get("debugMode")) {
         if (!window.console) window.console = {};
@@ -40,6 +43,10 @@ $(document).ready(function () {
             console[methods[i]] = function () { };
         }
     }
+
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = 'https://ssl.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 });
 
 
@@ -58,6 +65,8 @@ function togglePanel(){
 }
 
 function injectIntoTab(tabId){
+    _gaq.push(['_trackPageview']); // Tracking
+
     chrome.tabs.insertCSS(tabId, { file: "style.css" });
     chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
     if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
@@ -107,6 +116,15 @@ chrome.extension.onRequest.addListener(
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
             sendResponse(settings.toObject());
+        }
+
+        // Event listener for tracking
+        if (request.type == PP_RequestType.TrackEvent) {
+            var senderId = request.senderId;
+            var eventType = request.eventType;
+
+            _gaq.push(['_trackEvent', senderId, eventType]);
+            sendResponse(true);
         }
 
         // Event listener for file operations

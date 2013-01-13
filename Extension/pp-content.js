@@ -41,6 +41,20 @@ $(document).ready(function () {
     });
 });
 
+var trackEvent = function(senderId, eventType) {
+    console.log("PP track event", "senderId: " + senderId + "; eventType: " + eventType);
+    chrome.extension.sendRequest(
+        {
+            type: PP_RequestType.TrackEvent,
+            senderId: senderId,
+            eventType: eventType
+        },
+        function (response) {
+            if(!response)
+                console.log("PP error", "Tracking error: " + senderId + ", " + eventType);
+        });
+}
+
 var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {
         var panelHtml =
@@ -97,37 +111,44 @@ var createPanel = function () {
         $('body').append(panelHtml);
 
         // Set event handlers
-        $('.chromeperfectpixel-showHideBtn').bind('click', function () {
+        $('.chromeperfectpixel-showHideBtn').bind('click', function (e) {
+            trackEvent("showHideBtn", e.type);
             ChromePerfectPixel.toggleOverlay();
         });
 
-        $('.chromeperfectpixel-lockBtn').bind('click', function () {
+        $('.chromeperfectpixel-lockBtn').bind('click', function (e) {
+            trackEvent("lockBtn", e.type);
             ChromePerfectPixel.toggleLock();
         });
 
-        $('#chromeperfectpixel-fakefile').bind('click', function () {
+        $('#chromeperfectpixel-fakefile').bind('click', function (e) {
+            trackEvent("addNewLayerBtn", e.type);
             $(this).parent().find('input[type=file]').click();
         });
         $('#chromeperfectpixel-fileUploader').bind('change', function () {
             ChromePerfectPixel.upload(this.files, this);
         });
 
-        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function () {
+        $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
             // Live handler called.
+            trackEvent("layer", e.type);
             var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
             ChromePerfectPixel.setCurrentLayer(overlayId);
         });
 
-        $('#chromeperfectpixel-opacity').change(function () {
+        $('#chromeperfectpixel-opacity').change(function (e) {
             ChromePerfectPixel.opacity($(this));
         });
 
-        $('#chromeperfectpixel-scale').change(function () {
+        $('#chromeperfectpixel-scale').change(function (e) {
+            trackEvent("scale", e.type);
             ChromePerfectPixel.change(false, false, false, $(this).val());
         });
 
-        $('#chromeperfectpixel-origin-controls button').live("click", function (event) {
-            event.preventDefault();
+        $('#chromeperfectpixel-origin-controls button').live("click", function (e) {
+            e.preventDefault();
+            trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), e.type);
+
             if ($(this).attr('id') == "chromeperfectpixel-xless" || $(this).attr('id') == "chromeperfectpixel-xmore") {
                 ChromePerfectPixel.xleft($(this));
             }
@@ -136,8 +157,10 @@ var createPanel = function () {
             }
         });
 
-        $('.chromeperfectpixel-coords').live("keypress", function (event) {
-            if (event.which == 13) {
+        $('.chromeperfectpixel-coords').live("keypress", function (e) {
+            if (e.which == 13) {
+                trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), e.type);
+
                 if ($(this).attr("id") == "chromeperfectpixel-coordX")
                     ChromePerfectPixel.change(false, $(this).val(), false);
                 if ($(this).attr("id") == "chromeperfectpixel-coordY")
@@ -161,6 +184,7 @@ var createPanel = function () {
         $('#chromeperfectpixel-panel-header').dblclick(function (event) {
             //if (event.target.id == "chromeperfectpixel-header-logo")
             //    return;
+            trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), event.type);
 
             var panel = $('#chromeperfectpixel-panel');
             var body = $('#chromeperfectpixel-panel-body');
@@ -196,6 +220,21 @@ var createPanel = function () {
         });
 
         $('#chromeperfectpixel-panel button').button();
+
+        // Workaround to catch single value of opacity during opacity HTML element change
+        (function(el, timeout) {
+            var timer, trig=function() { el.trigger("changed"); };
+            el.bind("change", function() {
+                if(timer) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(trig, timeout);
+            });
+        })($("#chromeperfectpixel-opacity"), 500);
+
+        $('#chromeperfectpixel-opacity').bind('changed', function (e) {
+            trackEvent("opacity", e.type);
+        });
 
         // Global hotkeys on
         if (ChromePerfectPixel.get_KeyboardEnabled()) {
@@ -487,7 +526,8 @@ var ChromePerfectPixel = new function () {
         }
 
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
-        deleteBtn.bind('click', function () {
+        deleteBtn.bind('click', function (e) {
+            trackEvent("layer-delete", e.type);
             ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
         });
         deleteBtn.button(); // apply css
@@ -509,6 +549,7 @@ var ChromePerfectPixel = new function () {
 
     this.deleteLayer = function (layer) {
         if (confirm('Are you sure want to delete layer?')) {
+            trackEvent("layer-delete", 'confirmed');
             var overlayId = $(layer).data('Id');
             PPStorage.DeleteOverlay(overlayId, function () {
                 var overlaysCount = PPStorage.GetOverlaysCount();
@@ -524,6 +565,7 @@ var ChromePerfectPixel = new function () {
                 ChromePerfectPixel.renderLayers();
             });
         }
+        trackEvent("layer-delete", 'canceled');
     }
 
     this.setCurrentLayer = function (overlayId) {
