@@ -29,8 +29,12 @@ var settings = new Store("settings", {
     "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
-    "enableHotkeys": true
+    "enableHotkeys": true,
+    "enableStatistics": true
 });
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-26666773-2']);
 
 $(document).ready(function () {
     if (!settings.get("debugMode")) {
@@ -40,8 +44,13 @@ $(document).ready(function () {
             console[methods[i]] = function () { };
         }
     }
-});
 
+    if (settings.get("enableStatistics")) {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    }
+});
 
 // here we store panel' state for every tab
 var PP_state = [];
@@ -58,6 +67,10 @@ function togglePanel(){
 }
 
 function injectIntoTab(tabId){
+    if (settings.get("enableStatistics")) {
+        _gaq.push(['_trackPageview']); // Tracking
+    }
+
     chrome.tabs.insertCSS(tabId, { file: "style.css" });
     chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
     if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
@@ -77,7 +90,7 @@ function injectIntoTab(tabId){
         });
     });
 }
-    
+
 //React when a browser' action icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
     var pp_tab_state = PP_state[tab.id];
@@ -107,6 +120,18 @@ chrome.extension.onRequest.addListener(
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
             sendResponse(settings.toObject());
+        }
+
+        // Event listener for tracking
+        if (request.type == PP_RequestType.TrackEvent) {
+            var senderId = String(request.senderId);
+            var eventType = String(request.eventType);
+
+            if (settings.get("enableStatistics")) {
+                _gaq.push(['_trackEvent', senderId, eventType]);
+            }
+
+            sendResponse(true);
         }
 
         // Event listener for file operations

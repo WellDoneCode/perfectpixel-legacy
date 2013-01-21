@@ -32,6 +32,13 @@ this.manifest = {
             "label": "Remember panel state<br>When enabled panel will be re-opened when you browse to another page or reload current if it was opened before that."
         },
         {
+            "tab": "General",
+            "group": "Statistics",
+            "name": "enableStatistics",
+            "type": "checkbox",
+            "label": "Send anonymous statistics to developers"
+        },
+        {
             "tab": "Appearance",
             "group": "Design",
             "name": "classicLayersSection",
