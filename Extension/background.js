@@ -120,8 +120,8 @@ chrome.extension.onRequest.addListener(
 
         // Event listener for tracking
         if (request.type == PP_RequestType.TrackEvent) {
-            var senderId = request.senderId;
-            var eventType = request.eventType;
+            var senderId = String(request.senderId);
+            var eventType = String(request.eventType);
 
             _gaq.push(['_trackEvent', senderId, eventType]);
             sendResponse(true);
