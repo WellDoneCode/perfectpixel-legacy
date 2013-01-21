@@ -42,6 +42,9 @@ $(document).ready(function () {
 });
 
 var trackEvent = function(senderId, eventType) {
+    if(ExtOptions.enableStatistics == false)
+        return;
+
     console.log("PP track event", "senderId: " + senderId + "; eventType: " + eventType);
     chrome.extension.sendRequest(
         {
@@ -112,12 +115,12 @@ var createPanel = function () {
 
         // Set event handlers
         $('.chromeperfectpixel-showHideBtn').bind('click', function (e) {
-            trackEvent("showHideBtn", e.type);
+            //trackEvent("showHideBtn", e.type);
             ChromePerfectPixel.toggleOverlay();
         });
 
         $('.chromeperfectpixel-lockBtn').bind('click', function (e) {
-            trackEvent("lockBtn", e.type);
+            //trackEvent("lockBtn", e.type);
             ChromePerfectPixel.toggleLock();
         });
 
@@ -131,7 +134,7 @@ var createPanel = function () {
 
         $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
             // Live handler called.
-            trackEvent("layer", e.type);
+            //trackEvent("layer", e.type);
             var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
             ChromePerfectPixel.setCurrentLayer(overlayId);
         });

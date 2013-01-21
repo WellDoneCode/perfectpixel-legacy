@@ -29,7 +29,8 @@ var settings = new Store("settings", {
     "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
-    "enableHotkeys": true
+    "enableHotkeys": true,
+    "enableStatistics": true
 });
 
 var _gaq = _gaq || [];
@@ -44,11 +45,12 @@ $(document).ready(function () {
         }
     }
 
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = 'https://ssl.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    if (settings.get("enableStatistics")) {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = 'https://ssl.google-analytics.com/u/ga_debug.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    }
 });
-
 
 // here we store panel' state for every tab
 var PP_state = [];
@@ -65,7 +67,9 @@ function togglePanel(){
 }
 
 function injectIntoTab(tabId){
-    _gaq.push(['_trackPageview']); // Tracking
+    if (settings.get("enableStatistics")) {
+        _gaq.push(['_trackPageview']); // Tracking
+    }
 
     chrome.tabs.insertCSS(tabId, { file: "style.css" });
     chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
@@ -86,7 +90,7 @@ function injectIntoTab(tabId){
         });
     });
 }
-    
+
 //React when a browser' action icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
     var pp_tab_state = PP_state[tab.id];
@@ -123,7 +127,10 @@ chrome.extension.onRequest.addListener(
             var senderId = String(request.senderId);
             var eventType = String(request.eventType);
 
-            _gaq.push(['_trackEvent', senderId, eventType]);
+            if (settings.get("enableStatistics")) {
+                _gaq.push(['_trackEvent', senderId, eventType]);
+            }
+
             sendResponse(true);
         }
 
