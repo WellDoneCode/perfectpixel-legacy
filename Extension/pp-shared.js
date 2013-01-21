@@ -107,6 +107,7 @@ function stringToBuffer(str) {
 // --------------------------------------------------------------
 var PP_RequestType = new function () {
     this.GetExtensionOptions = "GETEXTOPTIONS";
+    this.TrackEvent = "TRACKEVENT"; // Google Analytics
     this.ADDFILE = "ADDFILE";
     this.GETFILE = "GETFILE";
     this.DELETEFILE = "DELETEFILE";

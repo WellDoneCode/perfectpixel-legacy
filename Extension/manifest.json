@@ -11,6 +11,7 @@
     "browser_action":{
         "default_icon":"icons/icon.png"
     },
+    "content_security_policy":"script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
     "description":"The extension help develop your websites with per pixel accuracy!",
     "icons":{
         "128":"icons/128.png",
@@ -22,7 +23,7 @@
     "options_page":"fancy-settings/source/index.html",
     "permissions":[ "tabs", "\u003Call_urls\u003E", "unlimitedStorage" ],
     "update_url":"http://clients2.google.com/service/update2/crx",
-    "version":"1.19",
+    "version":"1.20",
     "web_accessible_resources":[
         "images/noise.jpg",
         "icons/16.png"
