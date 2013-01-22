@@ -285,6 +285,7 @@ var ChromePerfectPixel = new function () {
     var default_height_px = 300;
     var default_zIndex = 2147483646;
     var overlayUniqueId = 'chromeperfectpixel-overlay_3985123731465987';
+    var deleteLayerConfirmationMessage = 'Are you sure want to delete layer?';
 
     this.get_KeyboardEnabled = function () {
         return ExtOptions.enableHotkeys;
@@ -551,7 +552,7 @@ var ChromePerfectPixel = new function () {
     }
 
     this.deleteLayer = function (layer) {
-        if (confirm('Are you sure want to delete layer?')) {
+        if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer-delete", 'confirmed');
             var overlayId = $(layer).data('Id');
             PPStorage.DeleteOverlay(overlayId, function () {

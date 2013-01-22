@@ -29,6 +29,7 @@ var settings = new Store("settings", {
     "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
+    "enableDeleteLayerConfirmationMessage": true,
     "enableHotkeys": true,
     "enableStatistics": true
 });
