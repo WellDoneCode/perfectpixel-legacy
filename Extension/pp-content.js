@@ -41,7 +41,7 @@ $(document).ready(function () {
     });
 });
 
-var trackEvent = function(senderId, eventType) {
+var trackEvent = function(senderId, eventType, integerValue, stringValue) {
     if(ExtOptions.enableStatistics == false)
         return;
 
@@ -50,7 +50,9 @@ var trackEvent = function(senderId, eventType) {
         {
             type: PP_RequestType.TrackEvent,
             senderId: senderId,
-            eventType: eventType
+            eventType: eventType,
+            integerValue: integerValue,
+            stringValue: stringValue
         },
         function (response) {
             if(!response)
@@ -115,17 +117,15 @@ var createPanel = function () {
 
         // Set event handlers
         $('.chromeperfectpixel-showHideBtn').bind('click', function (e) {
-            //trackEvent("showHideBtn", e.type);
             ChromePerfectPixel.toggleOverlay();
         });
 
         $('.chromeperfectpixel-lockBtn').bind('click', function (e) {
-            //trackEvent("lockBtn", e.type);
             ChromePerfectPixel.toggleLock();
         });
 
         $('#chromeperfectpixel-fakefile').bind('click', function (e) {
-            trackEvent("addNewLayerBtn", e.type);
+            trackEvent("layer", "add", PPStorage.GetOverlaysCount() + 1);
             $(this).parent().find('input[type=file]').click();
         });
         $('#chromeperfectpixel-fileUploader').bind('change', function () {
@@ -134,7 +134,7 @@ var createPanel = function () {
 
         $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
             // Live handler called.
-            //trackEvent("layer", e.type);
+            //trackEvent("layer", "select");
             var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
             ChromePerfectPixel.setCurrentLayer(overlayId);
         });
@@ -144,13 +144,13 @@ var createPanel = function () {
         });
 
         $('#chromeperfectpixel-scale').change(function (e) {
-            trackEvent("scale", e.type);
+            trackEvent("scale", e.type, $(this).val() * 10); // GA tracks only integers not floats
             ChromePerfectPixel.change(false, false, false, $(this).val());
         });
 
         $('#chromeperfectpixel-origin-controls button').live("click", function (e) {
             e.preventDefault();
-            trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), e.type);
+            trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
 
             if ($(this).attr('id') == "chromeperfectpixel-xless" || $(this).attr('id') == "chromeperfectpixel-xmore") {
                 ChromePerfectPixel.xleft($(this));
@@ -162,7 +162,7 @@ var createPanel = function () {
 
         $('.chromeperfectpixel-coords').live("keypress", function (e) {
             if (e.which == 13) {
-                trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), e.type);
+                trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
 
                 if ($(this).attr("id") == "chromeperfectpixel-coordX")
                     ChromePerfectPixel.change(false, $(this).val(), false);
@@ -236,7 +236,7 @@ var createPanel = function () {
         })($("#chromeperfectpixel-opacity"), 500);
 
         $('#chromeperfectpixel-opacity').bind('changed', function (e) {
-            trackEvent("opacity", e.type);
+            trackEvent("opacity", e.type, e.target.value * 100); // GA tracks only integers not floats
         });
 
         // Global hotkeys on
@@ -285,6 +285,7 @@ var ChromePerfectPixel = new function () {
     var default_height_px = 300;
     var default_zIndex = 2147483646;
     var overlayUniqueId = 'chromeperfectpixel-overlay_3985123731465987';
+    var deleteLayerConfirmationMessage = 'Are you sure want to delete layer?';
 
     this.get_KeyboardEnabled = function () {
         return ExtOptions.enableHotkeys;
@@ -378,14 +379,17 @@ var ChromePerfectPixel = new function () {
 
     this.toggleOverlay = function () {
         if ($('#' + overlayUniqueId).length > 0) {
+            trackEvent("overlay", "show");
             ChromePerfectPixel.removeOverlay();
         }
         else {
+            trackEvent("overlay", "hide");
             ChromePerfectPixel.createOverlay();
         }
     }
 
     this.lockOverlay = function () {
+        trackEvent("overlay", "lock");
         $('#' + overlayUniqueId).css('pointer-events', 'none');
         GlobalStorage.setOptions({
             'locked' : true
@@ -394,6 +398,7 @@ var ChromePerfectPixel = new function () {
     }
 
     this.unlockOverlay = function () {
+        trackEvent("overlay", "unlock");
         $('#' + overlayUniqueId).css('pointer-events', 'auto');
         GlobalStorage.setOptions({
             'locked' : false
@@ -530,7 +535,7 @@ var ChromePerfectPixel = new function () {
 
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
         deleteBtn.bind('click', function (e) {
-            trackEvent("layer-delete", e.type);
+            trackEvent("layer", "delete", undefined, "attempt");
             ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
         });
         deleteBtn.button(); // apply css
@@ -551,8 +556,8 @@ var ChromePerfectPixel = new function () {
     }
 
     this.deleteLayer = function (layer) {
-        if (confirm('Are you sure want to delete layer?')) {
-            trackEvent("layer-delete", 'confirmed');
+        if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
+            trackEvent("layer", "delete", undefined, "confirmed");
             var overlayId = $(layer).data('Id');
             PPStorage.DeleteOverlay(overlayId, function () {
                 var overlaysCount = PPStorage.GetOverlaysCount();
@@ -568,7 +573,8 @@ var ChromePerfectPixel = new function () {
                 ChromePerfectPixel.renderLayers();
             });
         }
-        trackEvent("layer-delete", 'canceled');
+        else
+            trackEvent("layer", "delete", undefined, "canceled");
     }
 
     this.setCurrentLayer = function (overlayId) {
@@ -725,4 +731,3 @@ var ChromePerfectPixel = new function () {
         ChromePerfectPixel.onOverlayUpdate(true);
     }
 }
-

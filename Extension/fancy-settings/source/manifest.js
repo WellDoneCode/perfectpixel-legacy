@@ -33,6 +33,13 @@ this.manifest = {
         },
         {
             "tab": "General",
+            "group": "Behavior",
+            "name": "enableDeleteLayerConfirmationMessage",
+            "type": "checkbox",
+            "label": "Enable confirmation messages<br>Confirmation message will appear when you attempt to delete layer."
+        },
+        {
+            "tab": "General",
             "group": "Statistics",
             "name": "enableStatistics",
             "type": "checkbox",

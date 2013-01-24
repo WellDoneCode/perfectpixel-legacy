@@ -29,6 +29,7 @@ var settings = new Store("settings", {
     "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
+    "enableDeleteLayerConfirmationMessage": true,
     "enableHotkeys": true,
     "enableStatistics": true
 });
@@ -48,6 +49,7 @@ $(document).ready(function () {
     if (settings.get("enableStatistics")) {
         var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
         ga.src = 'https://ssl.google-analytics.com/ga.js';
+        //ga.src = 'https://ssl.google-analytics.com/u/ga_debug.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     }
 });
@@ -126,9 +128,23 @@ chrome.extension.onRequest.addListener(
         if (request.type == PP_RequestType.TrackEvent) {
             var senderId = String(request.senderId);
             var eventType = String(request.eventType);
+            var integerValue = Number(request.integerValue);
+            var stringValue = request.stringValue !== undefined ? String(request.stringValue) : request.stringValue;
 
             if (settings.get("enableStatistics")) {
-                _gaq.push(['_trackEvent', senderId, eventType]);
+                var params = ['_trackEvent', senderId, eventType];
+
+                if (integerValue && !isNaN(integerValue) && isFinite(integerValue)) {
+                    // push all values
+                    params.push(stringValue);
+                    params.push(Math.round(integerValue));
+                }
+                else if (stringValue && stringValue !== undefined) {
+                    // push all except integer value which is null
+                    params.push(stringValue);
+                }
+
+                _gaq.push(params);
             }
 
             sendResponse(true);
