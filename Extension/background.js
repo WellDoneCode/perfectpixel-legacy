@@ -109,7 +109,14 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 // On tab (re)load check if we need to open panel
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
     var pp_tab_state = PP_state[tabId];
-    if (!settings.get('rememberPanelOpenClosedState') || ! pp_tab_state || pp_tab_state == 'closed') return;
+    if (!settings.get('rememberPanelOpenClosedState')){
+        // we need to set this to 'closed' to prevent issue with page reloading while panel is opened
+        PP_state[tabId] = 'closed';
+        return;
+    }
+    else if (! pp_tab_state || pp_tab_state == 'closed') {
+        return;
+    }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
         PP_state[tabId] = 'open';
         injectIntoTab(tabId);
