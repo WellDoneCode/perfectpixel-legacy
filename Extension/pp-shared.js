@@ -26,6 +26,7 @@
 var PPOverlay = function () {
     this.Id = 0;
     this.Url = null;
+    this.ThumbnailUrl = null;
     this.Width = 0;
     this.Height = 0;
 
