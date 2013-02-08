@@ -26,33 +26,49 @@ var PPStorage_filesystem = function () {
 
     this._cacheOverlaysBlobUrls = [];
 
-    // -------------------------------
-    // Get all PPOverlays from storage
-    // -------------------------------
-    this.GetOverlays = function (callback) {
+    /**
+     * Get all PPOverlays from storage
+     * for available options see this.GetOverlay
+     * @param callback
+     * @param options
+     * @constructor
+     */
+    this.GetOverlays = function (callback, options) {
         var overlaysCount = this.GetOverlaysCount();
         var overlays = [];
 
         if (overlaysCount == 0)
             callback(overlays);
         var self = this;
-        this._GetOverlaysRecursion(0, self, overlays, overlaysCount, callback);
+        this._GetOverlaysRecursion(0, self, overlays, overlaysCount, callback, options);
     }
 
-    this._GetOverlaysRecursion = function (index, self, overlaysArray, overlaysCount, finalCallback) {
+    this._GetOverlaysRecursion = function (index, self, overlaysArray, overlaysCount, finalCallback, options) {
         this.GetOverlay(index, function (overlay) {
             overlaysArray[index] = overlay;
             if ((index + 1) == overlaysCount)
                 finalCallback(overlaysArray);
             else
-                self._GetOverlaysRecursion(index + 1, self, overlaysArray, overlaysCount, finalCallback);
-        });
+                self._GetOverlaysRecursion(index + 1, self, overlaysArray, overlaysCount, finalCallback, options);
+        }, options);
     }
 
-    // ---------------------------------
-    // Get PPOverlay object from storage
-    // ---------------------------------
-    this.GetOverlay = function (id, callback) {
+    /**
+     * Get PPOverlay object from storage
+     * options available:
+     * {
+     *  getThumbnailUrl: false,
+     *  getFullUrl: true
+     * }
+     * @param id
+     * @param callback
+     * @param options
+     * @return {*}
+     * @constructor
+     */
+    this.GetOverlay = function (id, callback, options) {
+        options = options || {};
+
         var overlayDataAsStr = localStorage["overlay" + id + "_data"];
         var overlayPositionAsStr = localStorage["overlay" + id + "_position"];
         if (overlayDataAsStr == null || overlayPositionAsStr == null)
