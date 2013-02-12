@@ -58,7 +58,7 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
             if(!response)
                 console.log("PP error", "Tracking error: " + senderId + ", " + eventType);
         });
-}
+};
 
 var createPanel = function () {
     if ($('#chromeperfectpixel-panel').length == 0) {
@@ -76,10 +76,10 @@ var createPanel = function () {
                     '<div id="chromeperfectpixel-section-origin">' +
                         '<span>Origin:</span>' +
                         '<div id="chromeperfectpixel-origin-controls">' +
-                            '<button id="chromeperfectpixel-ymore">&darr;</button>' +
-                            '<button id="chromeperfectpixel-yless">&uarr;</button>' +
-                            '<button id="chromeperfectpixel-xless">&larr;</button>' +
-                            '<button id="chromeperfectpixel-xmore">&rarr;</button>' +
+                            '<button id="chromeperfectpixel-ymore" data-axis="y" data-offset="-1">&darr;</button>' +
+                            '<button id="chromeperfectpixel-yless" data-axis="y" data-offset="1">&uarr;</button>' +
+                            '<button id="chromeperfectpixel-xless" data-axis="x" data-offset="1">&larr;</button>' +
+                            '<button id="chromeperfectpixel-xmore" data-axis="x" data-offset="-1">&rarr;</button>' +
                             '<div>' +
                                 '<div>' +
                                     '<div class="chromeperfectpixel-coords-label">X:</div>' +
@@ -145,33 +145,41 @@ var createPanel = function () {
 
         $('#chromeperfectpixel-scale').change(function (e) {
             trackEvent("scale", e.type, $(this).val() * 10); // GA tracks only integers not floats
-            ChromePerfectPixel.change(false, false, false, $(this).val());
+            ChromePerfectPixel.change({scale: $(this).val()});
         });
 
         $('#chromeperfectpixel-origin-controls button').live("click", function (e) {
             e.preventDefault();
             trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
 
-            if ($(this).attr('id') == "chromeperfectpixel-xless" || $(this).attr('id') == "chromeperfectpixel-xmore") {
-                ChromePerfectPixel.xleft($(this));
-            }
-            if ($(this).attr('id') == "chromeperfectpixel-yless" || $(this).attr('id') == "chromeperfectpixel-ymore") {
-                ChromePerfectPixel.xtop($(this));
+            var axis = $(this).data('axis');
+            if (axis == "x") {
+                var input = $('input#chromeperfectpixel-coordX');
+                var x = input.val() - $(this).data('offset');
+                input.val(x);
+                ChromePerfectPixel.change({left: x});
+            } else if (axis == "y") {
+                var input = $('input#chromeperfectpixel-coordY');
+                var y = input.val() - $(this).data('offset');
+                input.val(y);
+                ChromePerfectPixel.change({top: y});
             }
         });
 
-        $('.chromeperfectpixel-coords').live("keypress", function (e) {
+        $('.chromeperfectpixel-coords').change("keypress", function (e) {
             if (e.which == 13) {
-                trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
+                var id = $(this).attr("id");
+                trackEvent("coords", id.replace("chromeperfectpixel-", ""));
 
-                if ($(this).attr("id") == "chromeperfectpixel-coordX")
-                    ChromePerfectPixel.change(false, $(this).val(), false);
-                if ($(this).attr("id") == "chromeperfectpixel-coordY")
-                    ChromePerfectPixel.change(false, false, $(this).val());
+                if (id == "chromeperfectpixel-coordX") {
+                    ChromePerfectPixel.change({left: $(this).val()});
+                } else if (id == "chromeperfectpixel-coordY") {
+                    ChromePerfectPixel.change({top: $(this).val()});
+                }
             }
         });
 
-        // On load
+        // make panel draggable
         $('#chromeperfectpixel-panel').draggable({
             handle: "#chromeperfectpixel-panel-header",
             stop: function (event, ui) {
@@ -247,7 +255,7 @@ var createPanel = function () {
 
         ChromePerfectPixel.renderLayers();
     }
-}
+};
 
 var removePanel = function () {
     ChromePerfectPixel.removeOverlay();
@@ -264,7 +272,7 @@ var removePanel = function () {
     if ($('#chromeperfectpixel-panel').length > 0) {
         $('#chromeperfectpixel-panel').remove();
     }
-}
+};
 
 var togglePanel = function () {
     if ($('#chromeperfectpixel-panel').length > 0) {
@@ -273,7 +281,7 @@ var togglePanel = function () {
     else {
         createPanel();
     }
-}
+};
 
 var ChromePerfectPixel = new function () {
     // temporary hardcoded
@@ -289,7 +297,7 @@ var ChromePerfectPixel = new function () {
 
     this.get_KeyboardEnabled = function () {
         return ExtOptions.enableHotkeys;
-    }
+    };
 
     // Overlay
     this.createOverlay = function (options) {
@@ -358,7 +366,7 @@ var ChromePerfectPixel = new function () {
         });
 
         $('.chromeperfectpixel-showHideBtn').text('Hide');
-    }
+    };
 
     this.removeOverlay = function () {
         if ($('#' + overlayUniqueId).length > 0) {
@@ -375,7 +383,7 @@ var ChromePerfectPixel = new function () {
         GlobalStorage.setOptions({
             'visible' : false
         });
-    }
+    };
 
     this.toggleOverlay = function () {
         if ($('#' + overlayUniqueId).length > 0) {
@@ -386,7 +394,7 @@ var ChromePerfectPixel = new function () {
             trackEvent("overlay", "hide");
             ChromePerfectPixel.createOverlay();
         }
-    }
+    };
 
     this.lockOverlay = function () {
         trackEvent("overlay", "lock");
@@ -395,7 +403,7 @@ var ChromePerfectPixel = new function () {
             'locked' : true
         });
         $('.chromeperfectpixel-lockBtn').text('Unlock');
-    }
+    };
 
     this.unlockOverlay = function () {
         trackEvent("overlay", "unlock");
@@ -404,7 +412,7 @@ var ChromePerfectPixel = new function () {
             'locked' : false
         });
         $('.chromeperfectpixel-lockBtn').text('Lock');
-    }
+    };
 
     this.toggleLock = function () {
         var options = GlobalStorage.getOptions();
@@ -414,7 +422,7 @@ var ChromePerfectPixel = new function () {
         else {
             ChromePerfectPixel.lockOverlay();
         }
-    }
+    };
 
     this.onOverlayUpdate = function (isStop) {
         var overlay = $('#' + overlayUniqueId);
@@ -432,7 +440,7 @@ var ChromePerfectPixel = new function () {
                 PPStorage.UpdateOverlayPosition(GlobalStorage.get_CurrentOverlayId(), { X: x, Y: y, Opacity: opacity, Scale: scale });
             }
         }
-    }
+    };
 
     this.onKeyDown = function (event) {
         var overlay = $('#' + overlayUniqueId);
@@ -464,7 +472,7 @@ var ChromePerfectPixel = new function () {
 
         if($('#' + overlayUniqueId).length > 0)
             ChromePerfectPixel.onOverlayUpdate(true);
-    }
+    };
 
     // Layers
     this.renderLayers = function () {
@@ -501,7 +509,7 @@ var ChromePerfectPixel = new function () {
 
             ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
         });
-    }
+    };
 
     this.renderLayer = function (overlay) {
         var container = $('#chromeperfectpixel-layers');
@@ -542,7 +550,7 @@ var ChromePerfectPixel = new function () {
 
         layer.append(deleteBtn);
         container.append(layer);
-    }
+    };
 
     this.enableLayerControls = function () {
         $('.chromeperfectpixel-coords').attr('disabled', false);
@@ -553,7 +561,7 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
         $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
         $('#chromeperfectpixel-progressbar-area').hide();
-    }
+    };
 
     this.deleteLayer = function (layer) {
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
@@ -575,7 +583,7 @@ var ChromePerfectPixel = new function () {
         }
         else
             trackEvent("layer", "delete", undefined, "canceled");
-    }
+    };
 
     this.setCurrentLayer = function (overlayId) {
         if (PPStorage.GetOverlaysCount() == 0)
@@ -606,31 +614,18 @@ var ChromePerfectPixel = new function () {
                 $('.chromeperfectpixel-lockBtn').text('Unlock');
             }
         });
-    }
+    };
 
     // end Layers
 
     this.upload = function (files, uploadElem) {
-        file = files[0];
+        var file = files[0];
 
         // Only process image files.
         if (!file.type.match('image.*')) {
             alert('File must contain image');
             return;
         }
-
-        //                for (var i = 0; i < files.length; i++) {
-        //                    file = files[i];
-        //                    if (window.createObjectURL) {
-        //                        url = window.createObjectURL(file)
-        //                    } else if (window.createBlobURL) {
-        //                        url = window.createBlobURL(file)
-        //                    } else if (window.URL && window.URL.createObjectURL) {
-        //                        url = window.URL.createObjectURL(file)
-        //                    } else if (window.webkitURL && window.webkitURL.createObjectURL) {
-        //                        url = window.webkitURL.createObjectURL(file)
-        //                    }
-        //                }
 
         $('#chromeperfectpixel-progressbar-area').show();
 
@@ -653,7 +648,7 @@ var ChromePerfectPixel = new function () {
             if (!GlobalStorage.get_CurrentOverlayId() || PPStorage.GetOverlaysCount() == 1)
                 ChromePerfectPixel.setCurrentLayer(overlay.Id);
         });
-    }
+    };
 
     // UI
 
@@ -662,72 +657,38 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-coordY').val(y);
         $('#chromeperfectpixel-opacity').val(Number(opacity).toFixed(1));
         $('#chromeperfectpixel-scale').val(Number(scale).toFixed(1));
-    }
+    };
 
     this.opacity = function (input) {
-        /*var offset = 0;
-        if (button.attr('id') == "chromeperfectpixel-opless") {
-        if ($('input#chromeperfectpixel-opacity').val() >= 0.11)
-        offset = 0.1;
-        else offset = 0;
-        }
-        else {
-        if ($('input#chromeperfectpixel-opacity').val() <= 0.99)
-        offset = -0.1;
-        else offset = 0;
-        }
-        var thisOpacity = Number($('input#chromeperfectpixel-opacity').val() - offset).toFixed(1);
-        $('input#chromeperfectpixel-opacity').val(thisOpacity);*/
         if (input.is(":disabled")) // chrome bug if version < 15.0; opacity input isn't actually disabled
             return;
-        ChromePerfectPixel.change(input.val(), false, false);
-    }
+        ChromePerfectPixel.change({opacity: input.val()});
+    };
 
-    this.xleft = function (button) {
-        var offset = 0;
-        if (button.attr('id') == "chromeperfectpixel-xless") {
-            //if ($('input#chromeperfectpixel-coordX').val() >= 0)
-            offset = 1;
-            //else offset = 0;
-        }
-        else {
-            offset = -1;
-        }
-        var thisX = $('input#chromeperfectpixel-coordX').val() - offset;
-        $('input#chromeperfectpixel-coordX').val(thisX);
-        ChromePerfectPixel.change(false, thisX, false);
-    }
-
-    this.xtop = function (button) {
-        var offset = 0;
-        if (button.attr('id') == "chromeperfectpixel-yless") {
-            //if ($('input#chromeperfectpixel-coordY').val() >= 0)
-            offset = 1;
-            //else offset = 0;
-        }
-        else {
-            offset = -1;
-        }
-        var thisY = $('input#chromeperfectpixel-coordY').val() - offset;
-        $('input#chromeperfectpixel-coordY').val(thisY);
-        ChromePerfectPixel.change(false, false, thisY);
-    }
-
-    this.change = function (opacity, left, top, scale) {
+    /**
+     *
+     * @param values
+     * @param [values.opacity]
+     * @param [values.left]
+     * @param [values.top]
+     * @param [values.scale]
+     */
+    this.change = function(values) {
         var overlay = $('#' + overlayUniqueId);
-        if (opacity != false)
-            overlay.css('opacity', opacity);
-        if (left != false || Number(left) == 0) {
-            overlay.css('left', left + "px");
+        if (values.opacity !== undefined) {
+            overlay.css('opacity', values.opacity);
         }
-        if (top != false || Number(top) == 0) {
-            overlay.css('top', top + "px");
+        if (values.left !== undefined) {
+            overlay.css('left', values.left + "px");
         }
-        if (scale) {
-            overlay.data('scale', scale);
+        if (values.top !== undefined) {
+            overlay.css('top', values.top + "px");
+        }
+        if (values.scale !== undefined) {
+            overlay.data('scale', values.scale);
             overlay.css('height', 'auto');
-            overlay.css('width', Number(overlay.data('originalWidth')) * scale);
+            overlay.css('width', Number(overlay.data('originalWidth')) * values.scale);
         }
         ChromePerfectPixel.onOverlayUpdate(true);
-    }
-}
+    };
+};

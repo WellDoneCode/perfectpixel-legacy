@@ -34,7 +34,7 @@ var PPOverlay = function () {
     this.Y = 50;
     this.Opacity = 0.5;
     this.Scale = 1.0;
-}
+};
 
 
 // ----------------------------------------------
@@ -46,14 +46,14 @@ var GlobalStorage = new function () {
         if (localStorage["currentOverlayId"] == "null")
             return null;
         return localStorage["currentOverlayId"];
-    }
+    };
 
     this.set_CurrentOverlayId = function (val) {
         if (val != null)
             localStorage["currentOverlayId"] = val;
         else
             localStorage.removeItem("currentOverlayId");
-    }
+    };
 
     this.getOptions = function () {
         var options = {};
@@ -64,7 +64,7 @@ var GlobalStorage = new function () {
         }
 
         return options;
-    }
+    };
 
     this.setOptions = function (newOptions) {
         var index = 0;
@@ -83,7 +83,7 @@ var GlobalStorage = new function () {
             return {};
         }
     }
-}
+};
 
 // Converts any ArrayBuffer to a string
 //  (a comma-separated list of ASCII ordinals,
