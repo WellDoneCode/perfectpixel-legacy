@@ -30,6 +30,7 @@ var settings = new Store("settings", {
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
     "enableDeleteLayerConfirmationMessage": true,
+    "placeNewLayerToCurrentScrollPosition": true,
     "enableHotkeys": true,
     "enableStatistics": true
 });

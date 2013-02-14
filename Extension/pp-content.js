@@ -652,6 +652,14 @@ var ChromePerfectPixel = new function () {
 
             if (!GlobalStorage.get_CurrentOverlayId() || PPStorage.GetOverlaysCount() == 1)
                 ChromePerfectPixel.setCurrentLayer(overlay.Id);
+
+            if (ExtOptions.placeNewLayerToCurrentScrollPosition){
+                var thisY = $(window).scrollTop();
+                $('input#chromeperfectpixel-coordY').val(thisY);
+                // because layer is not in DOM now ChromePerfectPixel.change() is useless.
+                // UpdateOverlayPosition() to the resque!
+                PPStorage.UpdateOverlayPosition(overlay.Id,{Y: thisY});
+            }
         });
     }
 
