@@ -68,6 +68,8 @@ var PPStorage_localStorage = function () {
     // Save overlay position into storage
     // ----------------------------------
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
+        var oldPosition = JSON.parse(localStorage["overlay" + overlayId + "_position"]);
+        newPosition = $.extend({},oldPosition,newPosition);
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
 
