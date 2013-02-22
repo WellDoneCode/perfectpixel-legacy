@@ -19,9 +19,10 @@
 
 // Depend on pp-shared.js (PPOverlay class)
 
-// --------------------------------------------------------------------
-// PPStogare - place where images are stored permanently. Static object
-// --------------------------------------------------------------------
+/**
+ * PPStogare - place where images are stored permanently. Static object
+ * @constructor
+ */
 var PPStorage_filesystem = function () {
 
     this._cacheOverlaysBlobUrls = [];
@@ -126,16 +127,22 @@ var PPStorage_filesystem = function () {
         }
     };
 
-    // ----------------------------------
-    // Save overlay position into storage
-    // ----------------------------------
+    /**
+     * Save overlay position into storage
+     * @param overlayId
+     * @param newPosition
+     * @constructor
+     */
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
 
-    // ----------------------------------
-    // Delete overlay from storage
-    // ----------------------------------
+    /**
+     * Delete overlay from storage
+     * @param overlayId
+     * @param callback
+     * @constructor
+     */
     this.DeleteOverlay = function (overlayId, callback) {
         var overlaysCount = this.GetOverlaysCount();
         var overlayDataAsStr = localStorage["overlay" + overlayId + "_data"];
@@ -185,9 +192,12 @@ var PPStorage_filesystem = function () {
             });
     }
 
-    // ---------------------------------------------------
-    // Create PPOverlay from file and save it into storage
-    // ---------------------------------------------------
+    /**
+     * Create PPOverlay from file and save it into storage
+     * @param file
+     * @param callback
+     * @constructor
+     */
     this.SaveOverlayFromFile = function (file, callback) {
         // Only process image files.
         if (!file.type.match('image.*')) {
@@ -272,9 +282,11 @@ var PPStorage_filesystem = function () {
         reader.readAsArrayBuffer(file);
     };
 
-    // ---------------------------------------------------
-    // Get count of overlays stored
-    // ---------------------------------------------------
+    /**
+     * Get count of overlays stored
+     * @return {Number}
+     * @constructor
+     */
     this.GetOverlaysCount = function () {
         var count = 0;
         while (localStorage["overlay" + count + "_data"]) {
@@ -283,7 +295,12 @@ var PPStorage_filesystem = function () {
         return count;
     }
 
-    // Save PPOverlay object into storage
+    /**
+     * Save PPOverlay object into storage
+     * @param overlay
+     * @return {*}
+     * @private
+     */
     this._SaveOverlay = function (overlay) {
         if (!(overlay instanceof PPOverlay))
             alert("Object of type PPOverlay should be provided");
@@ -310,6 +327,11 @@ var PPStorage_filesystem = function () {
         return overlay;
     };
 
+    /**
+     * Handle response came from background page file manager
+     * @param response
+     * @private
+     */
     this._handleResponse = function (response) {
         console.log("PP " + response.status);
         if (response.message && response.showToUser)
