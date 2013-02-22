@@ -78,19 +78,21 @@ function injectIntoTab(tabId){
     if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
-    chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
-        chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
-            chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                        chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                            togglePanel();
-                        });
-                    });
-                });
-            });
-        });
-    });
+
+    var scripts = [
+        'jquery-1.6.2.min.js', 'jquery-ui.js', 'pp-shared.js', 'storage/pp-storage-filesystem.js',
+        'storage/pp-storage-localStorage.js', 'pp-content.js', togglePanel
+    ];
+    var executeScript = function(index) {
+        var callback = function () { (index < scripts.length - 1) && executeScript(index + 1); };
+        if (typeof scripts[index] === 'string') {
+            chrome.tabs.executeScript(null, { file: scripts[index] }, callback);
+        } else {
+            scripts[index]();
+            callback();
+        }
+    };
+    executeScript(0);
 }
 
 //React when a browser' action icon is clicked.
