@@ -65,10 +65,10 @@ var PP_state = [];
 //  }]
 
 function togglePanel(){
-    chrome.tabs.executeScript(null, { code: "togglePanel();" });
+    chrome.tabs.executeScript(null, { code: "Controller.togglePanel();" });
 }
 
-function injectIntoTab(tabId){
+function injectIntoTab(tabId, callback){
     if (settings.get("enableStatistics")) {
         _gaq.push(['_trackPageview']); // Tracking
     }
@@ -80,8 +80,14 @@ function injectIntoTab(tabId){
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
 
     var scripts = [
-        'jquery-1.6.2.min.js', 'jquery-ui.js', 'pp-shared.js', 'storage/pp-storage-filesystem.js',
-        'storage/pp-storage-localStorage.js', 'pp-content.js', togglePanel
+        'jquery-1.6.2.min.js',
+        'jquery-ui.js',
+        'controller.js',
+        'pp-shared.js',
+        'storage/pp-storage-filesystem.js',
+        'storage/pp-storage-localStorage.js',
+        'pp-content.js',
+        togglePanel
     ];
     var executeScript = function(index) {
         var callback = function () { (index < scripts.length - 1) && executeScript(index + 1); };
