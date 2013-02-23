@@ -81,10 +81,14 @@ function injectIntoTab(tabId){
     chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
         chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
             chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                        chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                            togglePanel();
+                chrome.tabs.executeScript(null, { file: "3rd Party/canvas-to-blob.min.js" }, function () {
+                    chrome.tabs.executeScript(null, { file: "storage/imagetools.js" }, function () {
+                        chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
+                            chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
+                                chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
+                                    togglePanel();
+                                });
+                            });
                         });
                     });
                 });
@@ -186,10 +190,10 @@ chrome.extension.onRequest.addListener(
                 }
                 else if (request.type == PP_RequestType.DELETEFILE) {
                     // DELETEFILE handler
-
+                    // array can be sent as request.fileName
                     var fileName = request.fileName;
 
-                    PPFileManager.DeleteFile(fileName, function () {
+                    PPFileManager.DeleteFiles(fileName, function () {
                         sendResponse({
                             status: "OK"
                         });

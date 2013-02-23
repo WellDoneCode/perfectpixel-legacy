@@ -62,6 +62,22 @@ var PPFileManager = new function () {
         }
     }
 
+    // TODO delete
+    /*this.GetFiles = function(fileNames, callback) {
+        var files = [];
+
+        for(var i=0; i<fileNames.length; i++) {
+            var index = i;
+            this.GetFile(fileNames[index], function(file) {
+                files[index] = file;
+                if(files.length == fileNames.length) {
+                    // all async events done
+                    callback(files);
+                }
+            })
+        }
+    }*/
+
     /**
      * Read file from filesystem. Returns PPFile object to callback function
      * @param fileName
@@ -157,6 +173,30 @@ var PPFileManager = new function () {
         }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
+    /**
+     * Delete multiple files from filesystem
+     * @param fileNames
+     * @param callback
+     * @constructor
+     */
+    this.DeleteFiles = function(fileNames, callback) {
+        var files = [];
+        var magicNumber = 100500;
+        if(!$.isArray(fileNames))
+            fileNames = [fileNames];
+
+        for(var i=0; i<fileNames.length; i++) {
+            var index = i;
+            this.DeleteFile(fileNames[index], function() {
+                files.push(magicNumber);
+                if(files.length == fileNames.length) {
+                    // all async events done
+                    callback();
+                }
+            })
+        }
+    }
+
 
     // Alpha version. For test purposes only
     // TODO return array of PPFile objects
@@ -211,7 +251,7 @@ var PPFileManager = new function () {
             default:
                 msg = 'Unknown Error';
                 break;
-        };
+        }
         return msg;
     };
 

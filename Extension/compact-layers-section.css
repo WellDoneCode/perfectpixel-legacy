@@ -4,7 +4,7 @@
 }
 #chromeperfectpixel-panel .chromeperfectpixel-layer {
     background-position: left top;
-    background-size: cover;
+    /*background-size: contain;*/
     cursor: pointer;
     text-align: center;
     opacity: 0.5;

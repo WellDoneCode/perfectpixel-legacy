@@ -43,6 +43,14 @@ var PPOverlay = function () {
 // ----------------------------------------------
 var GlobalStorage = new function () {
 
+    this.get_ThumbnailMinWidth = function() {
+        return 94;
+    }
+
+    this.get_ThumbnailMinHeight = function() {
+        return 60;
+    }
+
     this.get_CurrentOverlayId = function () {
         if (localStorage["currentOverlayId"] == "null")
             return null;

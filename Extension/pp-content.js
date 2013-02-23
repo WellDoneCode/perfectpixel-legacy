@@ -502,7 +502,9 @@ var ChromePerfectPixel = new function () {
 
             ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
             console.timeEnd("PP Profiling renderLayers");
-        });
+        }
+        ,{ getThumbnailUrl: true }
+        );
     }
 
     this.renderLayer = function (overlay) {
@@ -513,9 +515,6 @@ var ChromePerfectPixel = new function () {
                 Id: overlay.Id
             }
         });
-        var thumbHeight = 50;
-        var coeff = overlay.Height / thumbHeight;
-        var thumbWidth = Math.ceil(overlay.Width / coeff);
 
         var checkbox = ($('<input type=radio name="chromeperfectpixel-selectedLayer" />'));
         layer.append(checkbox);
@@ -525,6 +524,9 @@ var ChromePerfectPixel = new function () {
             layer.css({'background-image':  'url(' + thumbnailUrl + ')'});
         }
         else{
+            var thumbHeight = 50;
+            var coeff = overlay.Height / thumbHeight;
+            var thumbWidth = Math.ceil(overlay.Width / coeff);
             var thumb = $('<img />', {
                 class: 'chromeperfectpixel-thumb',
                 src: thumbnailUrl,
