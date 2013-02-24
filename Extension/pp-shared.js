@@ -44,11 +44,13 @@ var PPOverlay = function () {
 var GlobalStorage = new function () {
 
     this.get_ThumbnailMinWidth = function() {
-        return 94;
+        return 188;//94;
+        // // TODO /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
     }
 
     this.get_ThumbnailMinHeight = function() {
-        return 60;
+        return 120;//60;
+        // // TODO /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
     }
 
     this.get_CurrentOverlayId = function () {
