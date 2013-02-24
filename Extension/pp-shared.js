@@ -26,6 +26,7 @@
 var PPOverlay = function () {
     this.Id = 0;
     this.Url = null;
+    this.ThumbnailUrl = null;
     this.Width = 0;
     this.Height = 0;
 
@@ -41,6 +42,16 @@ var PPOverlay = function () {
 // GlobalStorage - for storing really global data
 // ----------------------------------------------
 var GlobalStorage = new function () {
+
+    this.get_ThumbnailMinWidth = function() {
+        return 188;//94;
+        // // TODO /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
+    }
+
+    this.get_ThumbnailMinHeight = function() {
+        return 120;//60;
+        // // TODO /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
+    }
 
     this.get_CurrentOverlayId = function () {
         if (localStorage["currentOverlayId"] == "null")

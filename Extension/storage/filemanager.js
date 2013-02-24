@@ -32,17 +32,19 @@ var PPFile = function () {
     }
 };
 
-// --------------------------------------------------------------
-// PPFileManager - local filesystem management
-// Must be used only in context of Extension (no content script!)
-// --------------------------------------------------------------
+/**
+ * PPFileManager - local filesystem management
+ * Must be used only in context of Extension (no content script!)
+ */
 var PPFileManager = new function () {
 
     this.fs = null;
 
-    // ------------------------
-    // Initialize PPFileManager
-    // ------------------------
+    /**
+     * Initialize PPFileManager
+     * @param callback
+     * @constructor
+     */
     this.Init = function (callback) {
         if (this.fs) {
             callback();
@@ -60,9 +62,12 @@ var PPFileManager = new function () {
         }
     }
 
-    // ---------------------------------------------------------------------
-    // Read file from filesystem. Returns PPFile object to callback function
-    // ---------------------------------------------------------------------
+    /**
+     * Read file from filesystem. Returns PPFile object to callback function
+     * @param fileName
+     * @param callback
+     * @constructor
+     */
     this.GetFile = function (fileName, callback) {
         if (!this.fs) {
             console.log('PP Filesystem is not initialized');
@@ -96,9 +101,12 @@ var PPFileManager = new function () {
         }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
-    // ----------------------------------------------
-    // Save file to filesystem. Accepts PPFile object
-    // ----------------------------------------------
+    /**
+     * Save file to filesystem. Accepts PPFile object
+     * @param ppFile
+     * @param callback
+     * @constructor
+     */
     this.SaveFile = function (ppFile, callback) {
         if (!this.fs) {
             console.log('PP Filesystem is not initialized');
@@ -126,9 +134,12 @@ var PPFileManager = new function () {
         }, function (e) { PPFileManager._errorHandler(e); callback(); });
     }
 
-    // ---------------------------
-    // Delete file from filesystem
-    // ---------------------------
+    /**
+     * Delete file from filesystem
+     * @param fileName
+     * @param callback
+     * @constructor
+     */
     this.DeleteFile = function (fileName, callback) {
         if (!this.fs) {
             console.log('PP Filesystem is not initialized');
@@ -144,6 +155,30 @@ var PPFileManager = new function () {
             }, function (e) { PPFileManager._errorHandler(e); callback(); });
 
         }, function (e) { PPFileManager._errorHandler(e); callback(); });
+    }
+
+    /**
+     * Delete multiple files from filesystem
+     * @param fileNames
+     * @param callback
+     * @constructor
+     */
+    this.DeleteFiles = function(fileNames, callback) {
+        var files = [];
+        var magicNumber = 100500;
+        if(!$.isArray(fileNames))
+            fileNames = [fileNames];
+
+        for(var i=0; i<fileNames.length; i++) {
+            var index = i;
+            this.DeleteFile(fileNames[index], function() {
+                files.push(magicNumber);
+                if(files.length == fileNames.length) {
+                    // all async events done
+                    callback();
+                }
+            })
+        }
     }
 
 
@@ -200,7 +235,7 @@ var PPFileManager = new function () {
             default:
                 msg = 'Unknown Error';
                 break;
-        };
+        }
         return msg;
     };
 

@@ -19,14 +19,17 @@
 
 // Depend on pp-shared.js (PPOverlay class)
 
-// --------------------------------------------------------------------
-// PPStogare - place where images are stored permanently. Static object
-// --------------------------------------------------------------------
+/**
+ * PPStogare - place where images are stored permanently. Static object
+ * @constructor
+ */
 var PPStorage_localStorage = function () {
 
-    // -------------------------------
-    // Get all PPOverlays from storage
-    // -------------------------------
+    /**
+     * Get all PPOverlays from storage
+     * @param callback
+     * @constructor
+     */
     this.GetOverlays = function (callback) {
         var overlaysCount = this.GetOverlaysCount();
         var overlays = [];
@@ -36,9 +39,13 @@ var PPStorage_localStorage = function () {
         callback(overlays);
     }
 
-    // -------------------------------
-    // Get PPOverlay object from storage
-    // -------------------------------
+    /**
+     * Get PPOverlay object from storage
+     * @param id
+     * @param callback
+     * @return {*}
+     * @constructor
+     */
     this.GetOverlay = function (id, callback) {
         var overlayDataAsStr = localStorage["overlay" + id + "_data"];
         var overlayPositionAsStr = localStorage["overlay" + id + "_position"];
@@ -64,16 +71,22 @@ var PPStorage_localStorage = function () {
             return overlay;
     };
 
-    // ----------------------------------
-    // Save overlay position into storage
-    // ----------------------------------
+    /**
+     * Save overlay position into storage
+     * @param overlayId
+     * @param newPosition
+     * @constructor
+     */
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
 
-    // ----------------------------------
-    // Delete overlay from storage
-    // ----------------------------------
+    /**
+     * Delete overlay from storage
+     * @param overlayId
+     * @param callback
+     * @constructor
+     */
     this.DeleteOverlay = function (overlayId, callback) {
         var overlaysCount = this.GetOverlaysCount();
 
@@ -94,9 +107,12 @@ var PPStorage_localStorage = function () {
         callback();
     }
 
-    // ---------------------------------------------------
-    // Create PPOverlay from file and save it into storage
-    // ---------------------------------------------------
+    /**
+     * Create PPOverlay from file and save it into storage
+     * @param file
+     * @param callback
+     * @constructor
+     */
     this.SaveOverlayFromFile = function (file, callback) {
         // Only process image files.
         if (!file.type.match('image.*')) {
@@ -138,9 +154,11 @@ var PPStorage_localStorage = function () {
         reader.readAsDataURL(file);
     };
 
-    // ---------------------------------------------------
-    // Get count of overlays stored
-    // ---------------------------------------------------
+    /**
+     * Get count of overlays stored
+     * @return {Number}
+     * @constructor
+     */
     this.GetOverlaysCount = function () {
         var count = 0;
         while (localStorage["overlay" + count + "_data"]) {
@@ -149,8 +167,12 @@ var PPStorage_localStorage = function () {
         return count;
     }
 
-
-    // Save PPOverlay object into storage
+    /**
+     * Save PPOverlay object into storage
+     * @param overlay
+     * @return {*}
+     * @private
+     */
     this._SaveOverlay = function (overlay) {
         if (!(overlay instanceof PPOverlay))
             alert("Object of type PPOverlay should be provided");
@@ -176,21 +198,3 @@ var PPStorage_localStorage = function () {
         return overlay;
     };
 };
-//            var getBase64Image = function (img) {
-//                // Create an empty canvas element
-//                var canvas = document.createElement("canvas");
-//                canvas.width = img.width;
-//                canvas.height = img.height;
-
-//                // Copy the image contents to the canvas
-//                var ctx = canvas.getContext("2d");
-//                ctx.drawImage(img, 0, 0);
-
-//                // Get the data-URL formatted image
-//                // Firefox supports PNG and JPEG. You could check img.src to
-//                // guess the original format, but be aware the using "image/jpg"
-//                // will re-encode the image.
-//                var dataURL = canvas.toDataURL("image/jpg");
-
-//                return dataURL;
-//            }

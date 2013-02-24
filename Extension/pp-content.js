@@ -32,7 +32,7 @@ $(document).ready(function () {
         if (!ExtOptions.debugMode) {
             // disable console messages
             if (!window.console) window.console = {};
-            var methods = ["log", "debug", "warn", "info"];
+            var methods = ["log", "debug", "warn", "info", "time", "timeEnd"];
             for (var i = 0; i < methods.length; i++) {
                 console[methods[i]] = function () { };
             }
@@ -468,6 +468,7 @@ var ChromePerfectPixel = new function () {
 
     // Layers
     this.renderLayers = function () {
+        console.time("PP Profiling renderLayers");
         // disable controls
         ChromePerfectPixel.updateCoordsUI(default_left_px, default_top_px, default_opacity, default_scale);
         $('.chromeperfectpixel-coords').attr('disabled', true);
@@ -500,7 +501,10 @@ var ChromePerfectPixel = new function () {
                 $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
 
             ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
-        });
+            console.timeEnd("PP Profiling renderLayers");
+        }
+        ,{ getThumbnailUrl: true }
+        );
     }
 
     this.renderLayer = function (overlay) {
@@ -511,20 +515,21 @@ var ChromePerfectPixel = new function () {
                 Id: overlay.Id
             }
         });
-        var thumbHeight = 50;
-        var coeff = overlay.Height / thumbHeight;
-        var thumbWidth = Math.ceil(overlay.Width / coeff);
 
         var checkbox = ($('<input type=radio name="chromeperfectpixel-selectedLayer" />'));
         layer.append(checkbox);
 
+        var thumbnailUrl = overlay.ThumbnailUrl ? overlay.ThumbnailUrl : overlay.Url;
         if (!ExtOptions.classicLayersSection){
-            layer.css({'background-image':  'url(' +overlay.Url + ')'});
+            layer.css({'background-image':  'url(' + thumbnailUrl + ')'});
         }
         else{
+            var thumbHeight = 50;
+            var coeff = overlay.Height / thumbHeight;
+            var thumbWidth = Math.ceil(overlay.Width / coeff);
             var thumb = $('<img />', {
                 class: 'chromeperfectpixel-thumb',
-                src: overlay.Url,
+                src: thumbnailUrl,
                 css: {
                     width: thumbWidth + 'px',
                     height: thumbHeight + 'px'
