@@ -18,41 +18,58 @@
  */
 
 // Depend on pp-shared.js (PPOverlay class)
+// Depend on imagetools.js
 
-// --------------------------------------------------------------------
-// PPStogare - place where images are stored permanently. Static object
-// --------------------------------------------------------------------
+/**
+ * PPStogare - place where images are stored permanently. Static object
+ * @constructor
+ */
 var PPStorage_filesystem = function () {
 
     this._cacheOverlaysBlobUrls = [];
 
-    // -------------------------------
-    // Get all PPOverlays from storage
-    // -------------------------------
-    this.GetOverlays = function (callback) {
+    /**
+     * Get all PPOverlays from storage
+     * for available options see this.GetOverlay
+     * @param callback
+     * @param options
+     * @constructor
+     */
+    this.GetOverlays = function (callback, options) {
         var overlaysCount = this.GetOverlaysCount();
         var overlays = [];
 
         if (overlaysCount == 0)
             callback(overlays);
         var self = this;
-        this._GetOverlaysRecursion(0, self, overlays, overlaysCount, callback);
+        this._GetOverlaysRecursion(0, self, overlays, overlaysCount, callback, options);
     }
 
-    this._GetOverlaysRecursion = function (index, self, overlaysArray, overlaysCount, finalCallback) {
+    this._GetOverlaysRecursion = function (index, self, overlaysArray, overlaysCount, finalCallback, options) {
         this.GetOverlay(index, function (overlay) {
             overlaysArray[index] = overlay;
             if ((index + 1) == overlaysCount)
                 finalCallback(overlaysArray);
             else
-                self._GetOverlaysRecursion(index + 1, self, overlaysArray, overlaysCount, finalCallback);
-        });
+                self._GetOverlaysRecursion(index + 1, self, overlaysArray, overlaysCount, finalCallback, options);
+        }, options);
     }
 
-    // ---------------------------------
-    // Get PPOverlay object from storage
-    // ---------------------------------
-    this.GetOverlay = function (id, callback) {
+    /**
+     * Get PPOverlay object from storage
+     * options available:
+     * {
+     *  getThumbnailUrl: false
+     * }
+     * @param id
+     * @param callback
+     * @param options
+     * @return {*}
+     * @constructor
+     */
+    this.GetOverlay = function (id, callback, options) {
+        options = options || {};
+
         var overlayDataAsStr = localStorage["overlay" + id + "_data"];
         var overlayPositionAsStr = localStorage["overlay" + id + "_position"];
         if (overlayDataAsStr == null || overlayPositionAsStr == null)
@@ -65,15 +82,24 @@ var PPStorage_filesystem = function () {
         overlay.Width = overlayData.Width;
         overlay.Height = overlayData.Height;
         overlay.FileName = overlayData.FileName;
+        overlay.ThumbnailFileName = overlayData.ThumbnailFileName;
         overlay.X = overlayPosition.X;
         overlay.Y = overlayPosition.Y;
         overlay.Opacity = overlayPosition.Opacity;
         overlay.Scale = overlayPosition.Scale;
-        if (! overlay.Scale) overlay.Scale = 1.0; //for old images
+        if (! overlay.Scale) overlay.Scale = 1.0; // for old images
+
+        var targetFileName = !options.getThumbnailUrl ? overlay.FileName : overlay.ThumbnailFileName;
+        if(!targetFileName || targetFileName === undefined) // for old images without thumbnails
+            targetFileName = overlay.FileName;
 
         // Lookup in cache for blob Url
-        if (this._cacheOverlaysBlobUrls[overlay.FileName]) {
-            overlay.Url = this._cacheOverlaysBlobUrls[overlay.FileName];
+        if (this._cacheOverlaysBlobUrls[targetFileName]) {
+
+            if(!options.getThumbnailUrl)
+                overlay.Url = this._cacheOverlaysBlobUrls[targetFileName];
+            else
+                overlay.ThumbnailUrl = this._cacheOverlaysBlobUrls[targetFileName];
             callback(overlay);
         }
         else {
@@ -82,27 +108,20 @@ var PPStorage_filesystem = function () {
             chrome.extension.sendRequest(
             {
                 type: PP_RequestType.GETFILE,
-                fileName: overlay.FileName
+                fileName: targetFileName
             },
             function (response) {
                 self._handleResponse(response);
                 if (response.status == "OK") {
                     var dataView = new DataView(stringToBuffer(response.arrayBuffer));
                     var blob = new Blob([dataView],{type:response.fileType});
+                    var url = PPImageTools.createBlobUrl(blob);
 
-                    var url;
-                    if (window.createObjectURL) {
-                        url = window.createObjectURL(blob)
-                    } else if (window.createBlobURL) {
-                        url = window.createBlobURL(blob)
-                    } else if (window.URL && window.URL.createObjectURL) {
-                        url = window.URL.createObjectURL(blob)
-                    } else if (window.webkitURL && window.webkitURL.createObjectURL) {
-                        url = window.webkitURL.createObjectURL(blob)
-                    }
-
-                    overlay.Url = url;
-                    self._cacheOverlaysBlobUrls[overlay.FileName] = url;
+                    if(!options.getThumbnailUrl)
+                        overlay.Url = url;
+                    else
+                        overlay.ThumbnailUrl = url;
+                    self._cacheOverlaysBlobUrls[targetFileName] = url;
                 }
 
                 callback(overlay);
@@ -110,68 +129,76 @@ var PPStorage_filesystem = function () {
         }
     };
 
-    // ----------------------------------
-    // Save overlay position into storage
-    // ----------------------------------
+    /**
+     * Save overlay position into storage
+     * @param overlayId
+     * @param newPosition
+     * @constructor
+     */
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
 
-    // ----------------------------------
-    // Delete overlay from storage
-    // ----------------------------------
+    /**
+     * Delete overlay from storage
+     * @param overlayId
+     * @param callback
+     * @constructor
+     */
     this.DeleteOverlay = function (overlayId, callback) {
         var overlaysCount = this.GetOverlaysCount();
         var overlayDataAsStr = localStorage["overlay" + overlayId + "_data"];
         var overlayData = JSON.parse(overlayDataAsStr);
 
-        // Delete physical file
-        console.log("PP Delete file operation");
+        // Delete physical files
+        console.log("PP Delete files operation");
         var self = this;
+        var filesToDelete = [overlayData.FileName];
+        if(overlayData.ThumbnailFileName && overlayData.ThumbnailFileName !== undefined)
+            filesToDelete.push(overlayData.ThumbnailFileName);
+
         chrome.extension.sendRequest(
-            {
-                type: PP_RequestType.DELETEFILE,
-                fileName: overlayData.FileName
-            },
-            function (response) {
-                self._handleResponse(response);
+        {
+            type: PP_RequestType.DELETEFILE,
+            fileName: filesToDelete
+        },
+        function (response) {
+            self._handleResponse(response);
 
-                if (response.status == "OK") {
-                    for (var i = overlayId; i < overlaysCount - 1; i++) {
-                        // use temp variables to prevent QUOTA_EXCEEDED_ERR during copy
-                        var dataToCopy = localStorage["overlay" + (i + 1) + "_data"];
-                        var positionToCopy = localStorage["overlay" + (i + 1) + "_position"];
+            if (response.status == "OK") {
+                for (var i = overlayId; i < overlaysCount - 1; i++) {
+                    // use temp variables to prevent QUOTA_EXCEEDED_ERR during copy
+                    var dataToCopy = localStorage["overlay" + (i + 1) + "_data"];
+                    var positionToCopy = localStorage["overlay" + (i + 1) + "_position"];
 
-                        localStorage.removeItem("overlay" + (i + 1) + "_data");
-                        localStorage.removeItem("overlay" + (i + 1) + "_position");
+                    localStorage.removeItem("overlay" + (i + 1) + "_data");
+                    localStorage.removeItem("overlay" + (i + 1) + "_position");
 
-                        localStorage["overlay" + i + "_data"] = dataToCopy;
-                        localStorage["overlay" + i + "_position"] = positionToCopy;
-                    }
-
-                    localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
-                    localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
-
-                    var blobUrl = self._cacheOverlaysBlobUrls[overlayData.FileName];
-                    if (window.revokeObjectURL) {
-                        window.revokeObjectURL(blobUrl);
-                    } else if (window.revokeBlobURL) {
-                        window.revokeBlobURL(blobUrl);
-                    } else if (window.URL && window.URL.revokeObjectURL) {
-                        window.URL.revokeObjectURL(blobUrl);
-                    } else if (window.webkitURL && window.webkitURL.revokeObjectURL) {
-                        window.webkitURL.revokeObjectURL(blobUrl);
-                    }
-                    self._cacheOverlaysBlobUrls[overlayData.FileName] = null;
+                    localStorage["overlay" + i + "_data"] = dataToCopy;
+                    localStorage["overlay" + i + "_position"] = positionToCopy;
                 }
 
-                callback();
-            });
+                localStorage.removeItem("overlay" + (overlaysCount - 1) + "_data");
+                localStorage.removeItem("overlay" + (overlaysCount - 1) + "_position");
+
+                var blobUrl = self._cacheOverlaysBlobUrls[overlayData.FileName];
+                var thumbBlobUrl = self._cacheOverlaysBlobUrls[overlayData.ThumbnailFileName];
+                PPImageTools.revokeBlobUrl(blobUrl);
+                PPImageTools.revokeBlobUrl(thumbBlobUrl);
+                self._cacheOverlaysBlobUrls[overlayData.FileName] = null;
+                self._cacheOverlaysBlobUrls[overlayData.ThumbnailFileName] = null;
+            }
+
+            callback();
+        });
     }
 
-    // ---------------------------------------------------
-    // Create PPOverlay from file and save it into storage
-    // ---------------------------------------------------
+    /**
+     * Create PPOverlay from file and save it into storage
+     * @param file
+     * @param callback
+     * @constructor
+     */
     this.SaveOverlayFromFile = function (file, callback) {
         // Only process image files.
         if (!file.type.match('image.*')) {
@@ -183,6 +210,8 @@ var PPStorage_filesystem = function () {
         var self = this;
         var reader = new FileReader();
         reader.onload = function (e) {
+
+            // 1. Add full size image to storage
             console.log("PP Add file operation");
             chrome.extension.sendRequest(
             {
@@ -195,27 +224,54 @@ var PPStorage_filesystem = function () {
                 self._handleResponse(response);
 
                 if (response.status == "OK") {
-//                    console.log(response);
+
                     var dataView = new DataView(stringToBuffer(response.arrayBuffer));
                     var blob = new Blob([dataView],{type:response.fileType});
 
-                    var url;
-                    if (window.createObjectURL) {
-                        url = window.createObjectURL(blob)
-                    } else if (window.createBlobURL) {
-                        url = window.createBlobURL(blob)
-                    } else if (window.URL && window.URL.createObjectURL) {
-                        url = window.URL.createObjectURL(blob)
-                    } else if (window.webkitURL && window.webkitURL.createObjectURL) {
-                        url = window.webkitURL.createObjectURL(blob)
-                    }
-
                     var overlay = new PPOverlay();
-                    overlay.Url = url;
+                    overlay.Url = PPImageTools.createBlobUrl(blob);
                     overlay.FileName = response.fileName;
 
+                    // 2. Generate thumbnail image
+                    PPImageTools.ResizeBlob(blob, GlobalStorage.get_ThumbnailMinWidth(), GlobalStorage.get_ThumbnailMinHeight(),
+                        function(resizedBlob, img) {
+                            overlay.Width = img.width;
+                            overlay.Height = img.height;
+
+                            PPImageTools.getArrayBufferFromBlob(resizedBlob, function(resizedBlobBuffer) {
+
+                                // 3. Add thumbnail image to storage
+                                console.log("PP Add file operation - thumbnail");
+                                chrome.extension.sendRequest(
+                                {
+                                    type: PP_RequestType.ADDFILE,
+                                    fileData: bufferToString(resizedBlobBuffer),
+                                    fileName: file.name,
+                                    fileType: resizedBlob.type
+                                },
+                                function (responseThumb) {
+                                    self._handleResponse(responseThumb);
+
+                                    if (responseThumb.status == "OK") {
+                                        var dataViewThumb = new DataView(stringToBuffer(responseThumb.arrayBuffer));
+                                        var blobThumb = new Blob([dataViewThumb],{type:responseThumb.fileType});
+
+                                        overlay.ThumbnailUrl = PPImageTools.createBlobUrl(blobThumb);
+                                        overlay.ThumbnailFileName = responseThumb.fileName;
+
+                                        overlay = PPStorage._SaveOverlay(overlay);
+                                        self._cacheOverlaysBlobUrls[overlay.FileName] = overlay.Url;
+                                        self._cacheOverlaysBlobUrls[overlay.ThumbnailFileName] = overlay.ThumbnailUrl;
+
+                                        callback(overlay);
+                                    }
+                                });
+                            });
+                        }
+                    );
+
                     // Render invisible thumbnail to obtain image width and height.
-                    var span = $('<span id="chromeperfectpixel-imgtools"></span>').css('position', 'absolute').css('opacity', 0);
+                    /*var span = $('<span id="chromeperfectpixel-imgtools"></span>').css('position', 'absolute').css('opacity', 0);
                     var img = $('<img />').attr({
                         src: overlay.Url,
                         title: file.name
@@ -232,7 +288,7 @@ var PPStorage_filesystem = function () {
 
                         span.remove();
                         callback(overlay);
-                    });
+                    });*/
                 }
                 else
                     callback();
@@ -256,9 +312,11 @@ var PPStorage_filesystem = function () {
         reader.readAsArrayBuffer(file);
     };
 
-    // ---------------------------------------------------
-    // Get count of overlays stored
-    // ---------------------------------------------------
+    /**
+     * Get count of overlays stored
+     * @return {Number}
+     * @constructor
+     */
     this.GetOverlaysCount = function () {
         var count = 0;
         while (localStorage["overlay" + count + "_data"]) {
@@ -267,7 +325,12 @@ var PPStorage_filesystem = function () {
         return count;
     }
 
-    // Save PPOverlay object into storage
+    /**
+     * Save PPOverlay object into storage
+     * @param overlay
+     * @return {*}
+     * @private
+     */
     this._SaveOverlay = function (overlay) {
         if (!(overlay instanceof PPOverlay))
             alert("Object of type PPOverlay should be provided");
@@ -278,7 +341,7 @@ var PPStorage_filesystem = function () {
         }
 
         // Url: overlay.Url
-        var overlayData = { FileName: overlay.FileName, Height: overlay.Height, Width: overlay.Width };
+        var overlayData = { FileName: overlay.FileName, ThumbnailFileName: overlay.ThumbnailFileName, Height: overlay.Height, Width: overlay.Width };
         var overlayPosition = { X: overlay.X, Y: overlay.Y, Opacity: overlay.Opacity, Scale: overlay.Scale };
 
         try {
@@ -294,6 +357,11 @@ var PPStorage_filesystem = function () {
         return overlay;
     };
 
+    /**
+     * Handle response came from background page file manager
+     * @param response
+     * @private
+     */
     this._handleResponse = function (response) {
         console.log("PP " + response.status);
         if (response.message && response.showToUser)

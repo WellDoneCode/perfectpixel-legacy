@@ -81,10 +81,14 @@ function injectIntoTab(tabId){
     chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
         chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
             chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                        chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                            togglePanel();
+                chrome.tabs.executeScript(null, { file: "3rd Party/canvas-to-blob.min.js" }, function () {
+                    chrome.tabs.executeScript(null, { file: "storage/imagetools.js" }, function () {
+                        chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
+                            chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
+                                chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
+                                    togglePanel();
+                                });
+                            });
                         });
                     });
                 });
@@ -109,7 +113,14 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 // On tab (re)load check if we need to open panel
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
     var pp_tab_state = PP_state[tabId];
-    if (!settings.get('rememberPanelOpenClosedState') || ! pp_tab_state || pp_tab_state == 'closed') return;
+    if (!settings.get('rememberPanelOpenClosedState')){
+        // we need to set this to 'closed' to prevent issue with page reloading while panel is opened
+        PP_state[tabId] = 'closed';
+        return;
+    }
+    else if (! pp_tab_state || pp_tab_state == 'closed') {
+        return;
+    }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
         PP_state[tabId] = 'open';
         injectIntoTab(tabId);
@@ -179,10 +190,10 @@ chrome.extension.onRequest.addListener(
                 }
                 else if (request.type == PP_RequestType.DELETEFILE) {
                     // DELETEFILE handler
-
+                    // array can be sent as request.fileName
                     var fileName = request.fileName;
 
-                    PPFileManager.DeleteFile(fileName, function () {
+                    PPFileManager.DeleteFiles(fileName, function () {
                         sendResponse({
                             status: "OK"
                         });
