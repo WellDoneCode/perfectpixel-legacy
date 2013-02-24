@@ -97,6 +97,29 @@ function injectIntoTab(tabId){
     });
 }
 
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.status != 'loading') return;
+    function change_icon_and_popup(icon, popup){
+        chrome.browserAction.setPopup({tabId: tabId, popup: popup})
+        chrome.browserAction.setIcon({path:chrome.extension.getURL(icon), tabId:tabId })
+    }
+    var disabled_icon = 'icons/icon_disabled.png';
+
+    if (tab.url.match(/chrome:/)){
+        change_icon_and_popup(disabled_icon,'popups/chrome-protocol-not-allowed.html')
+    }
+    else {
+        chrome.extension.isAllowedFileSchemeAccess(function(isAllowedAccess){
+            if (isAllowedAccess){
+                change_icon_and_popup('icons/icon.png','')
+            }
+            else if(tab.url.match(/file:\//)){
+                change_icon_and_popup(disabled_icon,'popups/file-scheme-access-not-allowed.html')
+            }
+        })
+    }
+});
+
 //React when a browser' action icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
     var pp_tab_state = PP_state[tab.id];
