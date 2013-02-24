@@ -62,22 +62,6 @@ var PPFileManager = new function () {
         }
     }
 
-    // TODO delete
-    /*this.GetFiles = function(fileNames, callback) {
-        var files = [];
-
-        for(var i=0; i<fileNames.length; i++) {
-            var index = i;
-            this.GetFile(fileNames[index], function(file) {
-                files[index] = file;
-                if(files.length == fileNames.length) {
-                    // all async events done
-                    callback(files);
-                }
-            })
-        }
-    }*/
-
     /**
      * Read file from filesystem. Returns PPFile object to callback function
      * @param fileName

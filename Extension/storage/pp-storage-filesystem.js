@@ -259,10 +259,6 @@ var PPStorage_filesystem = function () {
                                         overlay.ThumbnailUrl = PPImageTools.createBlobUrl(blobThumb);
                                         overlay.ThumbnailFileName = responseThumb.fileName;
 
-                                        //TODO remove 2 lines
-                                        //overlay.Url = overlay.ThumbnailUrl;
-                                        //overlay.FileName = overlay.ThumbnailFileName;
-
                                         overlay = PPStorage._SaveOverlay(overlay);
                                         self._cacheOverlaysBlobUrls[overlay.FileName] = overlay.Url;
                                         self._cacheOverlaysBlobUrls[overlay.ThumbnailFileName] = overlay.ThumbnailUrl;
