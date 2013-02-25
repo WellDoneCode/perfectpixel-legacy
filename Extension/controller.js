@@ -69,19 +69,8 @@ var Controller = {
             delete this.panelView;
         }
         else {
-            this.overlays = new OverlayCollection();
-            this.panelView = new PanelView({ overlays: this.overlays });
+            this.panelView = new PanelView();
         }
-    },
-
-    /**
-     *
-     * @param files
-     * @param uploadElem
-     */
-    upload: function (files, uploadElem) {
-        var overlay = new Overlay();
-        this.overlays.add(overlay);
     },
 
     /**
@@ -138,20 +127,6 @@ var Controller = {
      */
     changeOpacity: function(value) {
         ChromePerfectPixel.change({opacity: value});
-    },
-
-    /**
-     *
-     */
-    toggleOverlay: function() {
-        ChromePerfectPixel.toggleOverlay();
-    },
-
-    /**
-     *
-     */
-    toggleLock: function() {
-        ChromePerfectPixel.toggleLock();
     },
 
     onKeyDown: function(event) {
@@ -256,17 +231,6 @@ var ChromePerfectPixel = new function () {
         GlobalStorage.setOptions({
             'visible' : false
         });
-    };
-
-    this.toggleOverlay = function () {
-        if ($('#' + overlayUniqueId).length > 0) {
-            trackEvent("overlay", "show");
-            ChromePerfectPixel.removeOverlay();
-        }
-        else {
-            trackEvent("overlay", "hide");
-            ChromePerfectPixel.createOverlay();
-        }
     };
 
     this.lockOverlay = function () {

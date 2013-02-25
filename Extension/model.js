@@ -19,14 +19,15 @@
 
 var Overlay = Backbone.Model.extend({
     defaults: {
-        x: 0,
-        y: 0,
+        x: 300,
+        y: 300,
         width: 0,
         height: 0,
-        opacity: 1,
+        opacity: 0.5,
         scale: 1,
         url: '',
-        filename: ''
+        filename: '',
+        current: false
     },
 
     uploadFile: function(file, callback) {
@@ -115,3 +116,24 @@ var Overlay = Backbone.Model.extend({
 var OverlayCollection = Backbone.Collection.extend({
     model: Overlay
 });
+
+var PerfectPixelModel = Backbone.Model.extend({
+    defaults: {
+        currentOverlayIndex: 0,
+        overlayShown: false,
+        overlayLocked: false
+    },
+
+    initialize: function() {
+        this.overlays = new OverlayCollection();
+    },
+
+    toggleOverlayShown: function() {
+        this.set('overlayShown', !this.get('overlayShown'));
+    },
+
+    toggleOverlayLocked: function() {
+        this.set('overlayLocked', !this.get('overlayLocked'));
+    }
+});
+var PerfectPixel = new PerfectPixelModel();

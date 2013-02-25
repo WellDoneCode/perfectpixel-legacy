@@ -18,10 +18,18 @@
  */
 
 var PanelView = Backbone.View.extend({
+    el: $('body'),
+
+    events: {
+        'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
+        'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked'
+    },
+
     initialize: function(options) {
-        _.bindAll(this, 'render', 'appendOverlay', 'upload', '_bindFileUploader');
-        this.overlays = options.overlays || new OverlayCollection();
-        this.overlays.bind('add', this.appendOverlay);
+        _.bindAll(this, 'render', 'appendOverlay', 'upload', 'toggleOverlayShown', 'toggleOverlayLocked',
+            'update', '_bindFileUploader');
+        PerfectPixel.bind('change', this.update);
+        PerfectPixel.overlays.bind('add', this.appendOverlay);
         this.render();
     },
 
@@ -45,8 +53,39 @@ var PanelView = Backbone.View.extend({
         overlay.uploadFile(file, $.proxy(function() {
             $('#chromeperfectpixel-progressbar-area').hide();
             this._bindFileUploader({rebind: true});
-            this.overlays.add(overlay);
+            PerfectPixel.overlays.add(overlay);
         }, this));
+    },
+
+    toggleOverlayShown: function() {
+        PerfectPixel.toggleOverlayShown();
+    },
+
+    toggleOverlayLocked: function() {
+        PerfectPixel.toggleOverlayLocked();
+    },
+
+    update: function() {
+        if (PerfectPixel.get('overlayShown')) {
+            if (!this.overlayView) {
+                this.overlayView = new OverlayView({
+                    model: PerfectPixel.overlays.first()
+                });
+                this.$el.append(this.overlayView.render().el);
+            }
+            this.$el.find('.chromeperfectpixel-showHideBtn span').text('Hide');
+        } else {
+            if (this.overlayView) {
+                this.overlayView.unrender();
+                delete this.overlayView;
+            }
+            this.$el.find('.chromeperfectpixel-showHideBtn span').text('Show');
+        }
+
+        if (this.overlayView) {
+            this.overlayView.setLocked(PerfectPixel.get('overlayLocked'));
+        }
+        this.$el.find('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
     },
 
     render: function() {
@@ -102,16 +141,7 @@ var PanelView = Backbone.View.extend({
                     '</div>' +
                     '</div>';
 
-            $('body').append(panelHtml);
-
-            // Set event handlers
-            $('.chromeperfectpixel-showHideBtn').bind('click', function (e) {
-                Controller.toggleOverlay();
-            });
-
-            $('.chromeperfectpixel-lockBtn').bind('click', function (e) {
-                Controller.toggleLock();
-            });
+            this.$el.append(panelHtml);
 
             $('#chromeperfectpixel-fakefile').bind('click', function (e) {
                 //trackEvent("layer", "add", PPStorage.GetOverlaysCount() + 1);
@@ -119,12 +149,12 @@ var PanelView = Backbone.View.extend({
             });
             this._bindFileUploader();
 
-            $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
-                // Live handler called.
-                //trackEvent("layer", "select");
-                var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
-                Controller.setCurrentLayer(overlayId);
-            });
+//            $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
+//                // Live handler called.
+//                //trackEvent("layer", "select");
+//                var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
+//                Controller.setCurrentLayer(overlayId);
+//            });
 
             $('#chromeperfectpixel-opacity').change(function (e) {
                 if ($(this).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
@@ -152,24 +182,24 @@ var PanelView = Backbone.View.extend({
                 Controller.scaleChanged(value);
             });
 
-            $('#chromeperfectpixel-origin-controls button').live("click", function (e) {
-                e.preventDefault();
-                trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
-
-                var axis = $(this).data('axis');
-                var offset = $(this).data('offset');
-                Controller.originButtonClicked(axis, offset);
-            });
-
-            // TODO need to be fixed, doesn't work now
-            $('.chromeperfectpixel-coords').change("keypress", function (e) {
-                var id = $(this).attr("id");
-                trackEvent("coords", id.replace("chromeperfectpixel-", ""));
-
-                if (e.which == 13) {
-                    Controller.coordsKeyPressed(id, $(this).val());
-                }
-            });
+//            $('#chromeperfectpixel-origin-controls button').live("click", function (e) {
+//                e.preventDefault();
+//                trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
+//
+//                var axis = $(this).data('axis');
+//                var offset = $(this).data('offset');
+//                Controller.originButtonClicked(axis, offset);
+//            });
+//
+//            // TODO need to be fixed, doesn't work now
+//            $('.chromeperfectpixel-coords').change("keypress", function (e) {
+//                var id = $(this).attr("id");
+//                trackEvent("coords", id.replace("chromeperfectpixel-", ""));
+//
+//                if (e.which == 13) {
+//                    Controller.coordsKeyPressed(id, $(this).val());
+//                }
+//            });
 
             // make panel draggable
             $('#chromeperfectpixel-panel').draggable({
@@ -183,43 +213,43 @@ var PanelView = Backbone.View.extend({
                 }
             });
 
-            $('#chromeperfectpixel-panel-header').dblclick(function (event) {
-                //if (event.target.id == "chromeperfectpixel-header-logo")
-                //    return;
-                trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), event.type);
-
-                var panel = $('#chromeperfectpixel-panel');
-                var body = $('#chromeperfectpixel-panel-body');
-                var panelWidth = panel.width();
-
-                if (body.hasClass('collapsed')) {
-                    body.removeClass('collapsed');
-                    var state = body.data('state');
-                    panel.animate({ right: state.right }, 'fast', function () {
-                        body.animate(
-                            { 'height': state.height, 'padding-bottom': state.paddingBottom },
-                            'fast',
-                            function () {
-                                $(this).removeAttr('style');
-                                panel.draggable('option', 'axis', '');
-                            }
-                        );
-                    });
-                }
-                else {
-                    body.addClass('collapsed');
-                    body.data('state', { height: body.innerHeight(), paddingBottom: body.css('padding-bottom'), right: panel.css('right') });
-                    $('#chromeperfectpixel-panel-body').animate(
-                        { 'height': 0, 'padding-bottom': 0 },
-                        'fast',
-                        function () {
-                            panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
-                                panel.draggable('option', 'axis', 'y');
-                            });
-                        }
-                    );
-                }
-            });
+//            $('#chromeperfectpixel-panel-header').dblclick(function (event) {
+//                //if (event.target.id == "chromeperfectpixel-header-logo")
+//                //    return;
+//                trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), event.type);
+//
+//                var panel = $('#chromeperfectpixel-panel');
+//                var body = $('#chromeperfectpixel-panel-body');
+//                var panelWidth = panel.width();
+//
+//                if (body.hasClass('collapsed')) {
+//                    body.removeClass('collapsed');
+//                    var state = body.data('state');
+//                    panel.animate({ right: state.right }, 'fast', function () {
+//                        body.animate(
+//                            { 'height': state.height, 'padding-bottom': state.paddingBottom },
+//                            'fast',
+//                            function () {
+//                                $(this).removeAttr('style');
+//                                panel.draggable('option', 'axis', '');
+//                            }
+//                        );
+//                    });
+//                }
+//                else {
+//                    body.addClass('collapsed');
+//                    body.data('state', { height: body.innerHeight(), paddingBottom: body.css('padding-bottom'), right: panel.css('right') });
+//                    $('#chromeperfectpixel-panel-body').animate(
+//                        { 'height': 0, 'padding-bottom': 0 },
+//                        'fast',
+//                        function () {
+//                            panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
+//                                panel.draggable('option', 'axis', 'y');
+//                            });
+//                        }
+//                    );
+//                }
+//            });
 
             $('#chromeperfectpixel-panel button').button();
 
@@ -288,10 +318,10 @@ var OverlayItemView = Backbone.View.extend({
         var thumbWidth = Math.ceil(this.model.get('width') / coeff);
 
         var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
-        $(this.el).append(checkbox);
+        this.$el.append(checkbox);
 
         if (!ExtOptions.classicLayersSection) {
-            $(this.el).css({'background-image':  'url(' + this.model.get('url')  + ')'});
+            this.$el.css({'background-image':  'url(' + this.model.get('url')  + ')'});
         } else {
             var thumb = $('<img />', {
                 class: 'chromeperfectpixel-thumb',
@@ -301,21 +331,86 @@ var OverlayItemView = Backbone.View.extend({
                     height: thumbHeight + 'px'
                 }
             });
-            $(this.el).append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
+            this.$el.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
         }
 
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
         deleteBtn.button(); // apply css
-        $(this.el).append(deleteBtn);
+        this.$el.append(deleteBtn);
+
+        return this;
+    },
+
+    unrender: function() {
+        this.$el.remove();
+    },
+
+    remove: function() {
+        this.model.destroy();
+    }
+});
+
+var OverlayView = Backbone.View.extend({
+    tagName: 'img',
+    className: 'chromeperfectpixel-overlay',
+    id: 'chromeperfectpixel-overlay_3985123731465987',
+    zIndex: 2147483646,
+
+    initialize: function(){
+        _.bindAll(this, 'render', 'unrender', 'updateOverlay');
+
+        this.model.bind('change', this.updateOverlay);
+        this.model.bind('remove', this.unrender);
+    },
+
+    updateOverlay: function() {
+        var width = this.model.get('width') * this.model.get('scale');
+        this.$el.attr('src', this.model.get('url'))
+            .css('width', width + 'px')
+            .css('left', this.model.get('x') + 'px')
+            .css('top', this.model.get('y') + 'px')
+            .css('opacity', this.model.get('opacity'));
+    },
+
+    setLocked: function(value) {
+        this.$el.css('pointer-events', value ? 'none' : 'auto');
+    },
+
+    render: function() {
+        this.$el.css({
+            'z-index': this.zIndex,
+            'margin': 0,
+            'padding': 0,
+            'position': 'absolute',
+            'background-color': 'transparent',
+            'display': 'block',
+            'cursor': 'all-scroll',
+            'height': 'auto',
+            'pointer-events' : (PerfectPixel.get('overlayLocked')) ? 'none' : 'auto'
+        });
+        this.updateOverlay();
+
+        this.$el.bind('mousewheel', function (event) {
+//            if (event.wheelDelta < 0) {
+//                overlay.css('opacity', Number(overlay.css('opacity')) - 0.05);
+//            } else {
+//                overlay.css('opacity', Number(overlay.css('opacity')) + 0.05);
+//            }
+            event.stopPropagation();
+            event.preventDefault();
+        });
+
+        this.$el.draggable({
+//            drag: ChromePerfectPixel.onOverlayUpdate,
+//            stop: function () {
+//                ChromePerfectPixel.onOverlayUpdate(true);
+//            }
+        });
 
         return this;
     },
 
     unrender: function() {
         $(this.el).remove();
-    },
-
-    remove: function() {
-        this.model.destroy();
     }
 });
