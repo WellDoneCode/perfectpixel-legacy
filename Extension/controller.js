@@ -83,33 +83,6 @@ var Controller = {
 
     /**
      *
-     * @param value
-     */
-    scaleChanged: function(value) {
-        ChromePerfectPixel.change({scale: value});
-    },
-
-    /**
-     *
-     * @param axis
-     * @param offset
-     */
-    originButtonClicked: function(axis, offset) {
-        if (axis == "x") {
-            var input = $('input#chromeperfectpixel-coordX');
-            var x = input.val() - offset;
-            input.val(x);
-            ChromePerfectPixel.change({left: x});
-        } else if (axis == "y") {
-            var input = $('input#chromeperfectpixel-coordY');
-            var y = input.val() - offset;
-            input.val(y);
-            ChromePerfectPixel.change({top: y});
-        }
-    },
-
-    /**
-     *
      * @param inputId
      * @param value
      */
@@ -119,14 +92,6 @@ var Controller = {
         } else if (inputId == "chromeperfectpixel-coordY") {
             ChromePerfectPixel.change({top: value});
         }
-    },
-
-    /**
-     *
-     * @param value
-     */
-    changeOpacity: function(value) {
-        ChromePerfectPixel.change({opacity: value});
     },
 
     onKeyDown: function(event) {
@@ -283,95 +248,6 @@ var ChromePerfectPixel = new function () {
             ChromePerfectPixel.onOverlayUpdate(true);
     };
 
-    // Layers
-    this.renderLayers = function () {
-        // disable controls
-        ChromePerfectPixel.updateCoordsUI(default_left_px, default_top_px, default_opacity, default_scale);
-        $('.chromeperfectpixel-coords').attr('disabled', true);
-        $('#chromeperfectpixel-opacity').attr('disabled', true);
-        $('#chromeperfectpixel-scale').attr('disabled', true);
-        $('.chromeperfectpixel-showHideBtn').button("option", "disabled", true);
-        $('.chromeperfectpixel-lockBtn').button("option", "disabled", true);
-        $('#chromeperfectpixel-fakefile').button("option", "disabled", true);
-        $('#chromeperfectpixel-origin-controls button').button("option", "disabled", true);
-
-        var container = $('#chromeperfectpixel-layers');
-        container.empty();
-
-        if (PPStorage.GetOverlaysCount() > 0) {
-            $('#chromeperfectpixel-progressbar-area').show();
-        }
-
-        PPStorage.GetOverlays(function (overlays) {
-            container.empty();
-
-            for (var i = 0; i < overlays.length; i++) {
-                ChromePerfectPixel.renderLayer(overlays[i]);
-            }
-
-            // enable controls
-            if (overlays.length > 0) {
-                ChromePerfectPixel.enableLayerControls();
-            }
-            else
-                $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
-
-            ChromePerfectPixel.setCurrentLayer(GlobalStorage.get_CurrentOverlayId());
-        });
-    };
-
-    this.renderLayer = function (overlay) {
-        var container = $('#chromeperfectpixel-layers');
-        var layer = $('<label></label>', {
-            class: 'chromeperfectpixel-layer',
-            data: {
-                Id: overlay.Id
-            }
-        });
-        var thumbHeight = 50;
-        var coeff = overlay.Height / thumbHeight;
-        var thumbWidth = Math.ceil(overlay.Width / coeff);
-
-        var checkbox = ($('<input type=radio name="chromeperfectpixel-selectedLayer" />'));
-        layer.append(checkbox);
-
-        if (!ExtOptions.classicLayersSection){
-            layer.css({'background-image':  'url(' +overlay.Url + ')'});
-        }
-        else{
-            var thumb = $('<img />', {
-                class: 'chromeperfectpixel-thumb',
-                src: overlay.Url,
-                css: {
-                    width: thumbWidth + 'px',
-                    height: thumbHeight + 'px'
-                }
-            });
-            layer.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
-        }
-
-        var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>')); //($('<input type=button class="chromeperfectpixel-delete" value="X" />'));
-        deleteBtn.bind('click', function (e) {
-            trackEvent("layer", "delete", undefined, "attempt");
-            ChromePerfectPixel.deleteLayer($(this).parents('.chromeperfectpixel-layer'));
-        });
-        deleteBtn.button(); // apply css
-
-        layer.append(deleteBtn);
-        container.append(layer);
-    };
-
-    this.enableLayerControls = function () {
-        $('.chromeperfectpixel-coords').attr('disabled', false);
-        $('#chromeperfectpixel-opacity').attr('disabled', false);
-        $('#chromeperfectpixel-scale').attr('disabled', false);
-        $('.chromeperfectpixel-showHideBtn').button("option", "disabled", false);
-        $('.chromeperfectpixel-lockBtn').button("option", "disabled", false);
-        $('#chromeperfectpixel-fakefile').button("option", "disabled", false);
-        $('#chromeperfectpixel-origin-controls button').button("option", "disabled", false);
-        $('#chromeperfectpixel-progressbar-area').hide();
-    };
-
     this.deleteLayer = function (layer) {
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer", "delete", undefined, "confirmed");
@@ -466,32 +342,5 @@ var ChromePerfectPixel = new function () {
         $('#chromeperfectpixel-coordY').val(y);
         $('#chromeperfectpixel-opacity').val(Number(opacity).toFixed(1));
         $('#chromeperfectpixel-scale').val(Number(scale).toFixed(1));
-    };
-
-    /**
-     *
-     * @param {Object} values
-     * @param [values.opacity]
-     * @param [values.left]
-     * @param [values.top]
-     * @param [values.scale]
-     */
-    this.change = function(values) {
-        var overlay = $('#' + overlayUniqueId);
-        if (values.opacity !== undefined) {
-            overlay.css('opacity', values.opacity);
-        }
-        if (values.left !== undefined) {
-            overlay.css('left', values.left + "px");
-        }
-        if (values.top !== undefined) {
-            overlay.css('top', values.top + "px");
-        }
-        if (values.scale !== undefined) {
-            overlay.data('scale', values.scale);
-            overlay.css('height', 'auto');
-            overlay.css('width', Number(overlay.data('originalWidth')) * values.scale);
-        }
-        ChromePerfectPixel.onOverlayUpdate(true);
     };
 };

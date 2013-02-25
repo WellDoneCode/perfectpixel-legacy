@@ -1,6 +1,6 @@
 ﻿/*
 
-Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
 
 This file is part of PerfectPixel.
 

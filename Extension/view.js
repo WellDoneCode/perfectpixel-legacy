@@ -23,15 +23,17 @@ var PanelView = Backbone.View.extend({
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
-        'click #chromeperfectpixel-origin-controls button': 'originButtonClick'
+        'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
+        'change #chromeperfectpixel-opacity': 'changeOpacity',
+        'change #chromeperfectpixel-scale': 'changeScale'
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'appendOverlay', 'upload', 'toggleOverlayShown', 'toggleOverlayLocked',
-            'originButtonClick', 'update', '_bindFileUploader');
+        _.bindAll(this);
         PerfectPixel.bind('change', this.update);
         PerfectPixel.overlays.bind('add', this.appendOverlay);
         PerfectPixel.overlays.bind('remove', this.update);
+        PerfectPixel.overlays.bind('change', this.update);
         this.render();
     },
 
@@ -82,6 +84,26 @@ var PanelView = Backbone.View.extend({
         }
     },
 
+    changeOpacity: function(e) {
+        if ($(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
+            return;
+        }
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            var value = $(e.currentTarget).val();
+            overlay.set('opacity', Number(value).toFixed(1));
+        }
+    },
+
+    changeScale: function(e) {
+        trackEvent("scale", e.type, value * 10);
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            var value = $(e.currentTarget).val();
+            overlay.set('scale', Number(value).toFixed(1));
+        }
+    },
+
     update: function() {
         if (PerfectPixel.get('overlayShown')) {
             if (!this.overlayView) {
@@ -90,13 +112,13 @@ var PanelView = Backbone.View.extend({
                 });
                 this.$el.append(this.overlayView.render().el);
             }
-            this.$el.find('.chromeperfectpixel-showHideBtn span').text('Hide');
+            this.$('.chromeperfectpixel-showHideBtn span').text('Hide');
         } else {
             if (this.overlayView) {
                 this.overlayView.unrender();
                 delete this.overlayView;
             }
-            this.$el.find('.chromeperfectpixel-showHideBtn span').text('Show');
+            this.$('.chromeperfectpixel-showHideBtn span').text('Show');
         }
 
         if (this.overlayView) {
@@ -104,13 +126,24 @@ var PanelView = Backbone.View.extend({
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
-        this.$el.find('.chromeperfectpixel-showHideBtn span').button({ disabled: isNoOverlays });
-        this.$el.find('.chromeperfectpixel-lockBtn span').button({ disabled: isNoOverlays });
-        this.$el.find('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
-        this.$el.find('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
-        this.$el.find('input').not('input[type=file]').attr('disabled', function() {
+        this.$('.chromeperfectpixel-showHideBtn span').button({ disabled: isNoOverlays });
+        this.$('.chromeperfectpixel-lockBtn span').button({ disabled: isNoOverlays });
+        this.$('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
+        this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
+        this.$('input').not('input[type=file]').attr('disabled', function() {
             return isNoOverlays;
         });
+
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            this.$('#chromeperfectpixel-coordX').val(overlay.get('x'));
+            this.$('#chromeperfectpixel-coordY').val(overlay.get('y'));
+            this.$('#chromeperfectpixel-opacity').val(overlay.get('opacity'));
+        } else {
+            this.$('#chromeperfectpixel-coordX').val('');
+            this.$('#chromeperfectpixel-coordY').val('');
+            this.$('#chromeperfectpixel-opacity').val(0.5);
+        }
     },
 
     render: function() {
@@ -181,15 +214,6 @@ var PanelView = Backbone.View.extend({
 //                Controller.setCurrentLayer(overlayId);
 //            });
 
-            $('#chromeperfectpixel-opacity').change(function (e) {
-                if ($(this).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
-                    return;
-                }
-                Controller.changeOpacity($(this).val());
-            });
-            $('#chromeperfectpixel-opacity').bind('changed', function (e) {
-                trackEvent("opacity", e.type, e.target.value * 100); // GA tracks only integers not floats
-            });
             // Workaround to catch single value of opacity during opacity HTML element change
             (function(el, timeout) {
                 var timer, trig=function() { el.trigger("changed"); };
@@ -200,21 +224,6 @@ var PanelView = Backbone.View.extend({
                     timer = setTimeout(trig, timeout);
                 });
             })($("#chromeperfectpixel-opacity"), 500);
-
-            $('#chromeperfectpixel-scale').change(function (e) {
-                var value = $(this).val();
-                trackEvent("scale", e.type, value * 10); // GA tracks only integers not floats
-                Controller.scaleChanged(value);
-            });
-
-//            $('#chromeperfectpixel-origin-controls button').live("click", function (e) {
-//                e.preventDefault();
-//                trackEvent("coords", $(this).attr('id').replace("chromeperfectpixel-", ""));
-//
-//                var axis = $(this).data('axis');
-//                var offset = $(this).data('offset');
-//                Controller.originButtonClicked(axis, offset);
-//            });
 //
 //            // TODO need to be fixed, doesn't work now
 //            $('.chromeperfectpixel-coords').change("keypress", function (e) {
@@ -332,7 +341,7 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     initialize: function(){
-        _.bindAll(this, 'render', 'unrender', 'remove');
+        _.bindAll(this);
 
         this.model.bind('change', this.render);
         this.model.bind('remove', this.unrender);
@@ -382,8 +391,12 @@ var OverlayView = Backbone.View.extend({
     id: 'chromeperfectpixel-overlay_3985123731465987',
     zIndex: 2147483646,
 
+    events: {
+        'mousewheel': 'mousewheel'
+    },
+
     initialize: function(){
-        _.bindAll(this, 'render', 'unrender', 'updateOverlay');
+        _.bindAll(this);
 
         this.model.bind('change', this.updateOverlay);
         this.model.bind('remove', this.unrender);
@@ -402,6 +415,16 @@ var OverlayView = Backbone.View.extend({
         this.$el.css('pointer-events', value ? 'none' : 'auto');
     },
 
+    mousewheel: function(e) {
+        if (e.originalEvent.wheelDelta < 0) {
+            this.model.set('opacity', Number(this.model.get('opacity')) - 0.05);
+        } else {
+            this.model.set('opacity', Number(this.model.get('opacity')) + 0.05);
+        }
+        e.stopPropagation();
+        e.preventDefault();
+    },
+
     render: function() {
         this.$el.css({
             'z-index': this.zIndex,
@@ -415,16 +438,6 @@ var OverlayView = Backbone.View.extend({
             'pointer-events' : (PerfectPixel.get('overlayLocked')) ? 'none' : 'auto'
         });
         this.updateOverlay();
-
-        this.$el.bind('mousewheel', function (event) {
-//            if (event.wheelDelta < 0) {
-//                overlay.css('opacity', Number(overlay.css('opacity')) - 0.05);
-//            } else {
-//                overlay.css('opacity', Number(overlay.css('opacity')) + 0.05);
-//            }
-            event.stopPropagation();
-            event.preventDefault();
-        });
 
         this.$el.draggable({
 //            drag: ChromePerfectPixel.onOverlayUpdate,

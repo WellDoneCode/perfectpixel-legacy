@@ -17,7 +17,49 @@
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var Overlay = Backbone.Model.extend({
+/**
+ * https://github.com/berzniz/backbone.getters.setters
+ */
+Backbone.GSModel = Backbone.Model.extend({
+
+    get: function(attr) {
+        // Call the getter if available
+        if (_.isFunction(this.getters[attr])) {
+            return this.getters[attr].call(this);
+        }
+
+        return Backbone.Model.prototype.get.call(this, attr);
+    },
+
+    set: function(key, value, options) {
+        var attrs, attr;
+
+        // Normalize the key-value into an object
+        if (_.isObject(key) || key == null) {
+            attrs = key;
+            options = value;
+        } else {
+            attrs = {};
+            attrs[key] = value;
+        }
+
+        // Go over all the set attributes and call the setter if available
+        for (attr in attrs) {
+            if (_.isFunction(this.setters[attr])) {
+                attrs[attr] = this.setters[attr].call(this, attrs[attr]);
+            }
+        }
+
+        return Backbone.Model.prototype.set.call(this, attrs, options);
+    },
+
+    getters: {},
+
+    setters: {}
+
+});
+
+var Overlay = Backbone.GSModel.extend({
     defaults: {
         x: 300,
         y: 300,
@@ -28,6 +70,18 @@ var Overlay = Backbone.Model.extend({
         url: '',
         filename: '',
         current: false
+    },
+
+    setters: {
+        opacity: function(value) {
+            value = Number(value);
+            if (value < 0) {
+                value = 0;
+            } else if (value > 1.0) {
+                value = 1.0;
+            }
+            return value;
+        }
     },
 
     uploadFile: function(file, callback) {
