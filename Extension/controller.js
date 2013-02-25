@@ -233,34 +233,6 @@ var ChromePerfectPixel = new function () {
         });
     };
 
-    this.lockOverlay = function () {
-        trackEvent("overlay", "lock");
-        $('#' + overlayUniqueId).css('pointer-events', 'none');
-        GlobalStorage.setOptions({
-            'locked' : true
-        });
-        $('.chromeperfectpixel-lockBtn').text('Unlock');
-    };
-
-    this.unlockOverlay = function () {
-        trackEvent("overlay", "unlock");
-        $('#' + overlayUniqueId).css('pointer-events', 'auto');
-        GlobalStorage.setOptions({
-            'locked' : false
-        });
-        $('.chromeperfectpixel-lockBtn').text('Lock');
-    };
-
-    this.toggleLock = function () {
-        var options = GlobalStorage.getOptions();
-        if (options['locked'] === true) {
-            ChromePerfectPixel.unlockOverlay();
-        }
-        else {
-            ChromePerfectPixel.lockOverlay();
-        }
-    };
-
     this.onOverlayUpdate = function (isStop) {
         var overlay = $('#' + overlayUniqueId);
         if(overlay && overlay.length > 0)

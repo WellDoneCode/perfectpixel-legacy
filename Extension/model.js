@@ -128,6 +128,10 @@ var PerfectPixelModel = Backbone.Model.extend({
         this.overlays = new OverlayCollection();
     },
 
+    getCurrentOverlay: function() {
+        return this.overlays.first();
+    },
+
     toggleOverlayShown: function() {
         this.set('overlayShown', !this.get('overlayShown'));
     },

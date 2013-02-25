@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  *
@@ -22,14 +22,16 @@ var PanelView = Backbone.View.extend({
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
-        'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked'
+        'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
+        'click #chromeperfectpixel-origin-controls button': 'originButtonClick'
     },
 
     initialize: function(options) {
         _.bindAll(this, 'render', 'appendOverlay', 'upload', 'toggleOverlayShown', 'toggleOverlayLocked',
-            'update', '_bindFileUploader');
+            'originButtonClick', 'update', '_bindFileUploader');
         PerfectPixel.bind('change', this.update);
         PerfectPixel.overlays.bind('add', this.appendOverlay);
+        PerfectPixel.overlays.bind('remove', this.update);
         this.render();
     },
 
@@ -38,6 +40,7 @@ var PanelView = Backbone.View.extend({
             model: overlay
         });
         $('#chromeperfectpixel-layers').append(itemView.render().el);
+        this.update();
     },
 
     upload: function(file) {
@@ -65,11 +68,25 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.toggleOverlayLocked();
     },
 
+    originButtonClick: function(e) {
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            var button = $(e.currentTarget);
+            var axis = button.data('axis');
+            var offset = button.data('offset');
+            if (axis == "x") {
+                overlay.set('x', overlay.get('x') - offset);
+            } else if (axis == "y") {
+                overlay.set('y', overlay.get('y') - offset);
+            }
+        }
+    },
+
     update: function() {
         if (PerfectPixel.get('overlayShown')) {
             if (!this.overlayView) {
                 this.overlayView = new OverlayView({
-                    model: PerfectPixel.overlays.first()
+                    model: PerfectPixel.getCurrentOverlay()
                 });
                 this.$el.append(this.overlayView.render().el);
             }
@@ -85,7 +102,15 @@ var PanelView = Backbone.View.extend({
         if (this.overlayView) {
             this.overlayView.setLocked(PerfectPixel.get('overlayLocked'));
         }
+
+        var isNoOverlays = (PerfectPixel.overlays.size() == 0);
+        this.$el.find('.chromeperfectpixel-showHideBtn span').button({ disabled: isNoOverlays });
+        this.$el.find('.chromeperfectpixel-lockBtn span').button({ disabled: isNoOverlays });
         this.$el.find('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
+        this.$el.find('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
+        this.$el.find('input').not('input[type=file]').attr('disabled', function() {
+            return isNoOverlays;
+        });
     },
 
     render: function() {
@@ -252,6 +277,7 @@ var PanelView = Backbone.View.extend({
 //            });
 
             $('#chromeperfectpixel-panel button').button();
+            this.update();
 
             // Global hotkeys on
             if (ExtOptions.enableHotkeys) {
