@@ -18,7 +18,9 @@
  */
 
 var PanelView = Backbone.View.extend({
-    el: $('body'),
+    tagName: 'div',
+    className: "chromeperfectpixel-panel",
+    id: "chromeperfectpixel-panel",
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -42,7 +44,7 @@ var PanelView = Backbone.View.extend({
         var itemView = new OverlayItemView({
             model: overlay
         });
-        $('#chromeperfectpixel-layers').append(itemView.render().el);
+        this.$('#chromeperfectpixel-layers').append(itemView.render().el);
         this.update();
     },
 
@@ -53,11 +55,11 @@ var PanelView = Backbone.View.extend({
             return;
         }
 
-        $('#chromeperfectpixel-progressbar-area').show();
+        this.$('#chromeperfectpixel-progressbar-area').show();
 
         var overlay = new Overlay();
         overlay.uploadFile(file, $.proxy(function() {
-            $('#chromeperfectpixel-progressbar-area').hide();
+            this.$('#chromeperfectpixel-progressbar-area').hide();
             this._bindFileUploader({rebind: true});
             PerfectPixel.overlays.add(overlay);
         }, this));
@@ -74,7 +76,7 @@ var PanelView = Backbone.View.extend({
     originButtonClick: function(e) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var button = $(e.currentTarget);
+            var button = this.$(e.currentTarget);
             var axis = button.data('axis');
             var offset = button.data('offset');
             if (axis == "x") {
@@ -86,12 +88,12 @@ var PanelView = Backbone.View.extend({
     },
 
     changeOpacity: function(e) {
-        if ($(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
+        if (this.$(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
             return;
         }
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var value = $(e.currentTarget).val();
+            var value = this.$(e.currentTarget).val();
             overlay.set('opacity', Number(value).toFixed(1));
         }
     },
@@ -100,16 +102,16 @@ var PanelView = Backbone.View.extend({
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var value = $(e.currentTarget).val();
+            var value = this.$(e.currentTarget).val();
             overlay.set('scale', Number(value).toFixed(1));
         }
     },
 
     panelHeaderDoubleClick: function(e) {
-        trackEvent($(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), event.type);
+        trackEvent(this.$(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), event.type);
 
-        var panel = $('#chromeperfectpixel-panel');
-        var body = $('#chromeperfectpixel-panel-body');
+        var panel = this.$el;
+        var body = this.$('#chromeperfectpixel-panel-body');
         var panelWidth = panel.width();
 
         if (body.hasClass('collapsed')) {
@@ -132,7 +134,7 @@ var PanelView = Backbone.View.extend({
                 paddingBottom: body.css('padding-bottom'),
                 right: panel.css('right')
             });
-            $('#chromeperfectpixel-panel-body').animate(
+            this.$('#chromeperfectpixel-panel-body').animate(
                 { 'height': 0, 'padding-bottom': 0 },
                 'fast',
                 function () {
@@ -150,7 +152,7 @@ var PanelView = Backbone.View.extend({
                 this.overlayView = new OverlayView({
                     model: PerfectPixel.getCurrentOverlay()
                 });
-                this.$el.append(this.overlayView.render().el);
+                $('body').append(this.overlayView.render().el);
             }
             this.$('.chromeperfectpixel-showHideBtn span').text('Hide');
         } else {
@@ -187,65 +189,65 @@ var PanelView = Backbone.View.extend({
     },
 
     render: function() {
-        if ($('#chromeperfectpixel-panel').length == 0) {
-            var panelHtml =
-                '<div id="chromeperfectpixel-panel" class="chromeperfectpixel-panel" style="background:url(' + chrome.extension.getURL("images/noise.jpg") + ');">' +
-                    '<div id="chromeperfectpixel-panel-header">' +
-                    '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></div>' +
-                    '<h1>PerfectPixel</h1>' +
-                    '</div>' +
-                    '<div id="chromeperfectpixel-panel-body">' +
-                    '<div id="chromeperfectpixel-section-opacity">' +
-                    '<span>Opacity:</span>' +
-                    '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
-                    '</div>' +
-                    '<div id="chromeperfectpixel-section-origin">' +
-                    '<span>Origin:</span>' +
-                    '<div id="chromeperfectpixel-origin-controls">' +
-                    '<button id="chromeperfectpixel-ymore" data-axis="y" data-offset="-1">&darr;</button>' +
-                    '<button id="chromeperfectpixel-yless" data-axis="y" data-offset="1">&uarr;</button>' +
-                    '<button id="chromeperfectpixel-xless" data-axis="x" data-offset="1">&larr;</button>' +
-                    '<button id="chromeperfectpixel-xmore" data-axis="x" data-offset="-1">&rarr;</button>' +
-                    '<div>' +
-                    '<div>' +
-                    '<div class="chromeperfectpixel-coords-label">X:</div>' +
-                    '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
-                    '</div>' +
-                    '<div>' +
-                    '<div class="chromeperfectpixel-coords-label">Y:</div>' +
-                    '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
+        $('body').append(this.$el);
+        this.$el.css('background', 'url(' + chrome.extension.getURL("images/noise.jpg") + ');">');
 
-                    '<div>Layers:</div>' +
-                    '<div id="chromeperfectpixel-section-scale">' +
-                    '<div id="chromeperfectpixel-section-scale-label">Scale:</div>' +
-                    '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
-                    '</div>' +
-                    '<div id="chromeperfectpixel-layers"></div>' +
+        var panelHtml =
+            '<div id="chromeperfectpixel-panel-header">' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></div>' +
+            '<h1>PerfectPixel</h1>' +
+            '</div>' +
+            '<div id="chromeperfectpixel-panel-body">' +
+            '<div id="chromeperfectpixel-section-opacity">' +
+            '<span>Opacity:</span>' +
+            '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
+            '</div>' +
+            '<div id="chromeperfectpixel-section-origin">' +
+            '<span>Origin:</span>' +
+            '<div id="chromeperfectpixel-origin-controls">' +
+            '<button id="chromeperfectpixel-ymore" data-axis="y" data-offset="-1">&darr;</button>' +
+            '<button id="chromeperfectpixel-yless" data-axis="y" data-offset="1">&uarr;</button>' +
+            '<button id="chromeperfectpixel-xless" data-axis="x" data-offset="1">&larr;</button>' +
+            '<button id="chromeperfectpixel-xmore" data-axis="x" data-offset="-1">&rarr;</button>' +
+            '<div>' +
+            '<div>' +
+            '<div class="chromeperfectpixel-coords-label">X:</div>' +
+            '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
+            '</div>' +
+            '<div>' +
+            '<div class="chromeperfectpixel-coords-label">Y:</div>' +
+            '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
 
-                    '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
+            '<div>Layers:</div>' +
+            '<div id="chromeperfectpixel-section-scale">' +
+            '<div id="chromeperfectpixel-section-scale-label">Scale:</div>' +
+            '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
+            '</div>' +
+            '<div id="chromeperfectpixel-layers"></div>' +
 
-                    '<div id="chromeperfectpixel-buttons">' +
-                    '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show</button>' +
-                    '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">Lock</button>' +
-                    '<div id="chromeperfectpixel-upload-area">' +
-                    '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
-                    '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>';
+            '<div id="chromeperfectpixel-progressbar-area" style="display: none">Loading...</div>' +
 
-            this.$el.append(panelHtml);
+            '<div id="chromeperfectpixel-buttons">' +
+            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">Show</button>' +
+            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">Lock</button>' +
+            '<div id="chromeperfectpixel-upload-area">' +
+            '<button id="chromeperfectpixel-fakefile">Add new layer</button>' +
+            '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
 
-            $('#chromeperfectpixel-fakefile').bind('click', function (e) {
-                //trackEvent("layer", "add", PPStorage.GetOverlaysCount() + 1);
-                $(this).parent().find('input[type=file]').click();
-            });
-            this._bindFileUploader();
+        this.$el.append(panelHtml);
+
+        this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
+            //trackEvent("layer", "add", PPStorage.GetOverlaysCount() + 1);
+            $(this).parent().find('input[type=file]').click();
+        });
+        this._bindFileUploader();
 
 //            $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
 //                // Live handler called.
@@ -254,16 +256,16 @@ var PanelView = Backbone.View.extend({
 //                Controller.setCurrentLayer(overlayId);
 //            });
 
-            // Workaround to catch single value of opacity during opacity HTML element change
-            (function(el, timeout) {
-                var timer, trig=function() { el.trigger("changed"); };
-                el.bind("change", function() {
-                    if(timer) {
-                        clearTimeout(timer);
-                    }
-                    timer = setTimeout(trig, timeout);
-                });
-            })($("#chromeperfectpixel-opacity"), 500);
+        // Workaround to catch single value of opacity during opacity HTML element change
+        (function(el, timeout) {
+            var timer, trig=function() { el.trigger("changed"); };
+            el.bind("change", function() {
+                if(timer) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(trig, timeout);
+            });
+        })(this.$("#chromeperfectpixel-opacity"), 500);
 //
 //            // TODO need to be fixed, doesn't work now
 //            $('.chromeperfectpixel-coords').change("keypress", function (e) {
@@ -275,26 +277,25 @@ var PanelView = Backbone.View.extend({
 //                }
 //            });
 
-            // make panel draggable
-            $('#chromeperfectpixel-panel').draggable({
-                handle: "#chromeperfectpixel-panel-header",
-                stop: function (event, ui) {
-                    // change left to right
-                    if ($(this).css('left')) {
-                        $(this).css('right', ($(document.body).innerWidth() - $(this).offset().left - $(this).outerWidth()).toString() + 'px');
-                        $(this).css('left', '');
-                    }
+        // make panel draggable
+        this.$el.draggable({
+            handle: "#chromeperfectpixel-panel-header",
+            stop: function (event, ui) {
+                // change left to right
+                if ($(this).css('left')) {
+                    $(this).css('right', ($(document.body).innerWidth() - $(this).offset().left - $(this).outerWidth()).toString() + 'px');
+                    $(this).css('left', '');
                 }
-            });
-
-            $('#chromeperfectpixel-panel button').button();
-            this.update();
-
-            // Global hotkeys on
-            if (ExtOptions.enableHotkeys) {
-                $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
-                document.body.onkeydown = Controller.onKeyDown;
             }
+        });
+
+        this.$('button').button();
+        this.update();
+
+        // Global hotkeys on
+        if (ExtOptions.enableHotkeys) {
+            $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
+            document.body.onkeydown = Controller.onKeyDown;
         }
     },
 
@@ -309,9 +310,7 @@ var PanelView = Backbone.View.extend({
             $(document.body).removeAttr('data-chromeperfectpixel-oldonkeydown');
         }
 
-        if ($('#chromeperfectpixel-panel').length > 0) {
-            $('#chromeperfectpixel-panel').remove();
-        }
+        this.$el.remove();
     },
 
     /**
@@ -321,7 +320,7 @@ var PanelView = Backbone.View.extend({
      * @private
      */
     _bindFileUploader: function(options) {
-        var uploader = $('#chromeperfectpixel-fileUploader');
+        var uploader = this.$('#chromeperfectpixel-fileUploader');
         if (options && options.rebind) {
             // Hack Clear file upload
             uploader.unbind('change');
