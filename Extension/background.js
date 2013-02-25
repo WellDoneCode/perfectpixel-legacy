@@ -74,14 +74,14 @@ function injectIntoTab(tabId, callback){
     }
 
     chrome.tabs.insertCSS(tabId, { file: "style.css" });
-    chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
+    chrome.tabs.insertCSS(tabId, { file: "3rd-party/jquery-ui-1.10.1.custom.min.css" });
     if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
 
     var scripts = [
         '3rd-party/jquery-1.9.1.min.js',
-        'jquery-ui.js',
+        '3rd-party/jquery-ui-1.10.1.custom.min.js',
         '3rd-party/underscore-min.js',
         '3rd-party/backbone-min.js',
         'pp-shared.js',

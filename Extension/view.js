@@ -427,6 +427,14 @@ var OverlayView = Backbone.View.extend({
         e.preventDefault();
     },
 
+    drag: function(e, ui) {
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            overlay.set('x', ui.position.left);
+            overlay.set('y', ui.position.top);
+        }
+    },
+
     render: function() {
         this.$el.css({
             'z-index': this.zIndex,
@@ -441,12 +449,7 @@ var OverlayView = Backbone.View.extend({
         });
         this.updateOverlay();
 
-        this.$el.draggable({
-//            drag: ChromePerfectPixel.onOverlayUpdate,
-//            stop: function () {
-//                ChromePerfectPixel.onOverlayUpdate(true);
-//            }
-        });
+        this.$el.draggable({ stop: this.drag });
 
         return this;
     },
