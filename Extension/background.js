@@ -82,11 +82,11 @@ function injectIntoTab(tabId, callback){
     var scripts = [
         'jquery-1.6.2.min.js',
         'jquery-ui.js',
-        'controller.js',
         'pp-shared.js',
         'storage/pp-storage-filesystem.js',
         'storage/pp-storage-localStorage.js',
         'pp-content.js',
+        'controller.js',
         togglePanel
     ];
     var executeScript = function(index) {

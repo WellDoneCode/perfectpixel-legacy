@@ -218,3 +218,7 @@ var removePanel = function () {
         $('#chromeperfectpixel-panel').remove();
     }
 };
+
+var isPanelShown = function () {
+    return $('#chromeperfectpixel-panel').length > 0;
+};

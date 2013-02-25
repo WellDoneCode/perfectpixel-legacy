@@ -64,7 +64,7 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
 var Controller = {
 
     togglePanel: function() {
-        if ($('#chromeperfectpixel-panel').length > 0) {
+        if (isPanelShown()) {
             ChromePerfectPixel.removeOverlay();
             removePanel();
         }
