@@ -174,7 +174,7 @@ var OverlayCollection = Backbone.Collection.extend({
 var PerfectPixelModel = Backbone.Model.extend({
     defaults: {
         currentOverlayIndex: 0,
-        overlayShown: false,
+        overlayShown: true,
         overlayLocked: false
     },
 

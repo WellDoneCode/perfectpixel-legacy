@@ -60,7 +60,11 @@ var PanelView = Backbone.View.extend({
         var overlay = new Overlay();
         overlay.uploadFile(file, $.proxy(function() {
             this.$('#chromeperfectpixel-progressbar-area').hide();
-            this._bindFileUploader({rebind: true});
+            var uploader = this.$('#chromeperfectpixel-fileUploader');
+            // Hack Clear file upload
+            uploader.unbind('change');
+            uploader.parent().html(uploader.parent().html());
+            this._bindFileUploader();
             PerfectPixel.overlays.add(overlay);
         }, this));
     },
@@ -147,7 +151,8 @@ var PanelView = Backbone.View.extend({
     },
 
     update: function() {
-        if (PerfectPixel.get('overlayShown')) {
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay && PerfectPixel.get('overlayShown')) {
             if (!this.overlayView) {
                 this.overlayView = new OverlayView({
                     model: PerfectPixel.getCurrentOverlay()
@@ -176,7 +181,6 @@ var PanelView = Backbone.View.extend({
             return isNoOverlays;
         });
 
-        var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             this.$('#chromeperfectpixel-coordX').val(overlay.get('x'));
             this.$('#chromeperfectpixel-coordY').val(overlay.get('y'));
@@ -190,7 +194,7 @@ var PanelView = Backbone.View.extend({
 
     render: function() {
         $('body').append(this.$el);
-        this.$el.css('background', 'url(' + chrome.extension.getURL("images/noise.jpg") + ');">');
+        this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')"');
 
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +
@@ -315,18 +319,11 @@ var PanelView = Backbone.View.extend({
 
     /**
      *
-     * @param [options]
-     * @param [options.rebind]
      * @private
      */
-    _bindFileUploader: function(options) {
-        var uploader = this.$('#chromeperfectpixel-fileUploader');
-        if (options && options.rebind) {
-            // Hack Clear file upload
-            uploader.unbind('change');
-            uploader.parent().html(uploader.parent().html());
-        }
+    _bindFileUploader: function() {
         var self = this;
+        var uploader = this.$('#chromeperfectpixel-fileUploader');
         uploader.bind('change', function () {
             self.upload(this.files[0]);
         });
