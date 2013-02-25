@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
  *
  * This file is part of PerfectPixel.
  *
@@ -64,13 +64,13 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
 var Controller = {
 
     togglePanel: function() {
-        if (isPanelShown()) {
-            ChromePerfectPixel.removeOverlay();
-            removePanel();
+        if (this.panelView) {
+            this.panelView.destroy();
+            delete this.panelView;
         }
         else {
-            createPanel();
-            ChromePerfectPixel.renderLayers();
+            this.overlays = new OverlayCollection();
+            this.panelView = new PanelView({ overlays: this.overlays });
         }
     },
 
@@ -80,7 +80,8 @@ var Controller = {
      * @param uploadElem
      */
     upload: function (files, uploadElem) {
-        ChromePerfectPixel.upload(files, uploadElem);
+        var overlay = new Overlay();
+        this.overlays.add(overlay);
     },
 
     /**

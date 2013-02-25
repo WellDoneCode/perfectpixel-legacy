@@ -80,12 +80,15 @@ function injectIntoTab(tabId, callback){
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
 
     var scripts = [
-        'jquery-1.6.2.min.js',
+        '3rd-party/jquery-1.9.1.min.js',
         'jquery-ui.js',
+        '3rd-party/underscore-min.js',
+        '3rd-party/backbone-min.js',
         'pp-shared.js',
         'storage/pp-storage-filesystem.js',
         'storage/pp-storage-localStorage.js',
-        'pp-content.js',
+        'model.js',
+        'view.js',
         'controller.js',
         togglePanel
     ];
