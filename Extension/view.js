@@ -25,7 +25,8 @@ var PanelView = Backbone.View.extend({
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
-        'change #chromeperfectpixel-scale': 'changeScale'
+        'change #chromeperfectpixel-scale': 'changeScale',
+        'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick'
     },
 
     initialize: function(options) {
@@ -101,6 +102,45 @@ var PanelView = Backbone.View.extend({
         if (overlay) {
             var value = $(e.currentTarget).val();
             overlay.set('scale', Number(value).toFixed(1));
+        }
+    },
+
+    panelHeaderDoubleClick: function(e) {
+        trackEvent($(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), event.type);
+
+        var panel = $('#chromeperfectpixel-panel');
+        var body = $('#chromeperfectpixel-panel-body');
+        var panelWidth = panel.width();
+
+        if (body.hasClass('collapsed')) {
+            body.removeClass('collapsed');
+            var state = body.data('state');
+            panel.animate({ right: state.right }, 'fast', function () {
+                body.animate(
+                    { 'height': state.height, 'padding-bottom': state.paddingBottom },
+                    'fast',
+                    function () {
+                        $(this).removeAttr('style');
+                        panel.draggable('option', 'axis', '');
+                    }
+                );
+            });
+        } else {
+            body.addClass('collapsed');
+            body.data('state', {
+                height: body.innerHeight(),
+                paddingBottom: body.css('padding-bottom'),
+                right: panel.css('right')
+            });
+            $('#chromeperfectpixel-panel-body').animate(
+                { 'height': 0, 'padding-bottom': 0 },
+                'fast',
+                function () {
+                    panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
+                        panel.draggable('option', 'axis', 'y');
+                    });
+                }
+            );
         }
     },
 
@@ -246,44 +286,6 @@ var PanelView = Backbone.View.extend({
                     }
                 }
             });
-
-//            $('#chromeperfectpixel-panel-header').dblclick(function (event) {
-//                //if (event.target.id == "chromeperfectpixel-header-logo")
-//                //    return;
-//                trackEvent($(this).attr('id').replace("chromeperfectpixel-", ""), event.type);
-//
-//                var panel = $('#chromeperfectpixel-panel');
-//                var body = $('#chromeperfectpixel-panel-body');
-//                var panelWidth = panel.width();
-//
-//                if (body.hasClass('collapsed')) {
-//                    body.removeClass('collapsed');
-//                    var state = body.data('state');
-//                    panel.animate({ right: state.right }, 'fast', function () {
-//                        body.animate(
-//                            { 'height': state.height, 'padding-bottom': state.paddingBottom },
-//                            'fast',
-//                            function () {
-//                                $(this).removeAttr('style');
-//                                panel.draggable('option', 'axis', '');
-//                            }
-//                        );
-//                    });
-//                }
-//                else {
-//                    body.addClass('collapsed');
-//                    body.data('state', { height: body.innerHeight(), paddingBottom: body.css('padding-bottom'), right: panel.css('right') });
-//                    $('#chromeperfectpixel-panel-body').animate(
-//                        { 'height': 0, 'padding-bottom': 0 },
-//                        'fast',
-//                        function () {
-//                            panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
-//                                panel.draggable('option', 'axis', 'y');
-//                            });
-//                        }
-//                    );
-//                }
-//            });
 
             $('#chromeperfectpixel-panel button').button();
             this.update();
