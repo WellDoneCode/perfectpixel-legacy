@@ -205,9 +205,7 @@ var PanelView = Backbone.View.extend({
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay && PerfectPixel.get('overlayShown')) {
             if (!this.overlayView) {
-                this.overlayView = new OverlayView({
-                    model: PerfectPixel.getCurrentOverlay()
-                });
+                this.overlayView = new OverlayView();
                 $('body').append(this.overlayView.render().el);
             }
             this.$('.chromeperfectpixel-showHideBtn span').text('Hide');
@@ -236,10 +234,12 @@ var PanelView = Backbone.View.extend({
             this.$('#chromeperfectpixel-coordX').val(overlay.get('x'));
             this.$('#chromeperfectpixel-coordY').val(overlay.get('y'));
             this.$('#chromeperfectpixel-opacity').val(overlay.get('opacity'));
+            this.$('#chromeperfectpixel-scale').val(overlay.get('scale'));
         } else {
             this.$('#chromeperfectpixel-coordX').val('');
             this.$('#chromeperfectpixel-coordY').val('');
             this.$('#chromeperfectpixel-opacity').val(0.5);
+            this.$('#chromeperfectpixel-scale').val(1.0);
         }
     },
 
@@ -304,13 +304,6 @@ var PanelView = Backbone.View.extend({
         });
         this._bindFileUploader();
 
-//            $('#chromeperfectpixel-layers input[name="chromeperfectpixel-selectedLayer"]').live('click', function (e) {
-//                // Live handler called.
-//                //trackEvent("layer", "select");
-//                var overlayId = $(this).parents('.chromeperfectpixel-layer').data('Id');
-//                Controller.setCurrentLayer(overlayId);
-//            });
-
         // Workaround to catch single value of opacity during opacity HTML element change
         (function(el, timeout) {
             var timer, trig=function() { el.trigger("changed"); };
@@ -321,16 +314,6 @@ var PanelView = Backbone.View.extend({
                 timer = setTimeout(trig, timeout);
             });
         })(this.$("#chromeperfectpixel-opacity"), 500);
-//
-//            // TODO need to be fixed, doesn't work now
-//            $('.chromeperfectpixel-coords').change("keypress", function (e) {
-//                var id = $(this).attr("id");
-//                trackEvent("coords", id.replace("chromeperfectpixel-", ""));
-//
-//                if (e.which == 13) {
-//                    Controller.coordsKeyPressed(id, $(this).val());
-//                }
-//            });
 
         // make panel draggable
         this.$el.draggable({
@@ -386,14 +369,26 @@ var OverlayItemView = Backbone.View.extend({
     className: 'chromeperfectpixel-layer',
 
     events: {
-        'click .chromeperfectpixel-delete':  'remove'
+        'click .chromeperfectpixel-delete':  'remove',
+        'click input[name="chromeperfectpixel-selectedLayer"]': 'setCurrentOverlay'
     },
 
-    initialize: function(){
+    initialize: function() {
         _.bindAll(this);
 
         this.model.bind('change', this.render);
         this.model.bind('remove', this.unrender);
+        PerfectPixel.bind('change:currentOverlayId', this.update);
+
+        this.update();
+    },
+
+    setCurrentOverlay: function() {
+        PerfectPixel.set('currentOverlayId', this.model.cid);
+    },
+
+    update: function() {
+        this.$el.toggleClass('current', PerfectPixel.get('currentOverlayId') === this.model.cid);
     },
 
     render: function() {
@@ -452,9 +447,22 @@ var OverlayView = Backbone.View.extend({
 
     initialize: function(){
         _.bindAll(this);
+        PerfectPixel.bind('change:currentOverlayId', this.updateModel);
+        this.updateModel(false);
+    },
 
-        this.model.bind('change', this.updateOverlay);
-        this.model.bind('remove', this.unrender);
+    /**
+     *
+     * @param [updateOverlay]
+     */
+    updateModel: function(updateOverlay) {
+        (updateOverlay === undefined) && (updateOverlay = true);
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            this.model = overlay;
+            this.model.bind('change', this.updateOverlay);
+        }
+        updateOverlay && this.updateOverlay();
     },
 
     updateOverlay: function() {

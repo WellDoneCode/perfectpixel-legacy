@@ -61,15 +61,14 @@ Backbone.GSModel = Backbone.Model.extend({
 
 var Overlay = Backbone.GSModel.extend({
     defaults: {
-        x: 300,
-        y: 300,
-        width: 0,
-        height: 0,
+        x: 50,
+        y: 50,
+        width: 300,
+        height: 300,
         opacity: 0.5,
         scale: 1,
         url: '',
-        filename: '',
-        current: false
+        filename: ''
     },
 
     setters: {
@@ -173,17 +172,23 @@ var OverlayCollection = Backbone.Collection.extend({
 
 var PerfectPixelModel = Backbone.Model.extend({
     defaults: {
-        currentOverlayIndex: 0,
+        currentOverlayId: null,
         overlayShown: true,
         overlayLocked: false
     },
 
     initialize: function() {
         this.overlays = new OverlayCollection();
+        this.overlays.bind('add', this.overlayAdded, this);
+        this.overlays.bind('remove', this.overlayRemoved, this);
     },
 
     getCurrentOverlay: function() {
-        return this.overlays.first();
+        if (this.has('currentOverlayId')) {
+            return this.overlays.get(this.get('currentOverlayId'));
+        } else {
+            return null;
+        }
     },
 
     toggleOverlayShown: function() {
@@ -192,6 +197,23 @@ var PerfectPixelModel = Backbone.Model.extend({
 
     toggleOverlayLocked: function() {
         this.set('overlayLocked', !this.get('overlayLocked'));
+    },
+
+    overlayAdded: function(overlay) {
+        if (!this.has('currentOverlayId')) {
+            this.set('currentOverlayId', overlay.cid);
+        }
+    },
+
+    overlayRemoved: function(overlay) {
+        if (overlay.cid === this.get('currentOverlayId')) {
+            var firstOverlay = this.overlays.first();
+            if (firstOverlay) {
+                this.set('currentOverlayId', firstOverlay.cid);
+            } else {
+                this.set('currentOverlayId', null);
+            }
+        }
     }
-});
+ });
 var PerfectPixel = new PerfectPixelModel();

@@ -65,7 +65,7 @@ var PP_state = [];
 //  }]
 
 function togglePanel(){
-    chrome.tabs.executeScript(null, { code: "Controller.togglePanel();" });
+    chrome.tabs.executeScript(null, { code: "togglePanel();" });
 }
 
 function injectIntoTab(tabId, callback){
@@ -87,7 +87,7 @@ function injectIntoTab(tabId, callback){
         'pp-shared.js',
         'storage/pp-storage-filesystem.js',
         'storage/pp-storage-localStorage.js',
-        'controller.js',
+        'content.js',
         'model.js',
         'view.js',
         togglePanel
