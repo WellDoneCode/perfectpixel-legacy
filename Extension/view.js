@@ -312,7 +312,7 @@ var PanelView = Backbone.View.extend({
         this.$el.append(panelHtml);
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
-            //trackEvent("layer", "add", PPStorage.GetOverlaysCount() + 1);
+            trackEvent("layer", "add", PerfectPixel.overlays.size() + 1);
             $(this).parent().find('input[type=file]').click();
         });
         this._bindFileUploader();

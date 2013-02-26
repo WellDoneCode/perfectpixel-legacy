@@ -17,9 +17,8 @@
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Global variables
+// options
 var ExtOptions;
-
 $(document).ready(function () {
     chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, function (theOptions) {
         ExtOptions = theOptions;

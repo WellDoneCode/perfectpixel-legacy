@@ -1,7 +1,7 @@
 {
     "background":{
         "scripts":[
-            "jquery-1.6.2.min.js",
+            "3rd-party/jquery-1.9.1.min.js",
             "pp-shared.js",
             "storage/filemanager.js",
             "fancy-settings/source/lib/store.js",

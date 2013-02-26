@@ -178,7 +178,7 @@ var PerfectPixelModel = Backbone.Model.extend({
         overlayLocked: false
     },
 
-    localStorage: new Backbone.LocalStorage('perfectpixel-settings'),
+    localStorage: new Backbone.LocalStorage('perfectpixel'),
 
     initialize: function() {
         this.overlays = new OverlayCollection();
