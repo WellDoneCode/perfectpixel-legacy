@@ -167,7 +167,8 @@ var Overlay = Backbone.GSModel.extend({
 });
 
 var OverlayCollection = Backbone.Collection.extend({
-    model: Overlay
+    model: Overlay,
+    localStorage: new Backbone.LocalStorage('perfectpixel-overlays')
 });
 
 var PerfectPixelModel = Backbone.Model.extend({
@@ -176,6 +177,8 @@ var PerfectPixelModel = Backbone.Model.extend({
         overlayShown: true,
         overlayLocked: false
     },
+
+    localStorage: new Backbone.LocalStorage('perfectpixel-settings'),
 
     initialize: function() {
         this.overlays = new OverlayCollection();
@@ -192,11 +195,11 @@ var PerfectPixelModel = Backbone.Model.extend({
     },
 
     toggleOverlayShown: function() {
-        this.set('overlayShown', !this.get('overlayShown'));
+        this.save({overlayShown: !this.get('overlayShown')});
     },
 
     toggleOverlayLocked: function() {
-        this.set('overlayLocked', !this.get('overlayLocked'));
+        this.save({overlayLocked: !this.get('overlayLocked')});
     },
 
     overlayAdded: function(overlay) {
@@ -216,4 +219,4 @@ var PerfectPixelModel = Backbone.Model.extend({
         }
     }
  });
-var PerfectPixel = new PerfectPixelModel();
+var PerfectPixel = new PerfectPixelModel({ id: 1 });
