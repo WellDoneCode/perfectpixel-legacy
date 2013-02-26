@@ -26,6 +26,9 @@
     "version":"1.5",
     "web_accessible_resources":[
         "images/noise.jpg",
-        "icons/16.png"
+        "icons/16.png",
+        "images/ui-bg_glass_75_e6e6e6_1x400.png",
+        "images/ui-bg_glass_75_dadada_1x400.png",
+        "images/ui-bg_glass_65_ffffff_1x400.png"
     ]
 }
