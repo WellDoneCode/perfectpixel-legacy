@@ -26,6 +26,7 @@ var PanelView = Backbone.View.extend({
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
+        'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick'
@@ -91,6 +92,26 @@ var PanelView = Backbone.View.extend({
         }
     },
 
+    changeOrigin: function(e) {
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            var input = $(e.currentTarget);
+            var axis = input.data('axis');
+            var value = parseInt(input.val());
+            isNaN(value) && (value = 0);
+            switch (axis) {
+                case 'x':
+                    overlay.set('x', value);
+                    break;
+                case 'y':
+                    overlay.set('y', value);
+                    break;
+                default:
+                    break;
+            }
+        }
+    },
+
     changeOpacity: function(e) {
         if (this.$(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
             return;
@@ -147,6 +168,36 @@ var PanelView = Backbone.View.extend({
                     });
                 }
             );
+        }
+    },
+
+    keyDown: function(e) {
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
+            if (e.which == 37) { // left
+                overlay.set('x', overlay.get('x') - 1);
+            }
+            else if (e.which == 38) { // up
+                overlay.set('y', overlay.get('y') - 1);
+            }
+            else if (e.which == 39) { // right
+                overlay.set('x', overlay.get('x') + 1);
+            }
+            else if (e.which == 40) { // down
+                overlay.set('y', overlay.get('y') - 1);
+            }
+            else if (e.altKey && e.which == 83) { // Alt + s
+                PerfectPixel.toggleOverlayShown();
+            }
+            else if (e.altKey && e.which == 67) { // Alt + c
+                PerfectPixel.toggleOverlayLocked();
+            }
+            else {
+                return;
+            }
+
+            e.stopPropagation();
+            e.preventDefault();
         }
     },
 
@@ -216,11 +267,11 @@ var PanelView = Backbone.View.extend({
             '<div>' +
             '<div>' +
             '<div class="chromeperfectpixel-coords-label">X:</div>' +
-            '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
+            '<input type="text" class="chromeperfectpixel-coords" data-axis="x" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
             '</div>' +
             '<div>' +
             '<div class="chromeperfectpixel-coords-label">Y:</div>' +
-            '<input type="text" class="chromeperfectpixel-coords" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
+            '<input type="text" class="chromeperfectpixel-coords" data-axis="y" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -293,14 +344,14 @@ var PanelView = Backbone.View.extend({
             }
         });
 
-        this.$('button').button();
-        this.update();
-
         // Global hotkeys on
         if (ExtOptions.enableHotkeys) {
             $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
-            document.body.onkeydown = Controller.onKeyDown;
+            document.body.onkeydown = this.keyDown;
         }
+
+        this.$('button').button();
+        this.update();
     },
 
     destroy: function() {
@@ -379,7 +430,13 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     remove: function() {
-        this.model.destroy();
+        var deleteLayerConfirmationMessage = 'Are you sure want to delete layer?';
+        if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
+            trackEvent("layer", "delete", undefined, "confirmed");
+            this.model.destroy();
+        } else {
+            trackEvent("layer", "delete", undefined, "canceled");
+        }
     }
 });
 

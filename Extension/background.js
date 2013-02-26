@@ -87,9 +87,9 @@ function injectIntoTab(tabId, callback){
         'pp-shared.js',
         'storage/pp-storage-filesystem.js',
         'storage/pp-storage-localStorage.js',
+        'controller.js',
         'model.js',
         'view.js',
-        'controller.js',
         togglePanel
     ];
     var executeScript = function(index) {
