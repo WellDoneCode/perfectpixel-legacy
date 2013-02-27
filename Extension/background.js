@@ -85,7 +85,7 @@ function injectIntoTab(tabId, callback){
         '3rd-party/underscore-min.js',
         '3rd-party/backbone-min.js',
         '3rd-party/backbone.localStorage-min.js',
-        'pp-shared.js',
+        'shared.js',
         'content.js',
         'model.js',
         'view.js',

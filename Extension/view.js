@@ -17,6 +17,9 @@
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * PerfectPixel panel view
+ */
 var PanelView = Backbone.View.extend({
     tagName: 'div',
     className: "chromeperfectpixel-panel",
@@ -84,17 +87,20 @@ var PanelView = Backbone.View.extend({
     },
 
     toggleOverlayShown: function() {
+        trackEvent('overlay', PerfectPixel.get('overlayShown') ? 'hide' : 'show');
         PerfectPixel.toggleOverlayShown();
     },
 
     toggleOverlayLocked: function() {
+        trackEvent('overlay', PerfectPixel.get('overlayLocked') ? 'unlock' : 'lock');
         PerfectPixel.toggleOverlayLocked();
     },
 
     originButtonClick: function(e) {
+        var button = this.$(e.currentTarget);
+        trackEvent("coords", button.attr('id').replace("chromeperfectpixel-", ""));
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var button = this.$(e.currentTarget);
             var axis = button.data('axis');
             var offset = button.data('offset');
             if (axis == "x") {
@@ -106,9 +112,10 @@ var PanelView = Backbone.View.extend({
     },
 
     changeOrigin: function(e) {
+        var input = $(e.currentTarget);
+        trackEvent("coords", input.attr('id').replace("chromeperfectpixel-", ""));
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var input = $(e.currentTarget);
             var axis = input.data('axis');
             var value = parseInt(input.val());
             isNaN(value) && (value = 0);
@@ -129,6 +136,7 @@ var PanelView = Backbone.View.extend({
         if (this.$(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
             return;
         }
+        trackEvent("opacity", e.type, e.currentTarget.value * 100); // GA tracks only integers not floats
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var value = this.$(e.currentTarget).val();
@@ -146,7 +154,7 @@ var PanelView = Backbone.View.extend({
     },
 
     panelHeaderDoubleClick: function(e) {
-        trackEvent(this.$(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), event.type);
+        trackEvent(this.$(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), e.type);
 
         var panel = this.$el;
         var body = this.$('#chromeperfectpixel-panel-body');
@@ -197,7 +205,7 @@ var PanelView = Backbone.View.extend({
                 overlay.save({x: overlay.get('x') + 1});
             }
             else if (e.which == 40) { // down
-                overlay.save({y: overlay.get('y') - 1});
+                overlay.save({y: overlay.get('y') + 1});
             }
             else if (e.altKey && e.which == 83) { // Alt + s
                 PerfectPixel.toggleOverlayShown();
@@ -382,6 +390,9 @@ var PanelView = Backbone.View.extend({
     }
 });
 
+/**
+ * PerfectPixel panel overlay item view
+ */
 var OverlayItemView = Backbone.View.extend({
     tagName: 'label',
     className: 'chromeperfectpixel-layer',
@@ -444,6 +455,7 @@ var OverlayItemView = Backbone.View.extend({
 
     remove: function() {
         var deleteLayerConfirmationMessage = 'Are you sure want to delete layer?';
+        trackEvent("layer", "delete", undefined, "attempt");
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer", "delete", undefined, "confirmed");
             this.model.destroy();
@@ -453,6 +465,9 @@ var OverlayItemView = Backbone.View.extend({
     }
 });
 
+/**
+ * Overlay view
+ */
 var OverlayView = Backbone.View.extend({
     tagName: 'img',
     className: 'chromeperfectpixel-overlay',
