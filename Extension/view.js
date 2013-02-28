@@ -77,12 +77,18 @@ var PanelView = Backbone.View.extend({
         overlay.uploadFile(file, $.proxy(function() {
             this.$('#chromeperfectpixel-progressbar-area').hide();
             var uploader = this.$('#chromeperfectpixel-fileUploader');
+
             // Hack Clear file upload
             uploader.unbind('change');
             uploader.parent().html(uploader.parent().html());
             this._bindFileUploader();
+
             PerfectPixel.overlays.add(overlay);
             overlay.save();
+
+            if (!PerfectPixel.getCurrentOverlay()) {
+                PerfectPixel.setCurrentOverlay(overlay);
+            }
         }, this));
     },
 

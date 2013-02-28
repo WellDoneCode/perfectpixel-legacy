@@ -216,7 +216,6 @@ var PerfectPixelModel = Backbone.Model.extend({
 
     initialize: function() {
         this.overlays = new OverlayCollection();
-        this.overlays.bind('add', this.overlayAdded, this);
         this.overlays.bind('remove', this.overlayRemoved, this);
     },
 
@@ -242,13 +241,6 @@ var PerfectPixelModel = Backbone.Model.extend({
 
     toggleOverlayLocked: function() {
         this.save({overlayLocked: !this.get('overlayLocked')});
-    },
-
-    overlayAdded: function(overlay) {
-        if (!this.has('currentOverlayId')) {
-            // if overlay is not yet saved, its id is undefined, so we use cid (that will be copied to id after save)
-            this.save({currentOverlayId: overlay.id || overlay.cid});
-        }
     },
 
     overlayRemoved: function(overlay) {
