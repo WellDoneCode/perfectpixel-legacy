@@ -25,7 +25,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-// Depend on 3rd Party/canvas-to-blob.js
+// Depend on 3rd-party/canvas-to-blob.js
 
 var PPImageTools = new function() {
 
@@ -41,7 +41,7 @@ var PPImageTools = new function() {
             url = window.webkitURL.createObjectURL(blob)
         }
         return url;
-    }
+    };
 
     this.revokeBlobUrl = function (blobUrl) {
         if (window.revokeObjectURL) {
@@ -53,7 +53,7 @@ var PPImageTools = new function() {
         } else if (window.webkitURL && window.webkitURL.revokeObjectURL) {
             window.webkitURL.revokeObjectURL(blobUrl);
         }
-    }
+    };
 
     /**
      * Resize blob with same aspect ratio fit in maxWidth x maxHeight rectangle.
@@ -102,10 +102,10 @@ var PPImageTools = new function() {
                     fileType
                 );
             }
-        }
+        };
 
         reader.readAsDataURL(file);
-    }
+    };
 
     /**
      * Get ArrayBuffer from Blob object and pass it to callback function
@@ -120,4 +120,4 @@ var PPImageTools = new function() {
         };
         fileReader.readAsArrayBuffer(blob);
     }
-}
+};

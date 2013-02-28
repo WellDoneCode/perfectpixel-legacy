@@ -67,7 +67,6 @@ var Overlay = Backbone.GSModel.extend({
         height: 300,
         opacity: 0.5,
         scale: 1,
-        url: '',
         filename: ''
     },
 
@@ -83,6 +82,10 @@ var Overlay = Backbone.GSModel.extend({
         }
     },
 
+    initialize: function() {
+        this._updateImageUrl();
+    },
+
     uploadFile: function(file, callback) {
         // Only process image files.
         if (!file.type.match('image.*')) {
@@ -92,37 +95,21 @@ var Overlay = Backbone.GSModel.extend({
         var self = this;
         var reader = new FileReader();
         reader.onload = function (e) {
-            chrome.extension.sendRequest(
-                {
+            chrome.extension.sendRequest({
                     type: PP_RequestType.ADDFILE,
                     fileData: bufferToString(e.target.result),
                     fileName: file.name,
                     fileType: file.type
                 },
                 function (response) {
-                    if (response.message && response.showToUser) {
-                        alert(response.message);
-                    }
-
+                    self._handleResponse(response);
                     if (response.status == "OK") {
                         var dataView = new DataView(stringToBuffer(response.arrayBuffer));
                         var blob = new Blob([dataView], {type: response.fileType});
 
-                        var url;
-                        if (window.createObjectURL) {
-                            url = window.createObjectURL(blob);
-                        } else if (window.createBlobURL) {
-                            url = window.createBlobURL(blob);
-                        } else if (window.URL && window.URL.createObjectURL) {
-                            url = window.URL.createObjectURL(blob);
-                        } else if (window.webkitURL && window.webkitURL.createObjectURL) {
-                            url = window.webkitURL.createObjectURL(blob);
-                        }
-
-                        // save() will be called in callback
-                        self.set('url', url);
+                        self.imageUrl = PPImageTools.createBlobUrl(blob);
                         self.set('filename', response.fileName);
-                        self._updateImageSize(callback);
+                        self._updateImageSize(callback);                    // save() should be called in callback
                     } else {
                         callback();
                     }
@@ -147,23 +134,69 @@ var Overlay = Backbone.GSModel.extend({
         reader.readAsArrayBuffer(file);
     },
 
-    _updateImageSize: function(callback) {
-        // Render invisible thumbnail to obtain image width and height.
-        var span = $('<span id="chromeperfectpixel-imgtools"></span>')
-            .css('position', 'absolute').css('opacity', 0);
-        var img = $('<img />').attr({
-            src: this.get('url'),
-            title: this.get('filename')
-        });
-        span.append(img);
-        $(document.body).append(span);
+    /**
+     *
+     * @param [callback]
+     * @private
+     */
+    _updateImageUrl: function(callback) {
+        if (this.has('filename')) {
+            var self = this;
+            chrome.extension.sendRequest({
+                type: PP_RequestType.GETFILE,
+                fileName: this.get('filename')
+            },
+            function (response) {
+                self._handleResponse(response);
+                if (response.status == "OK") {
+                    var dataView = new DataView(stringToBuffer(response.arrayBuffer));
+                    var blob = new Blob([dataView],{type:response.fileType});
+                    self.imageUrl = PPImageTools.createBlobUrl(blob);
+                    self.trigger('change', self);
+                }
 
-        img.load($.proxy(function () {
-            this.set('width', img[0].offsetWidth);
-            this.set('height', img[0].offsetHeight);
-            span.remove();
-            callback();
-        }, this));
+                callback && callback();
+            });
+        } else {
+            delete this.imageUrl;
+        }
+    },
+
+    /**
+     * Render invisible thumbnail to obtain image width and height
+     * @param callback
+     * @private
+     */
+    _updateImageSize: function(callback) {
+        if (this.imageUrl) {
+            var span = $('<span id="chromeperfectpixel-imgtools"></span>')
+                .css('position', 'absolute').css('opacity', 0);
+            var img = $('<img />').attr({
+                src: this.imageUrl,
+                title: this.get('filename')
+            });
+            span.append(img);
+            $(document.body).append(span);
+
+            img.load($.proxy(function () {
+                this.set('width', img[0].offsetWidth);
+                this.set('height', img[0].offsetHeight);
+                span.remove();
+                callback();
+            }, this));
+        }
+    },
+
+    /**
+     * Handle response came from background page file manager
+     * @param response
+     * @private
+     */
+    _handleResponse: function(response) {
+        console.log("PP " + response.status);
+        if (response.message && response.showToUser) {
+            alert(response.message);
+        }
     }
 });
 
