@@ -85,6 +85,8 @@ function injectIntoTab(tabId, callback){
         '3rd-party/underscore-min.js',
         '3rd-party/backbone-min.js',
         '3rd-party/backbone.localStorage-min.js',
+        '3rd-party/canvas-to-blob.min.js',
+        'storage/imagetools.js',
         'shared.js',
         'content.js',
         'model.js',
@@ -102,6 +104,29 @@ function injectIntoTab(tabId, callback){
     };
     executeScript(0);
 }
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.status != 'loading') return;
+    function change_icon_and_popup(icon, popup){
+        chrome.browserAction.setPopup({tabId: tabId, popup: popup})
+        chrome.browserAction.setIcon({path:chrome.extension.getURL(icon), tabId:tabId })
+    }
+    var disabled_icon = 'icons/icon_disabled.png';
+
+    if (tab.url.match(/chrome:/)){
+        change_icon_and_popup(disabled_icon,'popups/chrome-protocol-not-allowed.html')
+    }
+    else {
+        chrome.extension.isAllowedFileSchemeAccess(function(isAllowedAccess){
+            if (isAllowedAccess){
+                change_icon_and_popup('icons/icon.png','')
+            }
+            else if(tab.url.match(/file:\//)){
+                change_icon_and_popup(disabled_icon,'popups/file-scheme-access-not-allowed.html')
+            }
+        })
+    }
+});
 
 //React when a browser' action icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
@@ -196,10 +221,10 @@ chrome.extension.onRequest.addListener(
                 }
                 else if (request.type == PP_RequestType.DELETEFILE) {
                     // DELETEFILE handler
-
+                    // array can be sent as request.fileName
                     var fileName = request.fileName;
 
-                    PPFileManager.DeleteFile(fileName, function () {
+                    PPFileManager.DeleteFiles(fileName, function () {
                         sendResponse({
                             status: "OK"
                         });
