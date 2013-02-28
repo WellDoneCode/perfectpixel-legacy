@@ -413,11 +413,11 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     setCurrentOverlay: function() {
-        PerfectPixel.save({currentOverlayId: this.model.cid});
+        PerfectPixel.setCurrentOverlay(this.model);
     },
 
     update: function() {
-        this.$el.toggleClass('current', PerfectPixel.get('currentOverlayId') === this.model.cid);
+        this.$el.toggleClass('current', PerfectPixel.isOverlayCurrent(this.model));
     },
 
     render: function() {

@@ -110,15 +110,16 @@ var Overlay = Backbone.GSModel.extend({
 
                         var url;
                         if (window.createObjectURL) {
-                            url = window.createObjectURL(blob)
+                            url = window.createObjectURL(blob);
                         } else if (window.createBlobURL) {
-                            url = window.createBlobURL(blob)
+                            url = window.createBlobURL(blob);
                         } else if (window.URL && window.URL.createObjectURL) {
-                            url = window.URL.createObjectURL(blob)
+                            url = window.URL.createObjectURL(blob);
                         } else if (window.webkitURL && window.webkitURL.createObjectURL) {
-                            url = window.webkitURL.createObjectURL(blob)
+                            url = window.webkitURL.createObjectURL(blob);
                         }
 
+                        // save() will be called in callback
                         self.set('url', url);
                         self.set('filename', response.fileName);
                         self._updateImageSize(callback);
@@ -194,6 +195,14 @@ var PerfectPixelModel = Backbone.Model.extend({
         }
     },
 
+    setCurrentOverlay: function(overlay) {
+        this.save({currentOverlayId: overlay.id});
+    },
+
+    isOverlayCurrent: function(overlay) {
+        return this.get('currentOverlayId') === overlay.id
+    },
+
     toggleOverlayShown: function() {
         this.save({overlayShown: !this.get('overlayShown')});
     },
@@ -204,17 +213,18 @@ var PerfectPixelModel = Backbone.Model.extend({
 
     overlayAdded: function(overlay) {
         if (!this.has('currentOverlayId')) {
-            this.set('currentOverlayId', overlay.cid);
+            // if overlay is not yet saved, its id is undefined, so we use cid (that will be copied to id after save)
+            this.save({currentOverlayId: overlay.id || overlay.cid});
         }
     },
 
     overlayRemoved: function(overlay) {
-        if (overlay.cid === this.get('currentOverlayId')) {
+        if (overlay.id === this.get('currentOverlayId')) {
             var firstOverlay = this.overlays.first();
             if (firstOverlay) {
-                this.set('currentOverlayId', firstOverlay.cid);
+                this.save({currentOverlayId: firstOverlay.id});
             } else {
-                this.set('currentOverlayId', null);
+                this.save({currentOverlayId: null});
             }
         }
     }
