@@ -31,6 +31,7 @@ var settings = new Store("settings", {
     "rememberPanelOpenClosedState": false,
     "enableDeleteLayerConfirmationMessage": true,
     "placeNewLayerToCurrentScrollPosition": true,
+    "makeNewLayerCurrentAndShowIt": true,
     "enableHotkeys": true,
     "enableStatistics": true
 });
