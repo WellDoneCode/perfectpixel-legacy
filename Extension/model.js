@@ -60,6 +60,7 @@ Backbone.GSModel = Backbone.Model.extend({
 });
 
 var Overlay = Backbone.GSModel.extend({
+
     defaults: {
         x: 50,
         y: 50,
@@ -68,6 +69,19 @@ var Overlay = Backbone.GSModel.extend({
         opacity: 0.5,
         scale: 1,
         filename: ''
+    },
+
+    getters: {
+        imageUrl: function() {
+            /*var imageUrl = Backbone.Model.prototype.get.call(this, 'imageUrl');
+            if(!imageUrl)
+                this._updateImageUrl();
+            return imageUrl;*/
+            return this.imageUrl;
+        },
+        thumbnailImageUrl: function() {
+            return this.thumbnailImageUrl;
+        }
     },
 
     setters: {
@@ -140,6 +154,7 @@ var Overlay = Backbone.GSModel.extend({
      * @private
      */
     _updateImageUrl: function(callback) {
+        console.time("PP Profiling _updateImageUrl " + this.get('filename'));
         if (this.has('filename')) {
             var self = this;
             chrome.extension.sendRequest({
@@ -154,6 +169,7 @@ var Overlay = Backbone.GSModel.extend({
                     self.imageUrl = PPImageTools.createBlobUrl(blob);
                     self.trigger('change', self);
                 }
+                console.timeEnd("PP Profiling _updateImageUrl " + self.get('filename'));
 
                 callback && callback();
             });

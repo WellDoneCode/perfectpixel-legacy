@@ -435,7 +435,7 @@ var OverlayItemView = Backbone.View.extend({
         this.$el.append(checkbox);
 
         if (!ExtOptions.classicLayersSection) {
-            this.model.imageUrl && this.$el.css({'background-image':  'url(' + this.model.imageUrl  + ')'});
+            this.model.get('imageUrl') && this.$el.css({'background-image':  'url(' + this.model.get('imageUrl')  + ')'});
         } else {
             var thumb = $('<img />', {
                 class: 'chromeperfectpixel-thumb',
@@ -444,7 +444,7 @@ var OverlayItemView = Backbone.View.extend({
                     height: thumbHeight + 'px'
                 }
             });
-            this.model.imageUrl && thumb.attr('src', this.model.imageUrl);
+            this.model.get('imageUrl') && thumb.attr('src', this.model.get('imageUrl'));
             this.$el.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
         }
 
@@ -510,7 +510,7 @@ var OverlayView = Backbone.View.extend({
             .css('left', this.model.get('x') + 'px')
             .css('top', this.model.get('y') + 'px')
             .css('opacity', this.model.get('opacity'));
-        this.model.imageUrl && this.$el.attr('src', this.model.imageUrl);
+        this.model.get('imageUrl') && this.$el.attr('src', this.model.get('imageUrl'));
     },
 
     setLocked: function(value) {
