@@ -136,6 +136,8 @@ var PPStorage_filesystem = function () {
      * @constructor
      */
     this.UpdateOverlayPosition = function (overlayId, newPosition) {
+        var oldPosition = JSON.parse(localStorage["overlay" + overlayId + "_position"]);
+        newPosition = $.extend({},oldPosition,newPosition);
         localStorage["overlay" + overlayId + "_position"] = JSON.stringify(newPosition);
     }
 

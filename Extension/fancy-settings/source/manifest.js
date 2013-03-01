@@ -40,6 +40,20 @@ this.manifest = {
         },
         {
             "tab": "General",
+            "group": "Behavior",
+            "name": "placeNewLayerToCurrentScrollPosition",
+            "type": "checkbox",
+            "label": "Place newly uploaded layer to current scroll position"
+        },
+        {
+            "tab": "General",
+            "group": "Behavior",
+            "name": "makeNewLayerCurrentAndShowIt",
+            "type": "checkbox",
+            "label": "Make newly uploaded layer active and show it"
+        },
+        {
+            "tab": "General",
             "group": "Statistics",
             "name": "enableStatistics",
             "type": "checkbox",
