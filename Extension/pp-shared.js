@@ -122,4 +122,5 @@ var PP_RequestType = new function () {
     this.ADDFILE = "ADDFILE";
     this.GETFILE = "GETFILE";
     this.DELETEFILE = "DELETEFILE";
+    this.PanelStateChange = "PanelStateChange";
 };

@@ -68,7 +68,7 @@ function togglePanel(){
     chrome.tabs.executeScript(null, { code: "togglePanel();" });
 }
 
-function injectIntoTab(tabId){
+function injectIntoTab(tabId, execute_after_scripts_injected){
     if (settings.get("enableStatistics")) {
         _gaq.push(['_trackPageview']); // Tracking
     }
@@ -86,7 +86,11 @@ function injectIntoTab(tabId){
                         chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
                             chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
                                 chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                                    togglePanel();
+                                    if (typeof(execute_after_scripts_injected) == 'function'){
+                                        execute_after_scripts_injected();
+                                    } else {
+                                        togglePanel();
+                                    }
                                 });
                             });
                         });
@@ -145,8 +149,12 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
         return;
     }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
-        PP_state[tabId] = 'open';
-        injectIntoTab(tabId);
+        if (! PP_state[tabId]) PP_state[tabId] = 'open';
+        var last_word;
+        if (PP_state[tabId] == 'collapsed'){
+            last_word = function(){chrome.tabs.executeScript(null, { code: "createPanel('collapsed');" })};
+        }
+        injectIntoTab(tabId, last_word);
     }
 });
 
@@ -225,6 +233,17 @@ chrome.extension.onRequest.addListener(
                 else
                     sendPPFileResponse(responseArgs, sendResponse);
             });
+        }
+    }
+);
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.PanelStateChange){
+            if (sender.tab){
+                console.log(sender.tab.id, request.state);
+                PP_state[sender.tab.id] = request.state;
+            }
         }
     }
 );
