@@ -60,7 +60,7 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
         });
 }
 
-var createPanel = function () {
+var createPanel = function (state) {
     if ($('#chromeperfectpixel-panel').length == 0) {
         var panelHtml =
             '<div id="chromeperfectpixel-panel" class="chromeperfectpixel-panel" style="background:url(' + chrome.extension.getURL("images/noise.jpg") + ');">' +
@@ -114,6 +114,14 @@ var createPanel = function () {
             '</div>';
 
         $('body').append(panelHtml);
+
+        var $panel = $('#chromeperfectpixel-panel'),
+            $panel_body = $('#chromeperfectpixel-panel-body');
+
+        if (state == 'collapsed'){
+            $panel_body.hide().addClass('collapsed');
+            $panel.css('right',(30 - $panel.width()) + 'px');
+        }
 
         // Set event handlers
         $('.chromeperfectpixel-showHideBtn').bind('click', function (e) {
@@ -194,11 +202,12 @@ var createPanel = function () {
             var panelWidth = panel.width();
 
             if (body.hasClass('collapsed')) {
+                chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'open'});
                 body.removeClass('collapsed');
                 var state = body.data('state');
+                if (! state) state = {right: 20 + 'px'}; // in case if panel was collapsed when tab was reloaded
                 panel.animate({ right: state.right }, 'fast', function () {
-                    body.animate(
-                        { 'height': state.height, 'padding-bottom': state.paddingBottom },
+                    body.slideDown(
                         'fast',
                         function () {
                             $(this).removeAttr('style');
@@ -208,10 +217,10 @@ var createPanel = function () {
                 });
             }
             else {
+                chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
                 body.addClass('collapsed');
-                body.data('state', { height: body.innerHeight(), paddingBottom: body.css('padding-bottom'), right: panel.css('right') });
-                $('#chromeperfectpixel-panel-body').animate(
-                    { 'height': 0, 'padding-bottom': 0 },
+                body.data('state', { right: panel.css('right') });
+                body.slideUp(
                     'fast',
                     function () {
                         panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
