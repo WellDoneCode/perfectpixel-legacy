@@ -9,7 +9,8 @@
         ]
     },
     "browser_action":{
-        "default_icon":"icons/icon.png"
+        "default_icon":"icons/icon_disabled.png",
+        "default_popup":"popups/tab-not-allowed.html"
     },
     "content_security_policy":"script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
     "description":"The extension help develop your websites with per pixel accuracy!",
