@@ -26,7 +26,7 @@ along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
 var settings = new Store("settings", {
     "storageCompatibilityMode": false,
     "debugMode": false,
-    "classicLayersSection": false,
+    "classicLayersSection": false, // TODO remove this option
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
     "enableDeleteLayerConfirmationMessage": true,

@@ -435,10 +435,11 @@ var OverlayItemView = Backbone.View.extend({
         this.$el.append(checkbox);
 
         if (!ExtOptions.classicLayersSection) {
-            this.model.image.getImageUrlAsync($.proxy(function(imageUrl) {
-                imageUrl && this.$el.css({'background-image':  'url(' + imageUrl  + ')'});
+            this.model.image.getThumbnailUrlAsync($.proxy(function(thumbUrl) {
+                thumbUrl && this.$el.css({'background-image':  'url(' + thumbUrl  + ')'});
             }, this));
         } else {
+            // TODO remove
             var thumb = $('<img />', {
                 class: 'chromeperfectpixel-thumb',
                 css: {
