@@ -72,12 +72,6 @@ var Overlay = Backbone.GSModel.extend({
         filename: ''
     },
 
-    getters: {
-        imageUrl: function() {
-            return this.image.getImageUrl();
-        }
-    },
-
     setters: {
         opacity: function(value) {
             value = Number(value);
@@ -123,19 +117,13 @@ var OverlayCollection = Backbone.Collection.extend({
 
 var OverlayImage = Backbone.GSModel.extend({
     defaults: {
-        filename: '',
-        isLoaded: false
+        filename: ''
     },
 
     initialize: function() {
     },
 
-    getImageUrl: function() {
-        return this.imageUrl;
-    },
-
     getImageUrlAsync: function(callback) {
-        //var self = this;
         if(this.imageUrl)
             callback(this.imageUrl);
         else
