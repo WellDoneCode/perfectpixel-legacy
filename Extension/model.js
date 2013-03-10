@@ -68,19 +68,13 @@ var Overlay = Backbone.GSModel.extend({
         height: 300,
         opacity: 0.5,
         scale: 1,
+        // TODO refactor store in nested model
         filename: ''
     },
 
     getters: {
         imageUrl: function() {
-            /*var imageUrl = Backbone.Model.prototype.get.call(this, 'imageUrl');
-            if(!imageUrl)
-                this._updateImageUrl();
-            return imageUrl;*/
-            return this.imageUrl;
-        },
-        thumbnailImageUrl: function() {
-            return this.thumbnailImageUrl;
+            return this.image.getImageUrl();
         }
     },
 
@@ -97,7 +91,70 @@ var Overlay = Backbone.GSModel.extend({
     },
 
     initialize: function() {
-        this._updateImageUrl();
+        this.image = new OverlayImage();
+        this.image.set('filename', this.get('filename'));
+
+        var self = this;
+        this.image.on("change:filename", function(model) {
+            self.set('filename', model.get('filename'));
+        });
+        this.image.on("change:width", function(model) {
+            self.set('width', model.get('width'));
+        });
+        this.image.on("change:height", function(model) {
+            self.set('height', model.get('height'));
+        });
+        this.on("change:filename", function(model) {
+            self.image.set('filename', model.get('filename'));
+            //this.image._updateImageUrl();
+        });
+        //this.image._updateImageUrl();
+    },
+
+    uploadFile: function(file, callback) {
+        this.image.uploadFile(file, callback);
+    }
+});
+
+var OverlayCollection = Backbone.Collection.extend({
+    model: Overlay,
+    localStorage: new Backbone.LocalStorage('perfectpixel-overlays')
+});
+
+var OverlayImage = Backbone.GSModel.extend({
+    defaults: {
+        filename: '',
+        isLoaded: false
+    },
+
+    initialize: function() {
+    },
+
+    getImageUrl: function() {
+        return this.imageUrl;
+    },
+
+    getImageUrlAsync: function(callback) {
+        //var self = this;
+        if(this.imageUrl)
+            callback(this.imageUrl);
+        else
+            this.fetch({ success: $.proxy(function() {
+                callback(this.imageUrl); }, this)
+            });
+    },
+
+    // Overriding getting model
+    sync: function(method, model, options) {
+        model._updateImageUrl(function(response) {
+            var success = options.success;
+            if (success) success(model, response, options);
+            model.trigger('sync', model, response, options);
+
+            var error = options.error;
+            if (error) error(model, response, options);
+            model.trigger('error', model, response, options);
+        })
     },
 
     uploadFile: function(file, callback) {
@@ -158,21 +215,21 @@ var Overlay = Backbone.GSModel.extend({
         if (this.has('filename')) {
             var self = this;
             chrome.extension.sendRequest({
-                type: PP_RequestType.GETFILE,
-                fileName: this.get('filename')
-            },
-            function (response) {
-                self._handleResponse(response);
-                if (response.status == "OK") {
-                    var dataView = new DataView(stringToBuffer(response.arrayBuffer));
-                    var blob = new Blob([dataView],{type:response.fileType});
-                    self.imageUrl = PPImageTools.createBlobUrl(blob);
-                    self.trigger('change', self);
-                }
-                console.timeEnd("PP Profiling _updateImageUrl " + self.get('filename'));
+                    type: PP_RequestType.GETFILE,
+                    fileName: this.get('filename')
+                },
+                function (response) {
+                    self._handleResponse(response);
+                    if (response.status == "OK") {
+                        var dataView = new DataView(stringToBuffer(response.arrayBuffer));
+                        var blob = new Blob([dataView],{type:response.fileType});
+                        self.imageUrl = PPImageTools.createBlobUrl(blob);
+                        self.trigger('change', self);
+                    }
+                    console.timeEnd("PP Profiling _updateImageUrl " + self.get('filename'));
 
-                callback && callback();
-            });
+                    callback && callback(response);
+                });
         } else {
             delete this.imageUrl;
         }
@@ -214,11 +271,6 @@ var Overlay = Backbone.GSModel.extend({
             alert(response.message);
         }
     }
-});
-
-var OverlayCollection = Backbone.Collection.extend({
-    model: Overlay,
-    localStorage: new Backbone.LocalStorage('perfectpixel-overlays')
 });
 
 var PerfectPixelModel = Backbone.Model.extend({
