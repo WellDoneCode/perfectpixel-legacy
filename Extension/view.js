@@ -434,19 +434,9 @@ var OverlayItemView = Backbone.View.extend({
         var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
         this.$el.append(checkbox);
 
-        if (!ExtOptions.classicLayersSection) {
-            this.model.imageUrl && this.$el.css({'background-image':  'url(' + this.model.imageUrl  + ')'});
-        } else {
-            var thumb = $('<img />', {
-                class: 'chromeperfectpixel-thumb',
-                css: {
-                    width: thumbWidth + 'px',
-                    height: thumbHeight + 'px'
-                }
-            });
-            this.model.imageUrl && thumb.attr('src', this.model.imageUrl);
-            this.$el.append($('<div class="chromeperfectpixel-thumbwrapper"></div>').append(thumb));
-        }
+        this.model.image.getThumbnailUrlAsync($.proxy(function(thumbUrl) {
+            thumbUrl && this.$el.css({'background-image':  'url(' + thumbUrl  + ')'});
+        }, this));
 
         var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
         deleteBtn.button(); // apply css
@@ -464,7 +454,7 @@ var OverlayItemView = Backbone.View.extend({
         trackEvent("layer", "delete", undefined, "attempt");
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer", "delete", undefined, "confirmed");
-            this.model.destroy();
+            this.model.destroy(); // TODO make image destroy
         } else {
             trackEvent("layer", "delete", undefined, "canceled");
         }
@@ -510,7 +500,9 @@ var OverlayView = Backbone.View.extend({
             .css('left', this.model.get('x') + 'px')
             .css('top', this.model.get('y') + 'px')
             .css('opacity', this.model.get('opacity'));
-        this.model.imageUrl && this.$el.attr('src', this.model.imageUrl);
+        this.model.image.getImageUrlAsync($.proxy(function(imageUrl) {
+            imageUrl && this.$el.attr('src', imageUrl);
+        }, this));
     },
 
     setLocked: function(value) {

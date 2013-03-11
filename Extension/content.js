@@ -25,7 +25,7 @@ $(document).ready(function () {
         if (!ExtOptions.debugMode) {
             // disable console messages
             if (!window.console) window.console = {};
-            var methods = ["log", "debug", "warn", "info"];
+            var methods = ["log", "debug", "warn", "info", "time", "timeEnd"];
             for (var i = 0; i < methods.length; i++) {
                 console[methods[i]] = function () { };
             }

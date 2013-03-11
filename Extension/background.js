@@ -24,9 +24,7 @@ along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
 //    });
 
 var settings = new Store("settings", {
-    "storageCompatibilityMode": false,
     "debugMode": false,
-    "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
     "enableDeleteLayerConfirmationMessage": true,
@@ -75,7 +73,7 @@ function injectIntoTab(tabId, callback){
 
     chrome.tabs.insertCSS(tabId, { file: "style.css" });
     chrome.tabs.insertCSS(tabId, { file: "3rd-party/jquery-ui-1.10.1.modified.min.css" });
-    if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
+    chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
 

@@ -60,6 +60,7 @@ Backbone.GSModel = Backbone.Model.extend({
 });
 
 var Overlay = Backbone.GSModel.extend({
+
     defaults: {
         x: 50,
         y: 50,
@@ -67,7 +68,8 @@ var Overlay = Backbone.GSModel.extend({
         height: 300,
         opacity: 0.5,
         scale: 1,
-        filename: ''
+        filename: '',
+        thumbnailFilename: ''
     },
 
     setters: {
@@ -83,19 +85,106 @@ var Overlay = Backbone.GSModel.extend({
     },
 
     initialize: function() {
-        this._updateImageUrl();
+        this.image = new OverlayImage();
+        this.image.set('parent', this);
     },
+
+    uploadFile: function(file, callback) {
+        this.image.uploadFile(file, callback);
+    }
+});
+
+var OverlayCollection = Backbone.Collection.extend({
+    model: Overlay,
+    localStorage: new Backbone.LocalStorage('perfectpixel-overlays')
+});
+
+var OverlayImage = Backbone.GSModel.extend({
+
+    // TODO for both /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
+    thumbnailMinWidth: 188,
+    thumbnailMinHeight: 120,
+
+    getters: {
+        filename: function() {
+            return this.get('parent').get('filename');
+        },
+        thumbnailFilename: function() {
+            return this.get('parent').get('thumbnailFilename');
+        },
+        width: function() {
+            return this.get('parent').get('width');
+        },
+        height: function() {
+            return this.get('parent').get('height');
+        }
+    },
+
+    setters: {
+        filename: function(value) {
+            return this.get('parent').set('filename', value);
+        },
+        thumbnailFilename: function(value) {
+            return this.get('parent').set('thumbnailFilename', value);
+        },
+        width: function(value) {
+            return this.get('parent').set('width', value);
+        },
+        height: function(value) {
+            return this.get('parent').set('height', value);
+        }
+    },
+
+    getImageUrlAsync: function(callback) {
+        if(this.imageUrl)
+            callback(this.imageUrl);
+        else
+        {
+            this._getImageUrlByFilename(this.get('filename'), $.proxy(function(imageUrl, response) {
+                this.imageUrl = imageUrl;
+                callback(this.imageUrl);
+            }, this));
+        }
+    },
+
+    getThumbnailUrlAsync: function(callback) {
+        if(this.thumbnailImageUrl)
+            callback(this.thumbnailImageUrl);
+        else
+        {
+            this._getImageUrlByFilename(this.get('thumbnailFilename'), $.proxy(function(thumbImageUrl, response) {
+                this.thumbnailImageUrl = thumbImageUrl;
+                callback(this.thumbnailImageUrl);
+            }, this));
+        }
+    },
+
+    // Overriding getting model
+    /*sync: function(method, model, options) {
+        model._getImageUrlByFilename(this.filename, function(imageUrl, response) {
+            this.imageUrl = imageUrl;
+            var success = options.success;
+            if (success) success(model, response, options);
+            model.trigger('sync', model, response, options);
+        })
+    },*/
 
     uploadFile: function(file, callback) {
         // Only process image files.
         if (!file.type.match('image.*')) {
-            throw new Error('File must contain image');
+            alert('File must contain image');
+            callback();
+            return;
         }
 
         var self = this;
         var reader = new FileReader();
         reader.onload = function (e) {
-            chrome.extension.sendRequest({
+
+            // 1. Add full size image to storage
+            console.log("PP Add file operation");
+            chrome.extension.sendRequest(
+                {
                     type: PP_RequestType.ADDFILE,
                     fileData: bufferToString(e.target.result),
                     fileName: file.name,
@@ -103,18 +192,53 @@ var Overlay = Backbone.GSModel.extend({
                 },
                 function (response) {
                     self._handleResponse(response);
+
                     if (response.status == "OK") {
+
                         var dataView = new DataView(stringToBuffer(response.arrayBuffer));
-                        var blob = new Blob([dataView], {type: response.fileType});
+                        var blob = new Blob([dataView],{type:response.fileType});
 
                         self.imageUrl = PPImageTools.createBlobUrl(blob);
                         self.set('filename', response.fileName);
-                        self._updateImageSize(callback);                    // save() should be called in callback
-                    } else {
-                        callback();
+
+                        // 2. Generate thumbnail image
+                        PPImageTools.ResizeBlob(blob, self.thumbnailMinWidth, self.thumbnailMinHeight,
+                            function(resizedBlob, img) {
+                                self.set('width', img.width);
+                                self.set('height', img.height);
+
+                                PPImageTools.getArrayBufferFromBlob(resizedBlob, function(resizedBlobBuffer) {
+
+                                    // 3. Add thumbnail image to storage
+                                    console.log("PP Add file operation - thumbnail");
+                                    chrome.extension.sendRequest(
+                                        {
+                                            type: PP_RequestType.ADDFILE,
+                                            fileData: bufferToString(resizedBlobBuffer),
+                                            fileName: file.name,
+                                            fileType: resizedBlob.type
+                                        },
+                                        function (responseThumb) {
+                                            self._handleResponse(responseThumb);
+
+                                            if (responseThumb.status == "OK") {
+                                                var dataViewThumb = new DataView(stringToBuffer(responseThumb.arrayBuffer));
+                                                var blobThumb = new Blob([dataViewThumb],{type:responseThumb.fileType});
+
+                                                self.thumbnailUrl = PPImageTools.createBlobUrl(blobThumb);
+                                                self.set('thumbnailFilename', responseThumb.fileName);
+
+                                                callback();
+                                            }
+                                        });
+                                });
+                            }
+                        );
                     }
+                    else
+                        callback();
                 });
-        };
+        }
         reader.onerror = function (stuff) {
             console.log("PP error", stuff);
 
@@ -124,66 +248,43 @@ var Overlay = Backbone.GSModel.extend({
             else {
                 // it might be the local file secutiry error.
                 // See http://stackoverflow.com/questions/6665457/updateusing-filereader-in-chrome
-                if (stuff.type == 'error' && document.location.protocol == 'file:') {
+                if (stuff.type == 'error' && document.location.protocol == 'file:')
                     alert('It looks like you are trying to use the extension on a local html page. Unfortunately, due to security reasons, Chrome doesn\'t allow scripts to access the local files from the local pages unless you start the browser with --allow-file-access-from-files flag.');
-                }
             }
 
             callback();
-        };
+        }
         reader.readAsArrayBuffer(file);
     },
 
     /**
-     *
+     * Load image from underlying data source by filename
+     * @param filename
      * @param [callback]
      * @private
      */
-    _updateImageUrl: function(callback) {
-        if (this.has('filename')) {
+    _getImageUrlByFilename: function(filename, callback) {
+        if (filename) {
+            console.time("PP Profiling _getImageUrlByFilename " + filename);
             var self = this;
             chrome.extension.sendRequest({
-                type: PP_RequestType.GETFILE,
-                fileName: this.get('filename')
-            },
-            function (response) {
-                self._handleResponse(response);
-                if (response.status == "OK") {
-                    var dataView = new DataView(stringToBuffer(response.arrayBuffer));
-                    var blob = new Blob([dataView],{type:response.fileType});
-                    self.imageUrl = PPImageTools.createBlobUrl(blob);
-                    self.trigger('change', self);
-                }
+                    type: PP_RequestType.GETFILE,
+                    fileName: filename
+                },
+                function (response) {
+                    self._handleResponse(response);
+                    if (response.status == "OK") {
+                        var dataView = new DataView(stringToBuffer(response.arrayBuffer));
+                        var blob = new Blob([dataView],{type:response.fileType});
+                        var imageUrl = PPImageTools.createBlobUrl(blob);
+                    }
+                    console.timeEnd("PP Profiling _getImageUrlByFilename " + filename);
 
-                callback && callback();
-            });
+                    callback && callback(imageUrl, response);
+                });
         } else {
-            delete this.imageUrl;
-        }
-    },
-
-    /**
-     * Render invisible thumbnail to obtain image width and height
-     * @param callback
-     * @private
-     */
-    _updateImageSize: function(callback) {
-        if (this.imageUrl) {
-            var span = $('<span id="chromeperfectpixel-imgtools"></span>')
-                .css('position', 'absolute').css('opacity', 0);
-            var img = $('<img />').attr({
-                src: this.imageUrl,
-                title: this.get('filename')
-            });
-            span.append(img);
-            $(document.body).append(span);
-
-            img.load($.proxy(function () {
-                this.set('width', img[0].offsetWidth);
-                this.set('height', img[0].offsetHeight);
-                span.remove();
-                callback();
-            }, this));
+            console.error("Attempt to get image url for empty filename");
+            callback && callback(null);
         }
     },
 
@@ -198,11 +299,6 @@ var Overlay = Backbone.GSModel.extend({
             alert(response.message);
         }
     }
-});
-
-var OverlayCollection = Backbone.Collection.extend({
-    model: Overlay,
-    localStorage: new Backbone.LocalStorage('perfectpixel-overlays')
 });
 
 var PerfectPixelModel = Backbone.Model.extend({
