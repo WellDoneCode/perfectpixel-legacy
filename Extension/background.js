@@ -1,6 +1,6 @@
 ﻿/*
 
-Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
 
 This file is part of PerfectPixel.
 
@@ -24,9 +24,7 @@ along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
 //    });
 
 var settings = new Store("settings", {
-    "storageCompatibilityMode": false,
     "debugMode": false,
-    "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
     "enableDeleteLayerConfirmationMessage": true,
@@ -68,33 +66,41 @@ function togglePanel(){
     chrome.tabs.executeScript(null, { code: "togglePanel();" });
 }
 
-function injectIntoTab(tabId){
+function injectIntoTab(tabId, callback){
     if (settings.get("enableStatistics")) {
         _gaq.push(['_trackPageview']); // Tracking
     }
 
     chrome.tabs.insertCSS(tabId, { file: "style.css" });
-    chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
-    if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
+    chrome.tabs.insertCSS(tabId, { file: "3rd-party/jquery-ui-1.10.1.modified.min.css" });
+    chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
-    chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
-        chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
-            chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "3rd Party/canvas-to-blob.min.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "storage/imagetools.js" }, function () {
-                        chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                            chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                                chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                                    togglePanel();
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
+
+    var scripts = [
+        '3rd-party/jquery-1.9.1.min.js',
+        '3rd-party/jquery-ui-1.10.1.min.js',
+        '3rd-party/underscore-min.js',
+        '3rd-party/backbone-min.js',
+        '3rd-party/backbone.localStorage-min.js',
+        '3rd-party/canvas-to-blob.min.js',
+        'storage/imagetools.js',
+        'shared.js',
+        'content.js',
+        'model.js',
+        'view.js',
+        togglePanel
+    ];
+    var executeScript = function(index) {
+        var callback = function () { (index < scripts.length - 1) && executeScript(index + 1); };
+        if (typeof scripts[index] === 'string') {
+            chrome.tabs.executeScript(null, { file: scripts[index] }, callback);
+        } else {
+            scripts[index]();
+            callback();
+        }
+    };
+    executeScript(0);
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {

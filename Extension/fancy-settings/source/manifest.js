@@ -5,13 +5,6 @@ this.manifest = {
     "settings": [
         {
             "tab": "General",
-            "group": "Storage",
-            "name": "storageCompatibilityMode",
-            "type": "checkbox",
-            "label": "Storage compatilibity mode<br/> Check this if you experience problems with images uploading. <i>Note:</i> file size can be max 1.5Mb in compatilibity mode"
-        },
-        {
-            "tab": "General",
             "group": "Debug",
             "name": "debugMode",
             "type": "checkbox",
@@ -44,13 +37,6 @@ this.manifest = {
             "name": "enableStatistics",
             "type": "checkbox",
             "label": "Send anonymous statistics to developers"
-        },
-        {
-            "tab": "Appearance",
-            "group": "Design",
-            "name": "classicLayersSection",
-            "type": "checkbox",
-            "label": "Enable classic layers display mode"
         },
         {
             "tab": "Appearance",

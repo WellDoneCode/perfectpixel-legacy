@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  * 
@@ -17,55 +17,10 @@
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="vs/chrome_extensions.js" />
-/// <reference path="vs/webkit_console.js" />
-
-// -----------------------------------
-// PPOverlay - abstraction for overlay
-// -----------------------------------
-var PPOverlay = function () {
-    this.Id = 0;
-    this.Url = null;
-    this.ThumbnailUrl = null;
-    this.Width = 0;
-    this.Height = 0;
-
-    // Position
-    this.X = 50;
-    this.Y = 50;
-    this.Opacity = 0.5;
-    this.Scale = 1.0;
-}
-
-
 // ----------------------------------------------
 // GlobalStorage - for storing really global data
 // ----------------------------------------------
 var GlobalStorage = new function () {
-
-    this.get_ThumbnailMinWidth = function() {
-        return 188;//94;
-        // // TODO /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
-    }
-
-    this.get_ThumbnailMinHeight = function() {
-        return 120;//60;
-        // // TODO /2, for now Canvas in Chrome scales images very bad without antialiasing, so using workaround CSS scaling
-    }
-
-    this.get_CurrentOverlayId = function () {
-        if (localStorage["currentOverlayId"] == "null")
-            return null;
-        return localStorage["currentOverlayId"];
-    }
-
-    this.set_CurrentOverlayId = function (val) {
-        if (val != null)
-            localStorage["currentOverlayId"] = val;
-        else
-            localStorage.removeItem("currentOverlayId");
-    }
-
     this.getOptions = function () {
         var options = {};
         try {
@@ -75,7 +30,7 @@ var GlobalStorage = new function () {
         }
 
         return options;
-    }
+    };
 
     this.setOptions = function (newOptions) {
         var index = 0;
@@ -94,7 +49,7 @@ var GlobalStorage = new function () {
             return {};
         }
     }
-}
+};
 
 // Converts any ArrayBuffer to a string
 //  (a comma-separated list of ASCII ordinals,

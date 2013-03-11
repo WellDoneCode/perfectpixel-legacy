@@ -1,8 +1,8 @@
 {
     "background":{
         "scripts":[
-            "jquery-1.6.2.min.js",
-            "pp-shared.js",
+            "3rd-party/jquery-1.9.1.min.js",
+            "shared.js",
             "storage/filemanager.js",
             "fancy-settings/source/lib/store.js",
             "background.js"
@@ -23,9 +23,12 @@
     "options_page":"fancy-settings/source/index.html",
     "permissions":[ "tabs", "\u003Call_urls\u003E", "unlimitedStorage" ],
     "update_url":"http://clients2.google.com/service/update2/crx",
-    "version":"1.22",
+    "version":"1.5",
     "web_accessible_resources":[
         "images/noise.jpg",
-        "icons/16.png"
+        "icons/16.png",
+        "images/ui-bg_glass_75_e6e6e6_1x400.png",
+        "images/ui-bg_glass_75_dadada_1x400.png",
+        "images/ui-bg_glass_65_ffffff_1x400.png"
     ]
 }
