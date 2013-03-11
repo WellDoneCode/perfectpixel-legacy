@@ -454,7 +454,7 @@ var OverlayItemView = Backbone.View.extend({
         trackEvent("layer", "delete", undefined, "attempt");
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer", "delete", undefined, "confirmed");
-            this.model.destroy();
+            this.model.destroy(); // TODO make image destroy
         } else {
             trackEvent("layer", "delete", undefined, "canceled");
         }

@@ -68,7 +68,6 @@ var Overlay = Backbone.GSModel.extend({
         height: 300,
         opacity: 0.5,
         scale: 1,
-        // TODO refactor store in nested model
         filename: '',
         thumbnailFilename: ''
     },
@@ -86,30 +85,8 @@ var Overlay = Backbone.GSModel.extend({
     },
 
     initialize: function() {
-        // TODO убрать эти костыли на костыле, или хранить все в Overlay, или сделать нормальный nesting через соотв плагины
         this.image = new OverlayImage();
-        this.image.set('filename', this.get('filename'));
-        this.image.set('thumbnailFilename', this.get('thumbnailFilename'));
-
-        var self = this;
-        this.image.on("change:width", function(model) {
-            self.set('width', model.get('width'));
-        });
-        this.image.on("change:height", function(model) {
-            self.set('height', model.get('height'));
-        });
-        this.image.on("change:filename", function(model) {
-            self.set('filename', model.get('filename'));
-        });
-        this.on("change:filename", function(model) {
-            self.image.set('filename', model.get('filename'));
-        });
-        this.image.on("change:thumbnailFilename", function(model) {
-            self.set('thumbnailFilename', model.get('thumbnailFilename'));
-        });
-        this.on("change:thumbnailFilename", function(model) {
-            self.image.set('thumbnailFilename', model.get('thumbnailFilename'));
-        });
+        this.image.set('parent', this);
     },
 
     uploadFile: function(file, callback) {
@@ -128,12 +105,34 @@ var OverlayImage = Backbone.GSModel.extend({
     thumbnailMinWidth: 188,
     thumbnailMinHeight: 120,
 
-    defaults: {
-        filename: '',
-        thumbnailFilename: ''
+    getters: {
+        filename: function() {
+            return this.get('parent').get('filename');
+        },
+        thumbnailFilename: function() {
+            return this.get('parent').get('thumbnailFilename');
+        },
+        width: function() {
+            return this.get('parent').get('width');
+        },
+        height: function() {
+            return this.get('parent').get('height');
+        }
     },
 
-    initialize: function() {
+    setters: {
+        filename: function(value) {
+            return this.get('parent').set('filename', value);
+        },
+        thumbnailFilename: function(value) {
+            return this.get('parent').set('thumbnailFilename', value);
+        },
+        width: function(value) {
+            return this.get('parent').set('width', value);
+        },
+        height: function(value) {
+            return this.get('parent').set('height', value);
+        }
     },
 
     getImageUrlAsync: function(callback) {
@@ -259,7 +258,7 @@ var OverlayImage = Backbone.GSModel.extend({
     },
 
     /**
-     *
+     * Load image from underlying data source by filename
      * @param filename
      * @param [callback]
      * @private
