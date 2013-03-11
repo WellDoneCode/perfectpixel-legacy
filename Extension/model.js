@@ -91,6 +91,14 @@ var Overlay = Backbone.GSModel.extend({
 
     uploadFile: function(file, callback) {
         this.image.uploadFile(file, callback);
+    },
+
+    destroy: function(options) {
+        this.image.destroy({
+            success: $.proxy(function() {
+                Backbone.GSModel.prototype.destroy.call(this, options);
+            }, this)
+        });
     }
 });
 
@@ -298,6 +306,37 @@ var OverlayImage = Backbone.GSModel.extend({
         if (response.message && response.showToUser) {
             alert(response.message);
         }
+    },
+
+    /**
+     * Desctructor. Delete image from underlying data source.
+     */
+    destroy: function(options) {
+        // Delete physical files
+        var filesToDelete = [this.get('filename')];
+        if(this.get('thumbnailFilename'))
+            filesToDelete.push(this.get('thumbnailFilename'));
+
+        console.log("PP Delete files operation " + filesToDelete.toString());
+
+        chrome.extension.sendRequest(
+        {
+            type: PP_RequestType.DELETEFILE,
+            fileName: filesToDelete
+        },
+        $.proxy(function (response) {
+            this._handleResponse(response);
+
+            if (response.status == "OK") {
+                PPImageTools.revokeBlobUrl(this.imageUrl);
+                PPImageTools.revokeBlobUrl(this.thumbnailImageUrl);
+
+                options.success && options.success(response);
+            }
+
+            options.error && options.error(response);
+
+        }, this));
     }
 });
 
