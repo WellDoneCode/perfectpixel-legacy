@@ -17,9 +17,6 @@
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../vs/chrome_extensions.js" />
-/// <reference path="../vs/webkit_console.js" />
-
 var PPFile = function () {
     this.ArrayBuffer = null;
     this.Name = null;

@@ -276,7 +276,7 @@ var PanelView = Backbone.View.extend({
 
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +
-            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("icons/16.png") + ');"></div>' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ');"></div>' +
             '<h1>PerfectPixel</h1>' +
             '</div>' +
             '<div id="chromeperfectpixel-panel-body">' +

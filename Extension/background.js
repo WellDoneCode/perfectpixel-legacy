@@ -71,9 +71,9 @@ function injectIntoTab(tabId, callback){
         _gaq.push(['_trackPageview']); // Tracking
     }
 
-    chrome.tabs.insertCSS(tabId, { file: "style.css" });
-    chrome.tabs.insertCSS(tabId, { file: "3rd-party/jquery-ui-1.10.1.modified.min.css" });
-    chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/style.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/jquery-ui-1.10.1.modified.min.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
 
@@ -84,11 +84,11 @@ function injectIntoTab(tabId, callback){
         '3rd-party/backbone-min.js',
         '3rd-party/backbone.localStorage-min.js',
         '3rd-party/canvas-to-blob.min.js',
-        'storage/imagetools.js',
+        'imagetools.js',
         'shared.js',
         'content.js',
-        'model.js',
-        'view.js',
+        'models/model.js',
+        'views/view.js',
         togglePanel
     ];
     var executeScript = function(index) {
@@ -109,7 +109,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         chrome.browserAction.setPopup({tabId: tabId, popup: popup})
         chrome.browserAction.setIcon({path:chrome.extension.getURL(icon), tabId:tabId })
     }
-    var disabled_icon = 'icons/icon_disabled.png';
+    var disabled_icon = 'images/icons/icon_disabled.png';
 
     if (tab.url.match(/chrome:/)){
         change_icon_and_popup(disabled_icon,'popups/chrome-protocol-not-allowed.html')
@@ -117,7 +117,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     else {
         chrome.extension.isAllowedFileSchemeAccess(function(isAllowedAccess){
             if (isAllowedAccess){
-                change_icon_and_popup('icons/icon.png','')
+                change_icon_and_popup('images/icons/icon.png','')
             }
             else if(tab.url.match(/file:\//)){
                 change_icon_and_popup(disabled_icon,'popups/file-scheme-access-not-allowed.html')

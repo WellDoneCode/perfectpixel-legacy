@@ -1,7 +1,7 @@
 ﻿// SAMPLE
 this.manifest = {
     "name": "PerfectPixel by WellDoneCode",
-    "icon": "../../icons/30.png",
+    "icon": "../../images/icons/30.png",
     "settings": [
         {
             "tab": "General",
