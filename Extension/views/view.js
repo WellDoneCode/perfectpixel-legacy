@@ -249,8 +249,8 @@ var PanelView = Backbone.View.extend({
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
-        this.$('.chromeperfectpixel-showHideBtn span').button({ disabled: isNoOverlays });
-        this.$('.chromeperfectpixel-lockBtn span').button({ disabled: isNoOverlays });
+        this.$('.chromeperfectpixel-showHideBtn').button({ disabled: isNoOverlays });
+        this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
         this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
         this.$('input').not('input[type=file]').attr('disabled', function() {
