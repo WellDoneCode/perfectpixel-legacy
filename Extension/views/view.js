@@ -151,10 +151,10 @@ var PanelView = Backbone.View.extend({
     },
 
     changeScale: function(e) {
+        var value = this.$(e.currentTarget).val();
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var value = this.$(e.currentTarget).val();
             overlay.save({scale: Number(value).toFixed(1)});
         }
     },
@@ -522,6 +522,13 @@ var OverlayView = Backbone.View.extend({
     drag: function(e, ui) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
+            overlay.set({x: ui.position.left, y: ui.position.top});
+        }
+    },
+
+    stopDrag: function(e, ui) {
+        var overlay = PerfectPixel.getCurrentOverlay();
+        if (overlay) {
             overlay.save({x: ui.position.left, y: ui.position.top});
         }
     },
@@ -540,7 +547,7 @@ var OverlayView = Backbone.View.extend({
         });
         this.updateOverlay();
 
-        this.$el.draggable({ stop: this.drag });
+        this.$el.draggable({ drag: this.drag, stop: this.stopDrag });
 
         return this;
     },
