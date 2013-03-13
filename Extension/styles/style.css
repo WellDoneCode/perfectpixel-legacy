@@ -40,6 +40,7 @@
     max-height:none;
     min-width:0;
     min-height:0;
+    image-rendering: -webkit-optimize-contrast;
 }
 
 /* Chrome default style values */
