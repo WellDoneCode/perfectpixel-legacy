@@ -109,6 +109,7 @@ var PanelView = Backbone.View.extend({
         if (overlay) {
             var axis = button.data('axis');
             var offset = button.data('offset');
+            if (e.shiftKey) offset *= 10;
             if (axis == "x") {
                 overlay.save({x: overlay.get('x') - offset});
             } else if (axis == "y") {
@@ -201,17 +202,18 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
+            var distance = e.shiftKey ? 10 : 1;
             if (e.which == 37) { // left
-                overlay.save({x: overlay.get('x') - 1});
+                overlay.save({x: overlay.get('x') - distance});
             }
             else if (e.which == 38) { // up
-                overlay.save({y: overlay.get('y') - 1});
+                overlay.save({y: overlay.get('y') - distance});
             }
             else if (e.which == 39) { // right
-                overlay.save({x: overlay.get('x') + 1});
+                overlay.save({x: overlay.get('x') + distance});
             }
             else if (e.which == 40) { // down
-                overlay.save({y: overlay.get('y') + 1});
+                overlay.save({y: overlay.get('y') + distance});
             }
             else if (e.altKey && e.which == 83) { // Alt + s
                 PerfectPixel.toggleOverlayShown();
