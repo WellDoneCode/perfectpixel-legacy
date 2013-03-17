@@ -155,10 +155,24 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
         return;
     }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
-        PP_state[tabId] = 'open';
-        injectIntoTab(tabId);
+        if (! PP_state[tabId]) PP_state[tabId] = 'open';
+        var last_word;
+        if (PP_state[tabId] == 'collapsed'){
+            last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('collapsed');" })};
+        }
+        injectIntoTab(tabId, last_word);
     }
 });
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.PanelStateChange){
+            if (sender.tab){
+                PP_state[sender.tab.id] = request.state;
+            }
+        }
+    }
+);
 
 chrome.extension.onRequest.addListener(
     function (request, sender, sendResponse) {

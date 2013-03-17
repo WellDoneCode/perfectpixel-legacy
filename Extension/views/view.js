@@ -169,11 +169,12 @@ var PanelView = Backbone.View.extend({
         var panelWidth = panel.width();
 
         if (body.hasClass('collapsed')) {
+            chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'open'});
             body.removeClass('collapsed');
             var state = body.data('state');
+            if (! state) state = {right: 20 + 'px'};
             panel.animate({ right: state.right }, 'fast', function () {
-                body.animate(
-                    { 'height': state.height, 'padding-bottom': state.paddingBottom },
+                body.slideDown(
                     'fast',
                     function () {
                         $(this).removeAttr('style');
@@ -182,14 +183,10 @@ var PanelView = Backbone.View.extend({
                 );
             });
         } else {
+            chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
             body.addClass('collapsed');
-            body.data('state', {
-                height: body.innerHeight(),
-                paddingBottom: body.css('padding-bottom'),
-                right: panel.css('right')
-            });
-            this.$('#chromeperfectpixel-panel-body').animate(
-                { 'height': 0, 'padding-bottom': 0 },
+            body.data('state', { right: panel.css('right') });
+            body.slideUp(
                 'fast',
                 function () {
                     panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
@@ -327,6 +324,14 @@ var PanelView = Backbone.View.extend({
             '</div>';
 
         this.$el.append(panelHtml);
+
+        var $panel = $('#chromeperfectpixel-panel'),
+            $panel_body = $('#chromeperfectpixel-panel-body');
+
+        if (this.options.state == 'collapsed'){
+            $panel_body.hide().addClass('collapsed');
+            $panel.css('right',(30 - $panel.width()) + 'px');
+        }
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
             trackEvent("layer", "add", PerfectPixel.overlays.size() + 1);
