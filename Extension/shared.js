@@ -45,7 +45,7 @@ var GlobalStorage = new function () {
 
             return options;
         } else {
-            localStorage.removeItem['options'];
+            localStorage.removeItem('options');
             return {};
         }
     }
