@@ -24,6 +24,7 @@ var PanelView = Backbone.View.extend({
     tagName: 'div',
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
+    fastMoveDistance: 10,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -109,7 +110,7 @@ var PanelView = Backbone.View.extend({
         if (overlay) {
             var axis = button.data('axis');
             var offset = button.data('offset');
-            if (e.shiftKey) offset *= 10;
+            if (e.shiftKey) offset *= this.fastMoveDistance;
             if (axis == "x") {
                 overlay.save({x: overlay.get('x') - offset});
             } else if (axis == "y") {
@@ -202,7 +203,7 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var distance = e.shiftKey ? 10 : 1;
+            var distance = e.shiftKey ? this.fastMoveDistance : 1;
             if (e.which == 37) { // left
                 overlay.save({x: overlay.get('x') - distance});
             }
