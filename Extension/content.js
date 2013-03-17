@@ -54,12 +54,12 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
     );
 };
 
-function togglePanel()  {
+function togglePanel(state)  {
     if (this.panelView) {
         this.panelView.destroy();
         delete this.panelView;
     }
     else {
-        this.panelView = new PanelView();
+        this.panelView = new PanelView({state: state});
     }
 }

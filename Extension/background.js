@@ -66,7 +66,7 @@ function togglePanel(){
     chrome.tabs.executeScript(null, { code: "togglePanel();" });
 }
 
-function injectIntoTab(tabId, callback){
+function injectIntoTab(tabId, after_injected_callback){
     if (settings.get("enableStatistics")) {
         _gaq.push(['_trackPageview']); // Tracking
     }
@@ -88,19 +88,23 @@ function injectIntoTab(tabId, callback){
         'shared.js',
         'content.js',
         'models/model.js',
-        'views/view.js',
-        togglePanel
+        'views/view.js'
     ];
-    var executeScript = function(index) {
-        var callback = function () { (index < scripts.length - 1) && executeScript(index + 1); };
-        if (typeof scripts[index] === 'string') {
-            chrome.tabs.executeScript(null, { file: scripts[index] }, callback);
+    function executeScripts(scripts, after_executed_callback) {
+        var script = scripts.shift();
+        if (script){
+            chrome.tabs.executeScript(null, { file: script }, function(){ executeScripts(scripts,after_executed_callback)});
         } else {
-            scripts[index]();
-            callback();
+            after_executed_callback();
         }
     };
-    executeScript(0);
+    executeScripts(scripts,function(){
+        if (typeof(after_injected_callback) == 'function'){
+            after_injected_callback();
+        } else {
+            togglePanel();
+        }
+    });
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
@@ -151,10 +155,24 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
         return;
     }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
-        PP_state[tabId] = 'open';
-        injectIntoTab(tabId);
+        if (! PP_state[tabId]) PP_state[tabId] = 'open';
+        var last_word;
+        if (PP_state[tabId] == 'collapsed'){
+            last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('collapsed');" })};
+        }
+        injectIntoTab(tabId, last_word);
     }
 });
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.PanelStateChange){
+            if (sender.tab){
+                PP_state[sender.tab.id] = request.state;
+            }
+        }
+    }
+);
 
 chrome.extension.onRequest.addListener(
     function (request, sender, sendResponse) {
