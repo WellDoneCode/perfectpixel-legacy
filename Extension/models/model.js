@@ -342,6 +342,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
 var PerfectPixelModel = Backbone.Model.extend({
     defaults: {
+        // TODO save current plugin version
         currentOverlayId: null,
         overlayShown: true,
         overlayLocked: false

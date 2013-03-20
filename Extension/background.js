@@ -92,6 +92,8 @@ function injectIntoTab(tabId, after_injected_callback){
         'shared.js',
         'content.js',
         'models/model.js',
+        'models/converters/converter.js',
+        'models/converters/version-converters.js',
         'views/view.js'
     ];
     function executeScripts(scripts, after_executed_callback) {

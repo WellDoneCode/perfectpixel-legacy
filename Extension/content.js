@@ -60,6 +60,7 @@ function togglePanel(state)  {
         delete this.panelView;
     }
     else {
+        Converter.apply(); // Convert storage format from prev version of plugin if needed
         this.panelView = new PanelView({state: state});
     }
 }
