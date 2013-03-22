@@ -374,8 +374,16 @@ var PerfectPixelModel = Backbone.Model.extend({
         this.save({overlayShown: !this.get('overlayShown')});
     },
 
+    showOverlay: function() {
+        this.save({overlayShown: true});
+    },
+
     toggleOverlayLocked: function() {
         this.save({overlayLocked: !this.get('overlayLocked')});
+    },
+
+    unlockOverlay: function() {
+        this.save({overlayLocked: false});
     },
 
     overlayRemoved: function(overlay) {
