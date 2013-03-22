@@ -33,6 +33,34 @@ this.manifest = {
         },
         {
             "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerMoveToScrollPosition",
+            "type": "checkbox",
+            "label": "Place to current scroll position"
+        },
+        {
+            "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerMakeActive",
+            "type": "checkbox",
+            "label": "Make active"
+        },
+        {
+            "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerShow",
+            "type": "checkbox",
+            "label": "Show"
+        },
+        {
+            "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerUnlock",
+            "type": "checkbox",
+            "label": "Unlock"
+        },
+        {
+            "tab": "General",
             "group": "Statistics",
             "name": "enableStatistics",
             "type": "checkbox",
