@@ -85,11 +85,14 @@ var PanelView = Backbone.View.extend({
             this._bindFileUploader();
 
             PerfectPixel.overlays.add(overlay);
+            if (ExtOptions.NewLayerMoveToScrollPosition) overlay.set('y',$(window).scrollTop());
             overlay.save();
 
-            if (!PerfectPixel.getCurrentOverlay()) {
+            if (!PerfectPixel.getCurrentOverlay() || ExtOptions.NewLayerMakeActive) {
                 PerfectPixel.setCurrentOverlay(overlay);
             }
+            if (ExtOptions.NewLayerShow) PerfectPixel.showOverlay();
+            if (ExtOptions.NewLayerUnlock) PerfectPixel.unlockOverlay();
         }, this));
     },
 
