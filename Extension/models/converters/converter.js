@@ -12,13 +12,21 @@ var Converter = {
      * Apply converter needed to current storage
      */
     apply: function() {
-        // TODO obtain current and target versions
-        var currentVersion = 1.22;
-        var targetVersion = 1.5;
-        if(currentVersion == targetVersion)
-            return;
+        try
+        {
+            // TODO obtain current and target versions
+            var currentVersion = 1.22;
+            var targetVersion = 1.5;
+            if(currentVersion == targetVersion)
+                return;
 
-        this._apply(currentVersion, targetVersion);
+            this._apply(currentVersion, targetVersion);
+        }
+        catch(e)
+        {
+            console.log("Converter failed: " + e.toString())
+            throw e;
+        }
     },
 
     _apply: function(currentVersion, targetVersion) {
