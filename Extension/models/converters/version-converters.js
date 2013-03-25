@@ -8,7 +8,7 @@
 
 var VersionConverter = {
 
-    convert: function() {
+    convert: function(currentDataVersion, targetDataVersion) {
     }
 
 };
@@ -18,7 +18,7 @@ var VersionConverter_122_15 = _.extend(VersionConverter, {
     /**
      * Overriden
      */
-    convert: function() {
+    convert: function(currentDataVersion, targetDataVersion) {
         var currentOverlayId = localStorage["currentOverlayId"];
         var overlayShown = $.parseJSON(localStorage["options"]).visible || false;
         var overlayLocked = $.parseJSON(localStorage["options"]).locked || false;
@@ -41,13 +41,14 @@ var VersionConverter_122_15 = _.extend(VersionConverter, {
         var PerfectPixel = new PerfectPixelModel({
             id: 1,
             overlayShown: overlayShown,
-            overlayLocked: overlayLocked
+            overlayLocked: overlayLocked,
+            version: targetDataVersion
         });
 
         for(var layerDataItem in layersData)
         {
             //debugger;
-            var overlay = new Overlay().set({
+            var overlay = new Overlay({
                 x: layerDataItem.X,
                 y: layerDataItem.Y,
                 width: layerDataItem.Width,

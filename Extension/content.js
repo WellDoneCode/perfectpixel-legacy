@@ -19,6 +19,7 @@
 
 // options
 var ExtOptions;
+var PerfectPixel;
 $(document).ready(function () {
     chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, function (theOptions) {
         ExtOptions = theOptions;
@@ -60,7 +61,10 @@ function togglePanel(state)  {
         delete this.panelView;
     }
     else {
-        Converter.apply(); // Convert storage format from prev version of plugin if needed
+        // Convert storage format from prev version of plugin if needed
+        Converter.apply();
+        // Initialize model and view
+        PerfectPixel = new PerfectPixelModel({ id: 1 });
         this.panelView = new PanelView({state: state});
     }
 }

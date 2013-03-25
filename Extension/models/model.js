@@ -342,18 +342,34 @@ var OverlayImage = Backbone.GSModel.extend({
 
 var PerfectPixelModel = Backbone.Model.extend({
     defaults: {
-        // TODO save current plugin version
         currentOverlayId: null,
         overlayShown: true,
-        overlayLocked: false
+        overlayLocked: false,
+        version: 0 // Version is always set by Converter class
     },
 
     localStorage: new Backbone.LocalStorage('perfectpixel'),
 
     initialize: function() {
+        console.log('PP model initialize') // TODO remove
         this.overlays = new OverlayCollection();
         this.overlays.bind('remove', this.overlayRemoved, this);
+
+        /*this.getCurrentExtensionVersionAsync($.proxy(function(version) {
+            this.save({ 'version': version });
+        }, this));*/
+
     },
+
+    /*getCurrentExtensionVersionAsync: function(callback) {
+        chrome.extension.sendRequest(
+        {
+            type: PP_RequestType.GetExtensionVersion
+        },
+        $.proxy(function (response) {
+            callback(response);
+        }));
+    },*/
 
     getCurrentOverlay: function() {
         if (this.has('currentOverlayId')) {
@@ -398,4 +414,4 @@ var PerfectPixelModel = Backbone.Model.extend({
         }
     }
  });
-var PerfectPixel = new PerfectPixelModel({ id: 1 });
+//var PerfectPixel = new PerfectPixelModel({ id: 1 });

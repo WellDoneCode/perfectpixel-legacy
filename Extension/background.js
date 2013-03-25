@@ -34,6 +34,7 @@ var settings = new Store("settings", {
     "NewLayerShow": true,
     "NewLayerUnlock": true,
     "enableStatistics": true
+    // + "version" property in content script = current extension version from manifest
 });
 
 var _gaq = _gaq || [];
@@ -185,7 +186,9 @@ chrome.extension.onRequest.addListener(
 
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
-            sendResponse(settings.toObject());
+            var setingsObj = settings.toObject();
+            setingsObj.version = chrome.runtime.getManifest().version;
+            sendResponse(setingsObj);
         }
 
         // Event listener for tracking

@@ -8,39 +8,53 @@
 
 var Converter = {
 
+    LEGACY_VERSION_NUM: "1.22",
+
     /**
-     * Apply converter needed to current storage
+     * Apply converter needed to current data storage
      */
     apply: function() {
         try
         {
-            // TODO obtain current and target versions
-            var currentVersion = 1.22;
-            var targetVersion = 1.5;
-            if(currentVersion == targetVersion)
-                return;
-
-            this._apply(currentVersion, targetVersion);
+            console.log('Converter apply'); // TODO remove
+            if(this._isConversionRequired())
+            {
+                // TODO add track event
+                this._convert();
+            }
         }
         catch(e)
         {
-            console.log("Converter failed: " + e.toString())
-            throw e;
+            console.log("Converter failed: " + e.toString());
+            if (ExtOptions.debugMode == true)
+                throw e;
         }
     },
 
-    _apply: function(currentVersion, targetVersion) {
-        switch(targetVersion) {
-            case 1.5:
-            {
-                switch(currentVersion) {
-                    case 1.22:
-                        VersionConverter_122_15.convert();
-                        break;
-                    default:
-                        break;
-                }
-            }
+    _isConversionRequired: function() {
+        return this._getCurrentExtensionVersion() != this._getCurrentDataVersion();
+    },
+
+    _getCurrentExtensionVersion: function() {
+        return ExtOptions.version;
+    },
+
+    _getCurrentDataVersion: function() {
+        var instanceId = localStorage["perfectpixel"];
+        var instanceData = localStorage["perfectpixel-" + instanceId];
+        if(!instanceId && !instanceData)
+            return this.LEGACY_VERSION_NUM;
+        else
+            return $.parseJSON(instanceData).version;
+    },
+
+    _convert: function() {
+        var currentDataVersion = this._getCurrentDataVersion();
+        var targetDataVersion = this._getCurrentExtensionVersion();
+
+        switch(currentDataVersion) {
+            case this.LEGACY_VERSION_NUM:
+                VersionConverter_122_15.convert(currentDataVersion, targetDataVersion);
                 break;
             default:
                 break;
