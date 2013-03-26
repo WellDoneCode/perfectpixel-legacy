@@ -19,19 +19,7 @@
 
 // options
 var ExtOptions;
-$(document).ready(function () {
-    chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, function (theOptions) {
-        ExtOptions = theOptions;
-        if (!ExtOptions.debugMode) {
-            // disable console messages
-            if (!window.console) window.console = {};
-            var methods = ["log", "debug", "warn", "info", "time", "timeEnd"];
-            for (var i = 0; i < methods.length; i++) {
-                console[methods[i]] = function () { };
-            }
-        }
-    });
-});
+var PerfectPixel;
 
 var trackEvent = function(senderId, eventType, integerValue, stringValue) {
     if (ExtOptions.enableStatistics == false) {
@@ -60,6 +48,23 @@ function togglePanel(state)  {
         delete this.panelView;
     }
     else {
-        this.panelView = new PanelView({state: state});
+        chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, $.proxy(function (theOptions) {
+            ExtOptions = theOptions;
+            if (!ExtOptions.debugMode) {
+                // disable console messages
+                if (!window.console) window.console = {};
+                var methods = ["log", "debug", "warn", "info", "time", "timeEnd"];
+                for (var i = 0; i < methods.length; i++) {
+                    console[methods[i]] = function () { };
+                }
+            }
+
+            // Convert storage format from prev version of plugin if needed
+            Converter.apply();
+            // Initialize model and view
+            PerfectPixel = new PerfectPixelModel({ id: 1 });
+            this.panelView = new PanelView({state: state});
+        }, this));
+
     }
 }

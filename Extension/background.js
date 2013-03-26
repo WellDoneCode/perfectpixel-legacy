@@ -34,6 +34,7 @@ var settings = new Store("settings", {
     "NewLayerShow": true,
     "NewLayerUnlock": true,
     "enableStatistics": true
+    // + "version" property in content script = current extension version from manifest
 });
 
 var _gaq = _gaq || [];
@@ -92,6 +93,8 @@ function injectIntoTab(tabId, after_injected_callback){
         'shared.js',
         'content.js',
         'models/model.js',
+        'models/converters/converter.js',
+        'models/converters/version-converters.js',
         'views/view.js'
     ];
     function executeScripts(scripts, after_executed_callback) {
@@ -183,7 +186,9 @@ chrome.extension.onRequest.addListener(
 
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
-            sendResponse(settings.toObject());
+            var setingsObj = settings.toObject();
+            setingsObj.version = chrome.runtime.getManifest().version;
+            sendResponse(setingsObj);
         }
 
         // Event listener for tracking
