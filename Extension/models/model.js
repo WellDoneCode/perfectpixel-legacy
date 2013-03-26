@@ -351,7 +351,6 @@ var PerfectPixelModel = Backbone.Model.extend({
     localStorage: new Backbone.LocalStorage('perfectpixel'),
 
     initialize: function() {
-        console.log('PP model initialize') // TODO remove
         this.overlays = new OverlayCollection();
         this.overlays.bind('remove', this.overlayRemoved, this);
 

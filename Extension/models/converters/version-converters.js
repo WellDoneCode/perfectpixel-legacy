@@ -19,9 +19,14 @@ var VersionConverterFromLegacy = _.extend(VersionConverter, {
      * Overriden
      */
     convert: function(currentDataVersion, targetDataVersion) {
-        var currentOverlayId = localStorage["currentOverlayId"];
-        var overlayShown = $.parseJSON(localStorage["options"]).visible || false;
-        var overlayLocked = $.parseJSON(localStorage["options"]).locked || false;
+        // Get old data
+        var currentOverlayId = Number(localStorage["currentOverlayId"] || -1);
+        if (localStorage["options"]) {
+            var overlayShown = $.parseJSON(localStorage["options"]).visible || false;
+            var overlayLocked = $.parseJSON(localStorage["options"]).locked || false;
+        }
+        else
+            var overlayShown = overlayLocked = false;
         var layersData = [];
 
         { // scope
@@ -38,6 +43,7 @@ var VersionConverterFromLegacy = _.extend(VersionConverter, {
             }
         }
 
+        // Save old data in new format
         var PerfectPixel = new PerfectPixelModel({
             id: 1,
             overlayShown: overlayShown,
@@ -66,6 +72,15 @@ var VersionConverterFromLegacy = _.extend(VersionConverter, {
         }
 
         PerfectPixel.save();
+
+        // Delete old data
+        localStorage.removeItem("currentOverlayId");
+        localStorage.removeItem("options");
+        for(var i=0; i<layersData.length; i++)
+        {
+            localStorage.removeItem("overlay" + i + "_data");
+            localStorage.removeItem("overlay" + i + "_position");
+        }
     }
 
 });
