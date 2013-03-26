@@ -13,7 +13,7 @@ var VersionConverter = {
 
 };
 
-var VersionConverter_122_15 = _.extend(VersionConverter, {
+var VersionConverterFromLegacy = _.extend(VersionConverter, {
 
     /**
      * Overriden
@@ -45,9 +45,9 @@ var VersionConverter_122_15 = _.extend(VersionConverter, {
             version: targetDataVersion
         });
 
-        for(var layerDataItem in layersData)
+        for(var i=0; i<layersData.length; i++)
         {
-            //debugger;
+            var layerDataItem = layersData[i];
             var overlay = new Overlay({
                 x: layerDataItem.X,
                 y: layerDataItem.Y,
@@ -58,6 +58,7 @@ var VersionConverter_122_15 = _.extend(VersionConverter, {
                 filename: layerDataItem.FileName,
                 thumbnailFilename: layerDataItem.ThumbnailFileName
             });
+
             PerfectPixel.overlays.add(overlay);
             overlay.save();
             if(layerDataItem.IsCurrent)

@@ -19,7 +19,7 @@ var Converter = {
             console.log('Converter apply'); // TODO remove
             if(this._isConversionRequired())
             {
-                // TODO add track event
+                trackEvent("system", "convert_version", null, this._getCurrentExtensionVersion());
                 this._convert();
             }
         }
@@ -54,7 +54,7 @@ var Converter = {
 
         switch(currentDataVersion) {
             case this.LEGACY_VERSION_NUM:
-                VersionConverter_122_15.convert(currentDataVersion, targetDataVersion);
+                VersionConverterFromLegacy.convert(currentDataVersion, targetDataVersion);
                 break;
             default:
                 break;

@@ -343,7 +343,7 @@ var OverlayImage = Backbone.GSModel.extend({
 var PerfectPixelModel = Backbone.Model.extend({
     defaults: {
         currentOverlayId: null,
-        overlayShown: true,
+        overlayShown: false,
         overlayLocked: false,
         version: 0 // Version is always set by Converter class
     },
