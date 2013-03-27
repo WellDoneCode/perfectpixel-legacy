@@ -23,7 +23,7 @@
     "options_page":"fancy-settings/source/index.html",
     "permissions":[ "tabs", "\u003Call_urls\u003E", "unlimitedStorage" ],
     "update_url":"http://clients2.google.com/service/update2/crx",
-    "version":"1.5",
+    "version":"1.50",
     "web_accessible_resources":[
         "images/noise.jpg",
         "images/icons/16.png",
