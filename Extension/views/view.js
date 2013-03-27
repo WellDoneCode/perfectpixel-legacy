@@ -501,8 +501,9 @@ var OverlayView = Backbone.View.extend({
         if (overlay) {
             this.model = overlay;
             this.model.bind('change', this.updateOverlay);
+
+            updateOverlay && this.updateOverlay();
         }
-        updateOverlay && this.updateOverlay();
     },
 
     updateOverlay: function() {
