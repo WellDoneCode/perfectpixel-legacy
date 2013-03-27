@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  *
@@ -16,9 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/// <reference path="../vs/chrome_extensions.js" />
-/// <reference path="../vs/webkit_console.js" />
 
 var PPFile = function () {
     this.ArrayBuffer = null;

@@ -1,15 +1,8 @@
 ﻿// SAMPLE
 this.manifest = {
     "name": "PerfectPixel by WellDoneCode",
-    "icon": "../../icons/30.png",
+    "icon": "../../images/icons/30.png",
     "settings": [
-        {
-            "tab": "General",
-            "group": "Storage",
-            "name": "storageCompatibilityMode",
-            "type": "checkbox",
-            "label": "Storage compatilibity mode<br/> Check this if you experience problems with images uploading. <i>Note:</i> file size can be max 1.5Mb in compatilibity mode"
-        },
         {
             "tab": "General",
             "group": "Debug",
@@ -22,7 +15,7 @@ this.manifest = {
             "group": "Mouse and Keyboard",
             "name": "enableHotkeys",
             "type": "checkbox",
-            "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right"
+            "label": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right<br/> Shift + ↑, ↓, ←, → - Move overlay with 10x speed"
         },
         {
             "tab": "General",
@@ -40,17 +33,38 @@ this.manifest = {
         },
         {
             "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerMoveToScrollPosition",
+            "type": "checkbox",
+            "label": "Place to current scroll position"
+        },
+        {
+            "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerMakeActive",
+            "type": "checkbox",
+            "label": "Make active"
+        },
+        {
+            "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerShow",
+            "type": "checkbox",
+            "label": "Show"
+        },
+        {
+            "tab": "General",
+            "group": "New Layer Behavior",
+            "name": "NewLayerUnlock",
+            "type": "checkbox",
+            "label": "Unlock"
+        },
+        {
+            "tab": "General",
             "group": "Statistics",
             "name": "enableStatistics",
             "type": "checkbox",
             "label": "Send anonymous statistics to developers"
-        },
-        {
-            "tab": "Appearance",
-            "group": "Design",
-            "name": "classicLayersSection",
-            "type": "checkbox",
-            "label": "Enable classic layers display mode"
         },
         {
             "tab": "Appearance",

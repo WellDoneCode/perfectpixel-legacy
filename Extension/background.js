@@ -1,6 +1,6 @@
 ﻿/*
 
-Copyright 2011-2012 Alex Belozerov, Ilya Stepanov
+Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
 
 This file is part of PerfectPixel.
 
@@ -24,14 +24,17 @@ along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
 //    });
 
 var settings = new Store("settings", {
-    "storageCompatibilityMode": false,
     "debugMode": false,
-    "classicLayersSection": false,
     "customCssCode": '',
     "rememberPanelOpenClosedState": false,
     "enableDeleteLayerConfirmationMessage": true,
     "enableHotkeys": true,
+    "NewLayerMoveToScrollPosition": true,
+    "NewLayerMakeActive": true,
+    "NewLayerShow": true,
+    "NewLayerUnlock": true,
     "enableStatistics": true
+    // + "version" property in content script = current extension version from manifest
 });
 
 var _gaq = _gaq || [];
@@ -68,34 +71,71 @@ function togglePanel(){
     chrome.tabs.executeScript(null, { code: "togglePanel();" });
 }
 
-function injectIntoTab(tabId){
+function injectIntoTab(tabId, after_injected_callback){
     if (settings.get("enableStatistics")) {
         _gaq.push(['_trackPageview']); // Tracking
     }
 
-    chrome.tabs.insertCSS(tabId, { file: "style.css" });
-    chrome.tabs.insertCSS(tabId, { file: "jquery-ui.css" });
-    if (!settings.get("classicLayersSection")) chrome.tabs.insertCSS(tabId, { file: "compact-layers-section.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/style.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/jquery-ui-1.10.1.modified.min.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
-    chrome.tabs.executeScript(null, { file: "jquery-1.6.2.min.js" }, function () {
-        chrome.tabs.executeScript(null, { file: "jquery-ui.js" }, function () {
-            chrome.tabs.executeScript(null, { file: "pp-shared.js" }, function () {
-                chrome.tabs.executeScript(null, { file: "3rd Party/canvas-to-blob.min.js" }, function () {
-                    chrome.tabs.executeScript(null, { file: "storage/imagetools.js" }, function () {
-                        chrome.tabs.executeScript(null, { file: "storage/pp-storage-filesystem.js" }, function () {
-                            chrome.tabs.executeScript(null, { file: "storage/pp-storage-localStorage.js" }, function () {
-                                chrome.tabs.executeScript(null, { file: "pp-content.js" }, function () {
-                                    togglePanel();
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
+
+    var scripts = [
+        '3rd-party/jquery-1.9.1.min.js',
+        '3rd-party/jquery-ui-1.10.1.min.js',
+        '3rd-party/underscore-min.js',
+        '3rd-party/backbone-min.js',
+        '3rd-party/backbone.localStorage-min.js',
+        '3rd-party/canvas-to-blob.min.js',
+        'imagetools.js',
+        'shared.js',
+        'content.js',
+        'models/model.js',
+        'models/converters/converter.js',
+        'models/converters/version-converters.js',
+        'views/view.js'
+    ];
+    function executeScripts(scripts, after_executed_callback) {
+        var script = scripts.shift();
+        if (script){
+            chrome.tabs.executeScript(null, { file: script }, function(){ executeScripts(scripts,after_executed_callback)});
+        } else {
+            after_executed_callback();
+        }
+    };
+    executeScripts(scripts,function(){
+        if (typeof(after_injected_callback) == 'function'){
+            after_injected_callback();
+        } else {
+            togglePanel();
+        }
     });
 }
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.status != 'loading') return;
+    function change_icon_and_popup(icon, popup){
+        chrome.browserAction.setPopup({tabId: tabId, popup: popup})
+        chrome.browserAction.setIcon({path:chrome.extension.getURL(icon), tabId:tabId })
+    }
+    var disabled_icon = 'images/icons/icon_disabled.png';
+
+    if (tab.url.match(/chrome:/)){
+        change_icon_and_popup(disabled_icon,'popups/chrome-protocol-not-allowed.html')
+    }
+    else {
+        chrome.extension.isAllowedFileSchemeAccess(function(isAllowedAccess){
+            if (isAllowedAccess){
+                change_icon_and_popup('images/icons/icon.png','')
+            }
+            else if(tab.url.match(/file:\//)){
+                change_icon_and_popup(disabled_icon,'popups/file-scheme-access-not-allowed.html')
+            }
+        })
+    }
+});
 
 //React when a browser' action icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
@@ -122,17 +162,33 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
         return;
     }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
-        PP_state[tabId] = 'open';
-        injectIntoTab(tabId);
+        if (! PP_state[tabId]) PP_state[tabId] = 'open';
+        var last_word;
+        if (PP_state[tabId] == 'collapsed'){
+            last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('collapsed');" })};
+        }
+        injectIntoTab(tabId, last_word);
     }
 });
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.PanelStateChange){
+            if (sender.tab){
+                PP_state[sender.tab.id] = request.state;
+            }
+        }
+    }
+);
 
 chrome.extension.onRequest.addListener(
     function (request, sender, sendResponse) {
 
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
-            sendResponse(settings.toObject());
+            var setingsObj = settings.toObject();
+            setingsObj.version = chrome.runtime.getManifest().version;
+            sendResponse(setingsObj);
         }
 
         // Event listener for tracking
