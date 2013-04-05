@@ -55,6 +55,12 @@ $(document).ready(function () {
         //ga.src = 'https://ssl.google-analytics.com/u/ga_debug.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     }
+    // because default icon is "disabled" we need to check all tabs
+    chrome.tabs.getAllInWindow(null, function(tabs){
+        for (var i = 0; i < tabs.length; i++) {
+            check_if_PP_available_for_tab(tabs[i]);
+        }
+    });
 });
 
 // here we store panel' state for every tab
@@ -77,14 +83,14 @@ function injectIntoTab(tabId, after_injected_callback){
     }
 
     chrome.tabs.insertCSS(tabId, { file: "styles/style.css" });
-    chrome.tabs.insertCSS(tabId, { file: "styles/jquery-ui-1.10.1.modified.min.css" });
+    chrome.tabs.insertCSS(tabId, { file: "styles/jquery-ui-1.10.2.modified.min.css" });
     chrome.tabs.insertCSS(tabId, { file: "styles/compact-layers-section.css" });
     var customCssCode = settings.get("customCssCode");
     if (customCssCode) chrome.tabs.insertCSS(tabId, { code: customCssCode});
 
     var scripts = [
         '3rd-party/jquery-1.9.1.min.js',
-        '3rd-party/jquery-ui-1.10.1.min.js',
+        '3rd-party/jquery-ui-1.10.2.min.js',
         '3rd-party/underscore-min.js',
         '3rd-party/backbone-min.js',
         '3rd-party/backbone.localStorage-min.js',
@@ -114,27 +120,40 @@ function injectIntoTab(tabId, after_injected_callback){
     });
 }
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo.status != 'loading') return;
-    function change_icon_and_popup(icon, popup){
-        chrome.browserAction.setPopup({tabId: tabId, popup: popup})
-        chrome.browserAction.setIcon({path:chrome.extension.getURL(icon), tabId:tabId })
-    }
-    var disabled_icon = 'images/icons/icon_disabled.png';
-
-    if (tab.url.match(/chrome:/)){
-        change_icon_and_popup(disabled_icon,'popups/chrome-protocol-not-allowed.html')
-    }
-    else {
+function check_if_PP_available_for_tab(tab){
+    var icon = 'images/icons/icon.png';
+    if (tab.url.match(/^chrome:/) || tab.url.match(/^https:\/\/chrome.google.com\/webstore/)){
+        //do nothing
+    } else if (tab.url.match(/file:\//)){
+        // if it's a file url we need to check if PP is allowed
         chrome.extension.isAllowedFileSchemeAccess(function(isAllowedAccess){
             if (isAllowedAccess){
-                change_icon_and_popup('images/icons/icon.png','')
+                set_icon(icon);
+                set_popup('');
             }
-            else if(tab.url.match(/file:\//)){
-                change_icon_and_popup(disabled_icon,'popups/file-scheme-access-not-allowed.html')
+            else {
+                set_popup('popups/file-scheme-access-not-allowed.html')
             }
         })
     }
+    else {
+        // assume all other urls as available
+        set_icon(icon);
+        set_popup('');
+    }
+
+    // usefull shortcuts
+    function set_popup(popup){
+        chrome.browserAction.setPopup({tabId: tab.id, popup: popup})
+    }
+    function set_icon(icon){
+        chrome.browserAction.setIcon({path:chrome.extension.getURL(icon), tabId:tab.id })
+    }
+}
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.status != 'loading') return;
+    check_if_PP_available_for_tab(tab);
 });
 
 //React when a browser' action icon is clicked.
