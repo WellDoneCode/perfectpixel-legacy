@@ -367,8 +367,7 @@ var PanelView = Backbone.View.extend({
 
         // Global hotkeys on
         if (ExtOptions.enableHotkeys) {
-            $(document.body).attr('data-chromeperfectpixel-oldonkeydown', document.body.onkeydown);
-            document.body.onkeydown = this.keyDown;
+            $('body').on('keydown', this.keyDown);
         }
 
         this.$('button').button();
@@ -378,12 +377,7 @@ var PanelView = Backbone.View.extend({
     destroy: function() {
         //Global hotkeys off
         if (ExtOptions.enableHotkeys) {
-            var oldonkeydown = $(document.body).attr('data-chromeperfectpixel-oldonkeydown');
-            if (!oldonkeydown) {
-                oldonkeydown = null;
-            }
-            document.body.onkeydown = oldonkeydown;
-            $(document.body).removeAttr('data-chromeperfectpixel-oldonkeydown');
+            $('body').off('keydown', this.keyDown);
         }
 
         if (this.overlayView) {
