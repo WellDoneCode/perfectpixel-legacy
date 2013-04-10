@@ -70,7 +70,8 @@
 }
 
 /* Chrome default style values */
-#chromeperfectpixel-panel input, input[type="password"],
+#chromeperfectpixel-panel input 
+#chromeperfectpixel-panel input[type="password"],
 #chromeperfectpixel-panel input[type="search"] {
     background-color: white;
     border: 2px inset;
