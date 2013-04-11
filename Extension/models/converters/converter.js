@@ -54,13 +54,11 @@ var Converter = {
         var currentDataVersion = this._getCurrentDataVersion();
         var targetDataVersion = this._getCurrentExtensionVersion();
 
-        switch(currentDataVersion) {
-            case this.LEGACY_VERSION_NUM:
-                VersionConverterFromLegacy.convert(currentDataVersion, targetDataVersion);
-                break;
-            default:
-                break;
-        }
+        if(currentDataVersion == this.LEGACY_VERSION_NUM)
+            VersionConverter_FromLegacy.convert(currentDataVersion, targetDataVersion);
+        else if(currentDataVersion >= 1.50
+            || currentDataVersion == 0) // sometimes this type of incorrect data occure
+            VersionConverter_SimpleVersionUpdater.convert(currentDataVersion, targetDataVersion);
     }
 
 };

@@ -13,7 +13,7 @@ var VersionConverter = {
 
 };
 
-var VersionConverterFromLegacy = _.extend(VersionConverter, {
+var VersionConverter_FromLegacy = _.extend(VersionConverter, {
 
     /**
      * Overriden
@@ -83,4 +83,17 @@ var VersionConverterFromLegacy = _.extend(VersionConverter, {
         }
     }
 
+});
+
+var VersionConverter_SimpleVersionUpdater = _.extend(VersionConverter, {
+
+    /**
+     * Overriden
+     */
+    convert: function(currentDataVersion, targetDataVersion) {
+        var PerfectPixel = new PerfectPixelModel({ id: 1 });
+        PerfectPixel.fetch();
+        PerfectPixel.set('version', targetDataVersion);
+        PerfectPixel.save();
+    }
 });
