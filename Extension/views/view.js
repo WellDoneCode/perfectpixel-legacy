@@ -98,12 +98,14 @@ var PanelView = Backbone.View.extend({
         }, this));
     },
 
-    toggleOverlayShown: function() {
+    toggleOverlayShown: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
         trackEvent('overlay', PerfectPixel.get('overlayShown') ? 'hide' : 'show');
         PerfectPixel.toggleOverlayShown();
     },
 
-    toggleOverlayLocked: function() {
+    toggleOverlayLocked: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
         trackEvent('overlay', PerfectPixel.get('overlayLocked') ? 'unlock' : 'lock');
         PerfectPixel.toggleOverlayLocked();
     },
@@ -257,6 +259,8 @@ var PanelView = Backbone.View.extend({
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
+        var min_btns = this.$('.chromeperfectpixel-min-showHideBtn,.chromeperfectpixel-min-lockBtn');
+        isNoOverlays ? min_btns.attr('disabled','') : min_btns.removeAttr('disabled');
         this.$('.chromeperfectpixel-showHideBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
