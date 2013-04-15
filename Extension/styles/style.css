@@ -318,6 +318,7 @@
 
 #chromeperfectpixel-min-buttons{
     display: none;
+    -webkit-user-select: none;
 }
 #chromeperfectpixel-min-buttons > *{
     cursor: pointer;
@@ -327,6 +328,7 @@
     padding: 8px;
     text-align: center;
     font-size: 16px;
+    -webkit-user-select: none;
 }
 #chromeperfectpixel-min-buttons [disabled]{
     opacity: .3;
