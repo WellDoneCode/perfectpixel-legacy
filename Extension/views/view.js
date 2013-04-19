@@ -28,7 +28,9 @@ var PanelView = Backbone.View.extend({
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
+        'click .chromeperfectpixel-min-showHideBtn': 'toggleOverlayShown',
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
+        'click .chromeperfectpixel-min-lockBtn': 'toggleOverlayLocked',
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
@@ -96,12 +98,14 @@ var PanelView = Backbone.View.extend({
         }, this));
     },
 
-    toggleOverlayShown: function() {
+    toggleOverlayShown: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
         trackEvent('overlay', PerfectPixel.get('overlayShown') ? 'hide' : 'show');
         PerfectPixel.toggleOverlayShown();
     },
 
-    toggleOverlayLocked: function() {
+    toggleOverlayLocked: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
         trackEvent('overlay', PerfectPixel.get('overlayLocked') ? 'unlock' : 'lock');
         PerfectPixel.toggleOverlayLocked();
     },
@@ -176,14 +180,14 @@ var PanelView = Backbone.View.extend({
             body.removeClass('collapsed');
             var state = body.data('state');
             if (! state) state = {right: 20 + 'px'};
-            panel.animate({ right: state.right }, 'fast', function () {
-                body.slideDown(
-                    'fast',
-                    function () {
-                        $(this).removeAttr('style');
-                        panel.draggable('option', 'axis', '');
-                    }
-                );
+            $('#chromeperfectpixel-min-buttons').slideUp('fast', function(){
+                panel.animate({ right: state.right }, 'fast', function () {
+                    body.slideDown( 'fast', function () {
+                            $(this).removeAttr('style');
+                            panel.draggable('option', 'axis', '');
+                        }
+                    );
+                });
             });
         } else {
             chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
@@ -194,6 +198,7 @@ var PanelView = Backbone.View.extend({
                 function () {
                     panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
                         panel.draggable('option', 'axis', 'y');
+                        $('#chromeperfectpixel-min-buttons').slideDown('fast');
                     });
                 }
             );
@@ -239,12 +244,14 @@ var PanelView = Backbone.View.extend({
                 $('body').append(this.overlayView.render().el);
             }
             this.$('.chromeperfectpixel-showHideBtn span').text('Hide');
+            this.$('.chromeperfectpixel-min-showHideBtn').text('v');
         } else {
             if (this.overlayView) {
                 this.overlayView.unrender();
                 delete this.overlayView;
             }
             this.$('.chromeperfectpixel-showHideBtn span').text('Show');
+            this.$('.chromeperfectpixel-min-showHideBtn').text('i');
         }
 
         if (this.overlayView) {
@@ -252,9 +259,12 @@ var PanelView = Backbone.View.extend({
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
+        var min_btns = this.$('.chromeperfectpixel-min-showHideBtn,.chromeperfectpixel-min-lockBtn');
+        isNoOverlays ? min_btns.attr('disabled','') : min_btns.removeAttr('disabled');
         this.$('.chromeperfectpixel-showHideBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn span').text(PerfectPixel.get('overlayLocked') ? 'Unlock' : 'Lock');
+        this.$('.chromeperfectpixel-min-lockBtn').text(PerfectPixel.get('overlayLocked') ? 'l' : 'u');
         this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
         this.$('input').not('input[type=file]').attr('disabled', function() {
             return isNoOverlays;
@@ -282,6 +292,11 @@ var PanelView = Backbone.View.extend({
             '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ');"></div>' +
             '<h1>PerfectPixel</h1>' +
             '</div>' +
+            '<div id="chromeperfectpixel-min-buttons">' +
+            '<div class="chromeperfectpixel-min-showHideBtn"></div>' +
+            '<div class="chromeperfectpixel-min-lockBtn"></div>' +
+            '</div>' +
+
             '<div id="chromeperfectpixel-panel-body">' +
             '<div id="chromeperfectpixel-section-opacity">' +
             '<span>Opacity:</span>' +
@@ -334,6 +349,7 @@ var PanelView = Backbone.View.extend({
         if (this.options.state == 'collapsed'){
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
+            $('#chromeperfectpixel-min-buttons').show();
         }
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
@@ -364,6 +380,7 @@ var PanelView = Backbone.View.extend({
                 }
             }
         });
+        if (this.options.state == 'collapsed') $panel.draggable('option', 'axis', 'y');
 
         // Global hotkeys on
         if (ExtOptions.enableHotkeys) {
