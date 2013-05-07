@@ -71,8 +71,7 @@ var PPImageTools = new function() {
             reader = new FileReader();
 
         reader.onloadend = function() {
-            var image = new Image();
-            image.src = reader.result;
+            var image = document.createElement('img');
 
             image.onload = function() {
                 var imageWidth = image.width,
@@ -101,7 +100,9 @@ var PPImageTools = new function() {
                     },
                     fileType
                 );
-            }
+            };
+
+            image.src = reader.result;
         };
 
         reader.readAsDataURL(file);
