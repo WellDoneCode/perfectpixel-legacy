@@ -217,21 +217,7 @@ chrome.extension.onRequest.addListener(
             var integerValue = Number(request.integerValue);
             var stringValue = request.stringValue !== undefined ? String(request.stringValue) : request.stringValue;
 
-            if (settings.get("enableStatistics")) {
-                var params = ['_trackEvent', senderId, eventType];
-
-                if (integerValue && !isNaN(integerValue) && isFinite(integerValue)) {
-                    // push all values
-                    params.push(stringValue);
-                    params.push(Math.round(integerValue));
-                }
-                else if (stringValue && stringValue !== undefined) {
-                    // push all except integer value which is null
-                    params.push(stringValue);
-                }
-
-                _gaq.push(params);
-            }
+            trackEvent(senderId, eventType, integerValue, stringValue);
 
             sendResponse(true);
         }
@@ -280,6 +266,28 @@ chrome.extension.onRequest.addListener(
         }
     }
 );
+
+function trackEvent(senderId, eventType, integerValue, stringValue)
+{
+    if (settings.get("enableStatistics")) {
+        var params = ['_trackEvent', senderId, eventType];
+
+        if (integerValue && !isNaN(integerValue) && isFinite(integerValue)) {
+            // push all values
+            if (!stringValue || stringValue === undefined) {
+                stringValue = "value"; // GA don't track forth parameter without third
+            }
+            params.push(stringValue);
+            params.push(Math.round(integerValue));
+        }
+        else if (stringValue && stringValue !== undefined) {
+            // push all except integer value which is null
+            params.push(stringValue);
+        }
+
+        _gaq.push(params);
+    }
+}
 
 function sendPPFileResponse(ppFile, sendResponse) {
     if (ppFile instanceof PPFile)
