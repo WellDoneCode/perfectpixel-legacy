@@ -34,6 +34,7 @@ var PanelView = Backbone.View.extend({
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
+        'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick'
     },
@@ -151,12 +152,15 @@ var PanelView = Backbone.View.extend({
         if (this.$(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
             return;
         }
-        trackEvent("opacity", e.type, e.currentTarget.value * 100); // GA tracks only integers not floats
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var value = this.$(e.currentTarget).val();
             overlay.save({opacity: Number(value).toFixed(1)});
         }
+    },
+
+    onOpacityChanged: function(e) {
+        trackEvent("opacity", e.type, e.currentTarget.value * 100); // GA tracks only integers not floats
     },
 
     changeScale: function(e) {
@@ -360,13 +364,19 @@ var PanelView = Backbone.View.extend({
 
         // Workaround to catch single value of opacity during opacity HTML element change
         (function(el, timeout) {
+            var prevVal = el.val();
             var timer, trig=function() { el.trigger("changed"); };
-            el.bind("change", function() {
-                if(timer) {
-                    clearTimeout(timer);
+            setInterval(function() {
+                var currentVal = el.val();
+                if(currentVal != prevVal)
+                {
+                    if(timer) {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(trig, timeout);
+                    prevVal = currentVal;
                 }
-                timer = setTimeout(trig, timeout);
-            });
+            }, timeout);
         })(this.$("#chromeperfectpixel-opacity"), 500);
 
         // make panel draggable

@@ -104,12 +104,7 @@ var Overlay = Backbone.GSModel.extend({
 
 var OverlayCollection = Backbone.Collection.extend({
     model: Overlay,
-    localStorage: new Backbone.LocalStorage('perfectpixel-overlays'),
-    initialize: function() {
-        this.on("sync", function() {
-            console.log("PP OverlayCollection sync. Layers: " + this.length)
-        });
-    }
+    localStorage: new Backbone.LocalStorage('perfectpixel-overlays')
 });
 
 var OverlayImage = Backbone.GSModel.extend({
