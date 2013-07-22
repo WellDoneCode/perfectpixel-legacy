@@ -34,6 +34,7 @@ var PanelView = Backbone.View.extend({
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
+        'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick'
     },
@@ -151,12 +152,15 @@ var PanelView = Backbone.View.extend({
         if (this.$(e.currentTarget).is(":disabled")) { // chrome bug if version < 15.0; opacity input isn't actually disabled
             return;
         }
-        trackEvent("opacity", e.type, e.currentTarget.value * 100); // GA tracks only integers not floats
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var value = this.$(e.currentTarget).val();
             overlay.save({opacity: Number(value).toFixed(1)});
         }
+    },
+
+    onOpacityChanged: function(e) {
+        trackEvent("opacity", e.type, e.currentTarget.value * 100); // GA tracks only integers not floats
     },
 
     changeScale: function(e) {
@@ -360,13 +364,19 @@ var PanelView = Backbone.View.extend({
 
         // Workaround to catch single value of opacity during opacity HTML element change
         (function(el, timeout) {
+            var prevVal = el.val();
             var timer, trig=function() { el.trigger("changed"); };
-            el.bind("change", function() {
-                if(timer) {
-                    clearTimeout(timer);
+            setInterval(function() {
+                var currentVal = el.val();
+                if(currentVal != prevVal)
+                {
+                    if(timer) {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(trig, timeout);
+                    prevVal = currentVal;
                 }
-                timer = setTimeout(trig, timeout);
-            });
+            }, timeout);
         })(this.$("#chromeperfectpixel-opacity"), 500);
 
         // make panel draggable
@@ -491,6 +501,7 @@ var OverlayView = Backbone.View.extend({
     className: 'chromeperfectpixel-overlay',
     id: 'chromeperfectpixel-overlay_3985123731465987',
     zIndex: 2147483646,
+    smartMovementStickBorder: 1,
 
     events: {
         'mousewheel': 'mousewheel'
@@ -542,11 +553,57 @@ var OverlayView = Backbone.View.extend({
         e.preventDefault();
     },
 
+    startDrag: function(e, ui) {
+        // For Smart movement
+        ui.helper.data('PPSmart.originalPosition', ui.position || {top: 0, left: 0});
+        ui.helper.data('PPSmart.stickBorder', null);
+    },
+
     drag: function(e, ui) {
         var overlay = PerfectPixel.getCurrentOverlay();
+        var newPosition = ui.position;
+
         if (overlay) {
-            overlay.set({x: ui.position.left, y: ui.position.top});
+            if(e.shiftKey === true)
+            {
+                // Smart movement
+                var originalPosition = ui.helper.data('PPSmart.originalPosition');
+                var deltaX = Math.abs(originalPosition.left - ui.position.left);
+                var deltaY = Math.abs(originalPosition.top - ui.position.top);
+
+                var stickBorder = ui.helper.data('PPSmart.stickBorder');
+                if(stickBorder == null)
+                {
+                    // Initialize stick border
+                    if(Math.abs(deltaX) >= Math.abs(deltaY)) {
+                        stickBorder = { x: this.smartMovementStickBorder, y : 0 };
+                    }
+                    else {
+                        stickBorder = { x: 0, y : this.smartMovementStickBorder };
+                    }
+                    ui.helper.data('PPSmart.stickBorder', stickBorder);
+                }
+
+                //console.log("X: " + deltaX + "; stickBorderX: " + stickBorder.x + " Y: " + deltaY + "; stickBorderY: " + stickBorder.y);
+
+                if(Math.abs(deltaX * stickBorder.x) >  Math.abs(deltaY * stickBorder.y) ||
+                  (Math.abs(deltaX * stickBorder.x) == Math.abs(deltaY * stickBorder.y) && stickBorder.x > stickBorder.y)) {
+                    newPosition.top = originalPosition.top;
+                    overlay.set({x: ui.position.left, y: originalPosition.top});
+                }
+                else {
+                    newPosition.left = originalPosition.left;
+                    overlay.set({x: originalPosition.left, y: ui.position.top});
+                }
+            }
+            else
+            {
+                overlay.set({x: ui.position.left, y: ui.position.top});
+                ui.helper.data('PPSmart.stickBorder', null);
+            }
         }
+        ui.helper.data('PPSmart.originalPosition', newPosition);
+        return newPosition;
     },
 
     stopDrag: function(e, ui) {
@@ -570,7 +627,7 @@ var OverlayView = Backbone.View.extend({
         });
         this.updateOverlay();
 
-        this.$el.draggable({ drag: this.drag, stop: this.stopDrag });
+        this.$el.draggable({ drag: this.drag, stop: this.stopDrag, start: this.startDrag });
 
         return this;
     },
