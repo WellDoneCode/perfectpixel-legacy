@@ -501,6 +501,7 @@ var OverlayView = Backbone.View.extend({
     className: 'chromeperfectpixel-overlay',
     id: 'chromeperfectpixel-overlay_3985123731465987',
     zIndex: 2147483646,
+    smartMovementStickBorder: 1,
 
     events: {
         'mousewheel': 'mousewheel'
@@ -552,11 +553,57 @@ var OverlayView = Backbone.View.extend({
         e.preventDefault();
     },
 
+    startDrag: function(e, ui) {
+        // For Smart movement
+        ui.helper.data('PPSmart.originalPosition', ui.position || {top: 0, left: 0});
+        ui.helper.data('PPSmart.stickBorder', null);
+    },
+
     drag: function(e, ui) {
         var overlay = PerfectPixel.getCurrentOverlay();
+        var newPosition = ui.position;
+
         if (overlay) {
-            overlay.set({x: ui.position.left, y: ui.position.top});
+            if(e.shiftKey === true)
+            {
+                // Smart movement
+                var originalPosition = ui.helper.data('PPSmart.originalPosition');
+                var deltaX = Math.abs(originalPosition.left - ui.position.left);
+                var deltaY = Math.abs(originalPosition.top - ui.position.top);
+
+                var stickBorder = ui.helper.data('PPSmart.stickBorder');
+                if(stickBorder == null)
+                {
+                    // Initialize stick border
+                    if(Math.abs(deltaX) >= Math.abs(deltaY)) {
+                        stickBorder = { x: this.smartMovementStickBorder, y : 0 };
+                    }
+                    else {
+                        stickBorder = { x: 0, y : this.smartMovementStickBorder };
+                    }
+                    ui.helper.data('PPSmart.stickBorder', stickBorder);
+                }
+
+                //console.log("X: " + deltaX + "; stickBorderX: " + stickBorder.x + " Y: " + deltaY + "; stickBorderY: " + stickBorder.y);
+
+                if(Math.abs(deltaX * stickBorder.x) >  Math.abs(deltaY * stickBorder.y) ||
+                  (Math.abs(deltaX * stickBorder.x) == Math.abs(deltaY * stickBorder.y) && stickBorder.x > stickBorder.y)) {
+                    newPosition.top = originalPosition.top;
+                    overlay.set({x: ui.position.left, y: originalPosition.top});
+                }
+                else {
+                    newPosition.left = originalPosition.left;
+                    overlay.set({x: originalPosition.left, y: ui.position.top});
+                }
+            }
+            else
+            {
+                overlay.set({x: ui.position.left, y: ui.position.top});
+                ui.helper.data('PPSmart.stickBorder', null);
+            }
         }
+        ui.helper.data('PPSmart.originalPosition', newPosition);
+        return newPosition;
     },
 
     stopDrag: function(e, ui) {
@@ -580,7 +627,7 @@ var OverlayView = Backbone.View.extend({
         });
         this.updateOverlay();
 
-        this.$el.draggable({ drag: this.drag, stop: this.stopDrag });
+        this.$el.draggable({ drag: this.drag, stop: this.stopDrag, start: this.startDrag });
 
         return this;
     },
