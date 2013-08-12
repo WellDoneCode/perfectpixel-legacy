@@ -25,6 +25,7 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
+    collectionNotifications: new NotificationCollection,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -36,7 +37,8 @@ var PanelView = Backbone.View.extend({
         'change #chromeperfectpixel-opacity': 'changeOpacity',
         'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
-        'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick'
+        'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
+        'click .chromeperfectpixel-closeNotification': 'closeCurrentNotification'
     },
 
     initialize: function(options) {
@@ -46,10 +48,24 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('remove', this.update);
         PerfectPixel.overlays.bind('change', this.update);
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
+
+        this.collectionNotifications.comparator = function(notify) {
+            return -notify.get("id");
+        };
+
+        this.collectionNotifications.add([
+            {id: 2, show: 1, text:  'Notific 2'},
+            {id: 4, show: 1, text:  'Notific 4'},
+            {id: 3, show: 1, text:  'Notific 3'},
+            {id: 1, show: 1, text:  'Notific 1'}
+        ]);
+
         this.render();
 
         PerfectPixel.fetch();
         PerfectPixel.overlays.fetch();
+
+
     },
 
     appendOverlay: function(overlay) {
@@ -209,6 +225,24 @@ var PanelView = Backbone.View.extend({
         }
     },
 
+    closeCurrentNotification: function(e){
+        var button = this.$(e.currentTarget);
+        var box = button.parent();
+        var textDiv = box.find('.chromeperfectpixel-notification-text');
+        var notifyId = button.data("id");
+        //Добавляем нотификацию в игнор
+
+        //Отображаем следующую
+        var newNotify = this.collectionNotifications.shift();
+        if (newNotify) {
+        textDiv.html(newNotify.showNotification());
+        button.data("id", newNotify.get("id"));
+        } else {
+            textDiv.html('');
+            button.hide();
+        }
+    },
+
     keyDown: function(e) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
@@ -291,6 +325,7 @@ var PanelView = Backbone.View.extend({
         $('body').append(this.$el);
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
 
+        var myNotify = this.collectionNotifications.shift();
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +
             '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ');"></div>' +
@@ -300,8 +335,12 @@ var PanelView = Backbone.View.extend({
             '<div class="chromeperfectpixel-min-showHideBtn"></div>' +
             '<div class="chromeperfectpixel-min-lockBtn"></div>' +
             '</div>' +
-
+            '<div id="chromeperfectpixel-notification-box">' +
+            '<div class="chromeperfectpixel-notification-text">' + myNotify.showNotification() + '</div>' +
+            '<div class="chromeperfectpixel-closeNotification" data-id="' + myNotify.get("id") + '">X</div>' +
+            '</div>' +
             '<div id="chromeperfectpixel-panel-body">' +
+
             '<div id="chromeperfectpixel-section-opacity">' +
             '<span>Opacity:</span>' +
             '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +

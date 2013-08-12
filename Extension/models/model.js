@@ -413,4 +413,36 @@ var PerfectPixelModel = Backbone.Model.extend({
         }
     }
  });
+
+var Notification = Backbone.GSModel.extend({
+
+    defaults: {
+        id: 1,
+        show: 0,
+        text:  'HELLO!!!11',
+        minVersion: 0,
+        maxVersion: 2,
+        expireDate: '10.10.2013'
+    },
+
+    initialize: function() {
+
+    },
+
+    showNotification: function() {
+        if (this.get('show')){
+            return this.get('text');
+        } else {
+            return '<div>Not Notifications</div>';
+        }
+    },
+
+    destroy: function(options) {
+
+    }
+});
+
+var NotificationCollection = Backbone.Collection.extend({
+    model: Notification
+})
 //var PerfectPixel = new PerfectPixelModel({ id: 1 });
