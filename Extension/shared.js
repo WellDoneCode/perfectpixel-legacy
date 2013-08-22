@@ -78,4 +78,7 @@ var PP_RequestType = new function () {
     this.GETFILE = "GETFILE";
     this.DELETEFILE = "DELETEFILE";
     this.PanelStateChange = "PANELSTATECHANGE";
+    this.GetNotifications = "GETNOTIFICATION";
+    this.SetNotifications = "SETNOTIFICATION";
+
 };

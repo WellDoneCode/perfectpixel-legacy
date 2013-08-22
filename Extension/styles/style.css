@@ -167,6 +167,7 @@
 #chromeperfectpixel-panel #chromeperfectpixel-section-opacity input[type=range] {
     width: 230px;
     border: none;
+    background: transparent;
 }
 
 #chromeperfectpixel-panel #chromeperfectpixel-section-origin {
@@ -342,3 +343,40 @@
     margin-left: 2px;
     padding-top: 4px;
 }
+
+#chromeperfectpixel-notification-box{
+    display: none;
+    background-color: #FFFEBE;
+    padding: 15px 10px 15px 10px;
+    margin-bottom: 10px;
+    position: relative;
+}
+    #chromeperfectpixel-notification-text {
+        font-size: 12px;
+        line-height: 14px;
+        vertical-align: top;
+    }
+    #chromeperfectpixel-notification-text  a{
+        line-height: 14px;
+        height: 14px;
+        color: #6800A6;
+        font-size: 12px;
+        vertical-align: top;
+    }
+    #chromeperfectpixel-closeNotification {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 16px;
+        color: #000000;
+        text-shadow: 0 1px 0 #ffffff;
+        opacity: 0.2;
+
+    }
+
+    #chromeperfectpixel-closeNotification:hover {
+        opacity: 0.5;
+    }

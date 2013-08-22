@@ -414,15 +414,19 @@ var PerfectPixelModel = Backbone.Model.extend({
     }
  });
 
+/**
+ * Notification Model
+ * @type {*}
+ */
 var Notification = Backbone.GSModel.extend({
 
     defaults: {
-        id: 1,
+        id: 0,
         show: 0,
-        text:  'HELLO!!!11',
+        text:  'default text',
         minVersion: 0,
-        maxVersion: 2,
-        expireDate: '10.10.2013'
+        maxVersion: 0,
+        expireDate: '10.10.2010'
     },
 
     initialize: function() {
@@ -437,12 +441,104 @@ var Notification = Backbone.GSModel.extend({
         }
     },
 
+    checkParam: function(version, maxid) {
+        var result = true;
+        var now = new Date(),
+            expireDate = new Date(this.get("expireDate")),
+            defaultDate = this.defaults.expireDate;
+
+        if (this.get("minVersion") > version && this.get("minVersion") != 0){
+            result = false;
+        }
+
+        if (this.get("maxVersion") < version && this.get("maxVersion") !=0 ){
+            result = false;
+        }
+
+        if (expireDate < now && defaultDate != this.get("expireDate")) {
+            result = false;
+        }
+        if ((this.get("id") < maxid) || (this.get("id") == maxid)) {
+            result = false;
+        }
+        return result;
+    },
+
     destroy: function(options) {
 
     }
 });
 
+/**
+ * Notifications collection
+ * @type {*}
+ */
 var NotificationCollection = Backbone.Collection.extend({
-    model: Notification
-})
+    defaults: {
+        model: Notification
+    },
+    model: Notification,
+    url: function() {
+        return "http://www.welldonecode.com/perfectpixel/data/notifications.json";
+    }
+});
+
+/**
+ * Model for working with NotificationCollection
+ * @type {*}
+ */
+var NotificationModel = Backbone.Model.extend({
+
+    defaults: {
+        collectionNotifications: new NotificationCollection,
+        currentNotification: new Notification,
+        maxId:0
+    },
+
+    setCollection: function(collection){
+        var collectionResult = new NotificationCollection,
+            version = Converter._getCurrentDataVersion(),
+            maxid = this.get("maxId");
+
+        collection.each( function( notify){
+            //Почему-то берет элементы через 1!!!???
+            var check = notify.checkParam(version, maxid);
+            if (check){
+                collectionResult.add(notify);
+            }
+        });
+        this.collectionNotifications = collectionResult;
+        this.setCurrentNotification();
+    },
+
+    getCurrentNotification: function(){
+        return this.currentNotification;
+    },
+
+    setCurrentNotification: function() {
+        if (this.collectionNotifications.length > 0) {
+            this.currentNotification = this.collectionNotifications.shift();
+        } else {
+            this.currentNotification = null;
+        }
+    },
+
+    closeCurrentNotification: function() {
+        var notify = this.getCurrentNotification();
+        chrome.extension.sendRequest(
+            {
+                type: PP_RequestType.SetNotifications,
+                notifyId: notify.get("id"),
+                keyName:'notification'
+            });
+        this.set("maxId", notify.get("id"));
+        this.setCurrentNotification();
+    },
+
+    setMaxId: function(maxid) {
+        this.set("maxId", maxid);
+    }
+
+
+});
 //var PerfectPixel = new PerfectPixelModel({ id: 1 });

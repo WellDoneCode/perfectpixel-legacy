@@ -264,6 +264,17 @@ chrome.extension.onRequest.addListener(
                     sendPPFileResponse(responseArgs, sendResponse);
             });
         }
+
+        //Event save closed notification
+        if (request.type == PP_RequestType.SetNotifications) {
+            localStorage[request.keyName] = request.notifyId;
+            sendResponse(true);
+        }
+        //Event get last viewed notification
+        if (request.type == PP_RequestType.GetNotifications) {
+            var id = localStorage[request.keyName];
+            sendResponse(id);
+        }
     }
 );
 

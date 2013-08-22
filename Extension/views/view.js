@@ -25,7 +25,7 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
-    collectionNotifications: new NotificationCollection,
+    modelNotification: new NotificationModel,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -38,7 +38,7 @@ var PanelView = Backbone.View.extend({
         'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
-        'click .chromeperfectpixel-closeNotification': 'closeCurrentNotification'
+        'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification'
     },
 
     initialize: function(options) {
@@ -49,23 +49,10 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('change', this.update);
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
 
-        this.collectionNotifications.comparator = function(notify) {
-            return -notify.get("id");
-        };
-
-        this.collectionNotifications.add([
-            {id: 2, show: 1, text:  'Notific 2'},
-            {id: 4, show: 1, text:  'Notific 4'},
-            {id: 3, show: 1, text:  'Notific 3'},
-            {id: 1, show: 1, text:  'Notific 1'}
-        ]);
-
         this.render();
 
         PerfectPixel.fetch();
         PerfectPixel.overlays.fetch();
-
-
     },
 
     appendOverlay: function(overlay) {
@@ -228,18 +215,15 @@ var PanelView = Backbone.View.extend({
     closeCurrentNotification: function(e){
         var button = this.$(e.currentTarget);
         var box = button.parent();
-        var textDiv = box.find('.chromeperfectpixel-notification-text');
+        var textDiv = box.find('#chromeperfectpixel-notification-text');
         var notifyId = button.data("id");
-        //Добавляем нотификацию в игнор
-
-        //Отображаем следующую
-        var newNotify = this.collectionNotifications.shift();
+        this.modelNotification.closeCurrentNotification();
+        var newNotify = this.modelNotification.getCurrentNotification();
         if (newNotify) {
-        textDiv.html(newNotify.showNotification());
-        button.data("id", newNotify.get("id"));
+            textDiv.html(newNotify.showNotification());
+            button.data("id", newNotify.get("id"));
         } else {
-            textDiv.html('');
-            button.hide();
+            box.hide();
         }
     },
 
@@ -325,7 +309,39 @@ var PanelView = Backbone.View.extend({
         $('body').append(this.$el);
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
 
-        var myNotify = this.collectionNotifications.shift();
+        var notifications = new NotificationCollection;
+        notifications.comparator= function(notify) {
+            return -notify.get("id");
+        }
+        notifications.fetch({
+            success: $.proxy(function(result) {
+                    chrome.extension.sendRequest(
+                        {
+                            type: PP_RequestType.GetNotifications,
+                            keyName:'notification'
+                        },
+                        $.proxy(function(response)
+                        {
+                            var maxid = 0;
+                            if (response){
+                                maxid = response;
+                            }
+                            this.modelNotification.setMaxId(maxid);
+                            this.modelNotification.setCollection(notifications);
+                            var myNotify = this.modelNotification.getCurrentNotification(),
+                                box = $('#chromeperfectpixel-notification-box'),
+                                textDiv = $('#chromeperfectpixel-notification-text'),
+                                button = $('#chromeperfectpixel-closeNotification');
+                            if (myNotify) {
+                                box.show();
+                                textDiv.html(myNotify.showNotification());
+                                button.data("id", myNotify.get("id"));
+                            }
+                        }, this)
+                    );
+            }
+        , this)});
+
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +
             '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ');"></div>' +
@@ -336,11 +352,10 @@ var PanelView = Backbone.View.extend({
             '<div class="chromeperfectpixel-min-lockBtn"></div>' +
             '</div>' +
             '<div id="chromeperfectpixel-notification-box">' +
-            '<div class="chromeperfectpixel-notification-text">' + myNotify.showNotification() + '</div>' +
-            '<div class="chromeperfectpixel-closeNotification" data-id="' + myNotify.get("id") + '">X</div>' +
+            '<div id="chromeperfectpixel-notification-text"></div>' +
+            '<div id="chromeperfectpixel-closeNotification">x</div>' +
             '</div>' +
             '<div id="chromeperfectpixel-panel-body">' +
-
             '<div id="chromeperfectpixel-section-opacity">' +
             '<span>Opacity:</span>' +
             '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
