@@ -501,7 +501,6 @@ var NotificationModel = Backbone.Model.extend({
             maxid = this.get("maxId");
 
         collection.each( function( notify){
-            //Почему-то берет элементы через 1!!!???
             var check = notify.checkParam(version, maxid);
             if (check){
                 collectionResult.add(notify);
