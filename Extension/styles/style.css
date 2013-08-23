@@ -347,6 +347,7 @@
 #chromeperfectpixel-notification-box{
     display: none;
     background-color: #FFFEBE;
+    box-shadow: 0 0 2px black;
     padding: 15px 10px 15px 10px;
     margin-bottom: 10px;
     position: relative;
