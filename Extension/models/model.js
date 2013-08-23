@@ -458,7 +458,7 @@ var Notification = Backbone.GSModel.extend({
         if (expireDate < now && defaultDate != this.get("expireDate")) {
             result = false;
         }
-        if ((this.get("id") < maxid) || (this.get("id") == maxid)) {
+        if ((parseInt(this.get("id")) < parseInt(maxid)) || (parseInt(this.get("id")) == parseInt(maxid))) {
             result = false;
         }
         return result;
@@ -529,7 +529,7 @@ var NotificationModel = Backbone.Model.extend({
             {
                 type: PP_RequestType.SetNotifications,
                 notifyId: notify.get("id"),
-                keyName:'notification'
+                keyName:'perfectpixel-notification'
             });
         this.set("maxId", notify.get("id"));
         this.setCurrentNotification();

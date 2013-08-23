@@ -267,7 +267,9 @@ chrome.extension.onRequest.addListener(
 
         //Event save closed notification
         if (request.type == PP_RequestType.SetNotifications) {
-            localStorage[request.keyName] = request.notifyId;
+            if (localStorage[request.keyName] < request.notifyId){
+                localStorage[request.keyName] = request.notifyId;
+            }
             sendResponse(true);
         }
         //Event get last viewed notification

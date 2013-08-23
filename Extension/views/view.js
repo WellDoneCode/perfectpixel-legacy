@@ -196,6 +196,7 @@ var PanelView = Backbone.View.extend({
                     );
                 });
             });
+            $('#chromeperfectpixel-notification-box').show();
         } else {
             chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
             body.addClass('collapsed');
@@ -209,6 +210,7 @@ var PanelView = Backbone.View.extend({
                     });
                 }
             );
+            $('#chromeperfectpixel-notification-box').hide();
         }
     },
 
@@ -310,15 +312,15 @@ var PanelView = Backbone.View.extend({
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
 
         var notifications = new NotificationCollection;
-        notifications.comparator= function(notify) {
-            return -notify.get("id");
-        }
+//        notifications.comparator= function(notify) {
+//            return notify.get("id");
+//        }
         notifications.fetch({
             success: $.proxy(function(result) {
                     chrome.extension.sendRequest(
                         {
                             type: PP_RequestType.GetNotifications,
-                            keyName:'notification'
+                            keyName:'perfectpixel-notification'
                         },
                         $.proxy(function(response)
                         {
@@ -333,9 +335,9 @@ var PanelView = Backbone.View.extend({
                                 textDiv = $('#chromeperfectpixel-notification-text'),
                                 button = $('#chromeperfectpixel-closeNotification');
                             if (myNotify) {
-                                box.show();
                                 textDiv.html(myNotify.showNotification());
                                 button.data("id", myNotify.get("id"));
+                                box.show();
                             }
                         }, this)
                     );
