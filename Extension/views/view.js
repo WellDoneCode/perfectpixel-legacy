@@ -293,6 +293,7 @@ var PanelView = Backbone.View.extend({
     render: function() {
         $('body').append(this.$el);
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
+        this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
 
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +

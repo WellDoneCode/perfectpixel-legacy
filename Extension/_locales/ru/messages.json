@@ -2,6 +2,9 @@
     "extension_description": {
         "message": "Это расширение помогает Вам разрабатывать сайт с попиксельной точностью!"
     },
+    "panel_css_class": {
+        "message": "chromeperfectpixel-locale-ru"
+    },
     "opacity": {
         "message": "Прозрачность"
     },
@@ -27,7 +30,7 @@
         "message": "Заблокировать"
     },
     "unlock": {
-        "message": "Заблокировать"
+        "message": "Разблокировать"
     },
     "add_new_layer": {
         "message": "Добавить новый слой"

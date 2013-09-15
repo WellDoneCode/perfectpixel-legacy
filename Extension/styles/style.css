@@ -112,6 +112,10 @@
     -webkit-transition-delay:0.3s;
 }
 
+#chromeperfectpixel-panel.chromeperfectpixel-locale-ru {
+	width: 335px;
+}
+
 #chromeperfectpixel-panel:hover {
     opacity:1;
     -webkit-transition-duration:0.1s;
@@ -132,7 +136,7 @@
     height: 16px;
     width: 16px;
     border: none;
-    border-radius:0px;
+    border-radius:0;
 }
 
 #chromeperfectpixel-header-showHideBtn.chromeperfectpixel-showHideBtn-enabled
@@ -167,6 +171,10 @@
 #chromeperfectpixel-panel #chromeperfectpixel-section-opacity input[type=range] {
     width: 230px;
     border: none;
+}
+
+#chromeperfectpixel-panel.chromeperfectpixel-locale-ru #chromeperfectpixel-section-opacity input[type=range] {
+	width: 205px;
 }
 
 #chromeperfectpixel-panel #chromeperfectpixel-section-origin {
