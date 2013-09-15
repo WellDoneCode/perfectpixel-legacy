@@ -1,0 +1,38 @@
+{
+    "extension_description": {
+        "message": "Это расширение помогает Вам разрабатывать сайт с попиксельной точностью!"
+    },
+    "opacity": {
+        "message": "Прозрачность"
+    },
+    "origin": {
+        "message": "Положение"
+    },
+    "layers": {
+        "message": "Слои"
+    },
+    "scale": {
+        "message": "Масштаб"
+    },
+    "loading": {
+        "message": "Загрузка"
+    },
+    "show": {
+        "message": "Показать"
+    },
+    "hide": {
+        "message": "Скрыть"
+    },
+    "lock": {
+        "message": "Заблокировать"
+    },
+    "unlock": {
+        "message": "Заблокировать"
+    },
+    "add_new_layer": {
+        "message": "Добавить новый слой"
+    },
+    "are_you_sure_you_want_to_delete_layer": {
+        "message": "Вы уверены, что хотите удалить этот слой?"
+    }
+}

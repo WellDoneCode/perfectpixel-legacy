@@ -1,0 +1,44 @@
+{
+    "extension_name": {
+        "message": "PerfectPixel by WellDoneCode"
+    },
+    "extension_name_short": {
+        "message": "PerfectPixel"
+    },
+    "extension_description": {
+        "message": "This extension helps develop your websites with per pixel accuracy!"
+    },
+    "opacity": {
+        "message": "Opacity"
+    },
+    "origin": {
+        "message": "Origin"
+    },
+    "layers": {
+        "message": "Layers"
+    },
+    "scale": {
+        "message": "Scale"
+    },
+    "loading": {
+        "message": "Loading"
+    },
+    "show": {
+        "message": "Show"
+    },
+    "hide": {
+        "message": "Hide"
+    },
+    "lock": {
+        "message": "Lock"
+    },
+    "unlock": {
+        "message": "Unlock"
+    },
+    "add_new_layer": {
+        "message": "Add new layer"
+    },
+    "are_you_sure_you_want_to_delete_layer": {
+        "message": "Are you sure you want to delete layer?"
+    }
+}
