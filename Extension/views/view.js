@@ -196,11 +196,11 @@ var PanelView = Backbone.View.extend({
                     );
                 });
             });
-            $('#chromeperfectpixel-notification-box').show();
         } else {
             chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
             body.addClass('collapsed');
             body.data('state', { right: panel.css('right') });
+
             body.slideUp(
                 'fast',
                 function () {
@@ -210,7 +210,6 @@ var PanelView = Backbone.View.extend({
                     });
                 }
             );
-            $('#chromeperfectpixel-notification-box').hide();
         }
     },
 
@@ -353,15 +352,19 @@ var PanelView = Backbone.View.extend({
             '<div class="chromeperfectpixel-min-showHideBtn"></div>' +
             '<div class="chromeperfectpixel-min-lockBtn"></div>' +
             '</div>' +
+            '<div id="chromeperfectpixel-panel-body">' +
+
             '<div id="chromeperfectpixel-notification-box">' +
             '<div id="chromeperfectpixel-notification-text"></div>' +
             '<div id="chromeperfectpixel-closeNotification">x</div>' +
             '</div>' +
-            '<div id="chromeperfectpixel-panel-body">' +
+
+            '<div id="chromeperfectpixel-section">'+
             '<div id="chromeperfectpixel-section-opacity">' +
             '<span>Opacity:</span>' +
             '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
             '</div>' +
+
             '<div id="chromeperfectpixel-section-origin">' +
             '<span>Origin:</span>' +
             '<div id="chromeperfectpixel-origin-controls">' +
@@ -371,9 +374,11 @@ var PanelView = Backbone.View.extend({
             '<button id="chromeperfectpixel-xmore" data-axis="x" data-offset="-1">&rarr;</button>' +
             '<div>' +
             '<div>' +
+
             '<div class="chromeperfectpixel-coords-label">X:</div>' +
             '<input type="text" class="chromeperfectpixel-coords" data-axis="x" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
             '</div>' +
+
             '<div>' +
             '<div class="chromeperfectpixel-coords-label">Y:</div>' +
             '<input type="text" class="chromeperfectpixel-coords" data-axis="y" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
@@ -399,6 +404,7 @@ var PanelView = Backbone.View.extend({
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
             '</div>' +
+            '</div>'+
             '</div>';
 
         this.$el.append(panelHtml);
