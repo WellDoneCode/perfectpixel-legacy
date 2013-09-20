@@ -1,4 +1,10 @@
 {
+    "extension_name": {
+        "message": "PerfectPixel by WellDoneCode"
+    },
+    "extension_name_short": {
+        "message": "PerfectPixel"
+    },
     "extension_description": {
         "message": "Это расширение помогает Вам разрабатывать сайт с попиксельной точностью!"
     },
