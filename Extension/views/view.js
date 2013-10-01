@@ -46,10 +46,30 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('remove', this.update);
         PerfectPixel.overlays.bind('change', this.update);
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
-        this.render();
+
+        var view = this;
+        chrome.extension.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
+            view.model = new Panel({id:res.tabId});
+            view.model.fetch();
+            view.listenTo(view.model, 'change', view.updatePanel);
+
+            view.render();
+        });
 
         PerfectPixel.fetch();
         PerfectPixel.overlays.fetch();
+    },
+
+    updatePanel: function(obj){
+        this.$el.toggleClass('collapsed', obj.attributes.collapsed);
+        this.$el.toggleClass('hidden', obj.attributes.hidden);
+        this.$el.toggleClass('vertical', obj.attributes.vertical);
+
+        var position = obj.attributes.position;
+        this.$el.css(position);
+        for(var index in position) {
+            if (position[index] == 0) this.$el.addClass('attached-' + index)
+        }
     },
 
     appendOverlay: function(overlay) {
@@ -175,38 +195,7 @@ var PanelView = Backbone.View.extend({
     panelHeaderDoubleClick: function(e) {
         trackEvent(this.$(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), e.type);
 
-        var panel = this.$el;
-        var body = this.$('#chromeperfectpixel-panel-body');
-        var panelWidth = panel.width();
-
-        if (body.hasClass('collapsed')) {
-            chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'open'});
-            body.removeClass('collapsed');
-            var state = body.data('state');
-            if (! state) state = {right: 20 + 'px'};
-            $('#chromeperfectpixel-min-buttons').slideUp('fast', function(){
-                panel.animate({ right: state.right }, 'fast', function () {
-                    body.slideDown( 'fast', function () {
-                            $(this).removeAttr('style');
-                            panel.draggable('option', 'axis', '');
-                        }
-                    );
-                });
-            });
-        } else {
-            chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
-            body.addClass('collapsed');
-            body.data('state', { right: panel.css('right') });
-            body.slideUp(
-                'fast',
-                function () {
-                    panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
-                        panel.draggable('option', 'axis', 'y');
-                        $('#chromeperfectpixel-min-buttons').slideDown('fast');
-                    });
-                }
-            );
-        }
+        this.model.toggleCollapsed();
     },
 
     keyDown: function(e) {
@@ -232,7 +221,7 @@ var PanelView = Backbone.View.extend({
                 PerfectPixel.toggleOverlayLocked();
             }
             else if (e.altKey && e.which == 72) { // Alt + H
-                this.togglePanelShown();
+                this.model.toggleHidden();
             }
             else {
                 return;
@@ -293,20 +282,14 @@ var PanelView = Backbone.View.extend({
         }
     },
 
-    togglePanelShown: function(){
-        $('#chromeperfectpixel-panel').toggle();
-        var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
-        chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: new_state});
-    },
-
     render: function() {
-        $('body').append(this.$el);
+        $('body').append(this.$el).append('<div id="chromeperfectpixel-window"/>');
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
         this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
 
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +
-            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ');"></div>' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ') center center no-repeat;"></div>' +
             '<h1>' + chrome.i18n.getMessage("extension_name_short") + '</h1>' +
             '</div>' +
             '<div id="chromeperfectpixel-min-buttons">' +
@@ -360,16 +343,12 @@ var PanelView = Backbone.View.extend({
 
         this.$el.append(panelHtml);
 
-        var $panel = $('#chromeperfectpixel-panel'),
-            $panel_body = $('#chromeperfectpixel-panel-body');
+        this.updatePanel(this.model);
 
         if (this.options.state == 'collapsed'){
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
             $('#chromeperfectpixel-min-buttons').show();
-        }
-        else if (this.options.state == 'hidden'){
-            $panel.hide();
         }
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
@@ -396,14 +375,53 @@ var PanelView = Backbone.View.extend({
         })(this.$("#chromeperfectpixel-opacity"), 500);
 
         // make panel draggable
+        var panelModel = this.model;
         this.$el.draggable({
             handle: "#chromeperfectpixel-panel-header",
-            stop: function (event, ui) {
-                // change left to right
-                if ($(this).css('left')) {
-                    $(this).css('right', ($(document.body).innerWidth() - $(this).offset().left - $(this).outerWidth()).toString() + 'px');
-                    $(this).css('left', '');
+            snap: "#chromeperfectpixel-window",
+            snapMode: "inner",
+            scroll: false,
+            stop: function( event, ui ) {
+                var $window = $(window),
+                    screenWidth = $window.width(),
+                    screenHeight = $window.height(),
+                    $panel = $(event.target),
+                    position = {
+                        left: ui.position.left,
+                        top: ui.position.top,
+                        right: screenWidth - (ui.position.left + $panel.width()),
+                        bottom: screenHeight - (ui.position.top + $panel.height())
+                    },
+                    outOfBoundaries = false,
+                    new_params = {};
+
+                for(var index in position) {
+                    var val = position[index];
+                    if (val < 0) {
+                        outOfBoundaries = true;
+                        position[index] = 0;
+                    }
                 }
+                position.right == 0 ? position.left = 'auto' : position.right = 'auto';
+                position.bottom == 0 ? position.top = 'auto' : position.bottom = 'auto';
+
+                new_params.position = position;
+
+                if (outOfBoundaries && ! panelModel.get('collapsed')) new_params.collapsed = true;
+
+                if ((position.top == 0 || position.bottom == 0) && (position.left != 0 && position.right != 0)){
+                    new_params.vertical = false;
+                }
+                else if ((position.left == 0 || position.right == 0) && (position.top != 0 && position.bottom != 0)){
+                    new_params.vertical = true;
+                }
+
+                panelModel.save(new_params)
+            },
+            start: function(){
+                $("#chromeperfectpixel-panel")
+                    .css({bottom:'auto',right: 'auto'})
+                    .removeClass('attached-top attached-left attached-right attached-bottom');
             }
         });
         if (this.options.state == 'collapsed') $panel.draggable('option', 'axis', 'y');
@@ -429,6 +447,7 @@ var PanelView = Backbone.View.extend({
         }
 
         this.$el.remove();
+        $('#chromeperfectpixel-window').remove();
     },
 
     /**
