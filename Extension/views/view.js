@@ -231,6 +231,9 @@ var PanelView = Backbone.View.extend({
             else if (e.altKey && e.which == 67) { // Alt + c
                 PerfectPixel.toggleOverlayLocked();
             }
+            else if (e.altKey && e.which == 72) { // Alt + H
+                this.togglePanelShown();
+            }
             else {
                 return;
             }
@@ -288,6 +291,12 @@ var PanelView = Backbone.View.extend({
             this.$('#chromeperfectpixel-opacity').val(0.5);
             this.$('#chromeperfectpixel-scale').val(1.0);
         }
+    },
+
+    togglePanelShown: function(){
+        $('#chromeperfectpixel-panel').toggle();
+        var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
+        chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: new_state});
     },
 
     render: function() {
@@ -358,6 +367,9 @@ var PanelView = Backbone.View.extend({
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
             $('#chromeperfectpixel-min-buttons').show();
+        }
+        else if (this.options.state == 'hidden'){
+            $panel.hide();
         }
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
