@@ -411,7 +411,21 @@ var PerfectPixelModel = Backbone.Model.extend({
                 this.save({currentOverlayId: null});
             }
         }
-    }
+    },
+
+    getDefaultLocale: function() {
+        return ExtOptions.defaultLocale;
+    },
+
+    getCurrentLocale: function() {
+        // Return only global locale: "en" instead of "en-US"
+        var regex = /(.*)-.*/i
+        var matchArray = regex.exec(window.navigator.language);
+        if (matchArray != null)
+            return matchArray[1];
+        else
+            return window.navigator.language;
+    },
  });
 
 /**
@@ -435,7 +449,11 @@ var Notification = Backbone.GSModel.extend({
 
     showNotification: function() {
         if (this.get('show')){
-            return this.get('text');
+            var locale = PerfectPixel.getCurrentLocale();
+            var val = this.get('text_' + locale);
+            if(!val)
+                val = this.get('text_' + PerfectPixel.getDefaultLocale());
+            return val;
         } else {
             return '<div>No notifications</div>';
         }
