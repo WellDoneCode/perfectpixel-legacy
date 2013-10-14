@@ -437,7 +437,7 @@ var Notification = Backbone.GSModel.extend({
         if (this.get('show')){
             return this.get('text');
         } else {
-            return '<div>Not Notifications</div>';
+            return '<div>No notifications</div>';
         }
     },
 
@@ -479,7 +479,7 @@ var NotificationCollection = Backbone.Collection.extend({
     },
     model: Notification,
     url: function() {
-        return "http://www.welldonecode.com/perfectpixel/data/notifications.json";
+        return "http://www.welldonecode.com/perfectpixel/data/notifications.json?random=" + Math.random();
     }
 });
 
