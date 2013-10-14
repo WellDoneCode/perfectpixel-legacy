@@ -186,6 +186,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
         if (PP_state[tabId] == 'collapsed'){
             last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('collapsed');" })};
         }
+        else if (PP_state[tabId] == 'hidden'){
+            last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('hidden');" })};
+        }
         injectIntoTab(tabId, last_word);
     }
 });
