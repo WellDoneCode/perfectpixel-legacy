@@ -36,7 +36,6 @@ var settings = new Store("settings", {
     "enableStatistics": true
     // + "version" property in content script = current extension version from manifest
     // + "defaultLocale" property in content script = default locale from manifest
-    // + "i18n_acceptedLanguages" property with array of accepted languages, i18n, localization
 });
 
 var _gaq = _gaq || [];
@@ -210,13 +209,14 @@ chrome.extension.onRequest.addListener(
 
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
-            var setingsObj = settings.toObject();
-            setingsObj.defaultLocale = chrome.runtime.getManifest().default_locale;
-            setingsObj.version = chrome.runtime.getManifest().version;
-            chrome.i18n.getAcceptLanguages(function(languages) { // not used anywhere
+            var settingsObj = settings.toObject();
+            settingsObj.defaultLocale = chrome.runtime.getManifest().default_locale;
+            settingsObj.version = chrome.runtime.getManifest().version;
+            sendResponse(settingsObj);
+            /*chrome.i18n.getAcceptLanguages(function(languages) { // not used anywhere
                 settingsObj.i18n_acceptedLanguages = languages;
-                sendResponse(setingsObj);
-            })
+                sendResponse(settingsObj);
+            })*/
         }
 
         // Event listener for tracking
