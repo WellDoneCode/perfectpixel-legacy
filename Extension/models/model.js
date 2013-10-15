@@ -453,6 +453,8 @@ var Notification = Backbone.GSModel.extend({
             var val = this.get('text_' + locale);
             if(!val)
                 val = this.get('text_' + PerfectPixel.getDefaultLocale());
+
+            trackEvent("notification", "show", null, this.get("id"));
             return val;
         } else {
             return '<div>No notifications</div>';
@@ -542,6 +544,7 @@ var NotificationModel = Backbone.Model.extend({
 
     closeCurrentNotification: function() {
         var notify = this.getCurrentNotification();
+        trackEvent("notification", "close", null, notify.get("id"));
         chrome.extension.sendRequest(
             {
                 type: PP_RequestType.SetNotifications,
