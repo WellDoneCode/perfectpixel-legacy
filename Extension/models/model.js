@@ -353,22 +353,8 @@ var PerfectPixelModel = Backbone.Model.extend({
     initialize: function() {
         this.overlays = new OverlayCollection();
         this.overlays.bind('remove', this.overlayRemoved, this);
-
-        /*this.getCurrentExtensionVersionAsync($.proxy(function(version) {
-            this.save({ 'version': version });
-        }, this));*/
-
+        this.notificationModel = new NotificationModel();
     },
-
-    /*getCurrentExtensionVersionAsync: function(callback) {
-        chrome.extension.sendRequest(
-        {
-            type: PP_RequestType.GetExtensionVersion
-        },
-        $.proxy(function (response) {
-            callback(response);
-        }));
-    },*/
 
     getCurrentOverlay: function() {
         if (this.has('currentOverlayId')) {
@@ -425,7 +411,7 @@ var PerfectPixelModel = Backbone.Model.extend({
             return matchArray[1];
         else
             return window.navigator.language;
-    },
+    }
  });
 
 /**
@@ -447,13 +433,11 @@ var Notification = Backbone.GSModel.extend({
 
     },
 
-    showNotification: function() {
+    getText: function() {
         var locale = PerfectPixel.getCurrentLocale();
         var val = this.get('text_' + locale);
         if(!val)
             val = this.get('text_' + PerfectPixel.getDefaultLocale());
-
-        trackEvent("notification", "show", null, this.get("id"));
         return val;
     },
 
@@ -509,9 +493,33 @@ var NotificationCollection = Backbone.Collection.extend({
 var NotificationModel = Backbone.Model.extend({
 
     defaults: {
-        collectionNotifications: new NotificationCollection,
-        currentNotification: new Notification,
+        collectionNotifications: new NotificationCollection(),
+        currentNotification: new Notification(),
         maxId:0
+    },
+
+    initialize: function() {
+        var that = this;
+        var allNotificationsFromRemote = new NotificationCollection();
+        allNotificationsFromRemote.fetch({
+            success: $.proxy(function(result) {
+                chrome.extension.sendRequest(
+                    {
+                        type: PP_RequestType.GetNotifications,
+                        keyName:'perfectpixel-notification'
+                    },
+                    $.proxy(function(response)
+                    {
+                        var maxid = 0;
+                        if (response){
+                            maxid = response;
+                        }
+                        that.setMaxId(maxid);
+                        that.setCollection(allNotificationsFromRemote);
+                    }, this)
+                );
+            }
+            , this)});
     },
 
     setCollection: function(collection){
@@ -539,11 +547,11 @@ var NotificationModel = Backbone.Model.extend({
         } else {
             this.currentNotification = null;
         }
+        this.trigger("change:currentNotification");
     },
 
     closeCurrentNotification: function() {
         var notify = this.getCurrentNotification();
-        trackEvent("notification", "close", null, notify.get("id"));
         chrome.extension.sendRequest(
             {
                 type: PP_RequestType.SetNotifications,
@@ -551,13 +559,11 @@ var NotificationModel = Backbone.Model.extend({
                 keyName:'perfectpixel-notification'
             });
         this.set("maxId", notify.get("id"));
-        this.setCurrentNotification();
+        // Don't need to care about changing current notification
+        // New notification is changed with PP_Background_RequestType.NotificationsUpdated request from backround page
     },
 
     setMaxId: function(maxid) {
         this.set("maxId", maxid);
     }
-
-
 });
-//var PerfectPixel = new PerfectPixelModel({ id: 1 });

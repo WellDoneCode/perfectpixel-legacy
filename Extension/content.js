@@ -68,3 +68,13 @@ function togglePanel(state)  {
 
     }
 }
+
+// Listener for events from background.js
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+
+        if(request.type == PP_Background_RequestType.NotificationsUpdated)
+        {
+            PerfectPixel.notificationModel.initialize();
+        }
+    });

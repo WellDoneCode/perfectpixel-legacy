@@ -25,7 +25,6 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
-    modelNotification: new NotificationModel,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -48,6 +47,7 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('remove', this.update);
         PerfectPixel.overlays.bind('change', this.update);
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
+        PerfectPixel.notificationModel.on('change:currentNotification', this.updateNotification);
 
         this.render();
 
@@ -214,18 +214,9 @@ var PanelView = Backbone.View.extend({
     },
 
     closeCurrentNotification: function(e){
-        var button = this.$(e.currentTarget);
-        var box = button.parent();
-        var textDiv = box.find('#chromeperfectpixel-notification-text');
-        var notifyId = button.data("id");
-        this.modelNotification.closeCurrentNotification();
-        var newNotify = this.modelNotification.getCurrentNotification();
-        if (newNotify) {
-            textDiv.html(newNotify.showNotification());
-            button.data("id", newNotify.get("id"));
-        } else {
-            box.hide();
-        }
+        var myNotify = PerfectPixel.notificationModel.getCurrentNotification();
+        trackEvent("notification", "close", null, myNotify.get("id"));
+        PerfectPixel.notificationModel.closeCurrentNotification();
     },
 
     keyDown: function(e) {
@@ -312,6 +303,21 @@ var PanelView = Backbone.View.extend({
         }
     },
 
+    updateNotification: function() {
+        var myNotify = PerfectPixel.notificationModel.getCurrentNotification(),
+            box = $('#chromeperfectpixel-notification-box'),
+            textDiv = $('#chromeperfectpixel-notification-text'),
+            button = $('#chromeperfectpixel-closeNotification');
+        if (myNotify) {
+            textDiv.html(myNotify.getText());
+            button.data("id", myNotify.get("id"));
+            trackEvent("notification", "show", null, myNotify.get("id"));
+            box.show();
+        } else {
+            box.hide();
+        }
+    },
+
     togglePanelShown: function(){
         $('#chromeperfectpixel-panel').toggle();
         var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
@@ -322,39 +328,6 @@ var PanelView = Backbone.View.extend({
         $('body').append(this.$el);
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
         this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
-
-        var notifications = new NotificationCollection;
-//        notifications.comparator= function(notify) {
-//            return notify.get("id");
-//        }
-        notifications.fetch({
-            success: $.proxy(function(result) {
-                    chrome.extension.sendRequest(
-                        {
-                            type: PP_RequestType.GetNotifications,
-                            keyName:'perfectpixel-notification'
-                        },
-                        $.proxy(function(response)
-                        {
-                            var maxid = 0;
-                            if (response){
-                                maxid = response;
-                            }
-                            this.modelNotification.setMaxId(maxid);
-                            this.modelNotification.setCollection(notifications);
-                            var myNotify = this.modelNotification.getCurrentNotification(),
-                                box = $('#chromeperfectpixel-notification-box'),
-                                textDiv = $('#chromeperfectpixel-notification-text'),
-                                button = $('#chromeperfectpixel-closeNotification');
-                            if (myNotify) {
-                                textDiv.html(myNotify.showNotification());
-                                button.data("id", myNotify.get("id"));
-                                box.show();
-                            }
-                        }, this)
-                    );
-            }
-        , this)});
 
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +

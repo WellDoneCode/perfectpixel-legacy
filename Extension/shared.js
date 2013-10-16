@@ -80,5 +80,11 @@ var PP_RequestType = new function () {
     this.PanelStateChange = "PANELSTATECHANGE";
     this.GetNotifications = "GETNOTIFICATION";
     this.SetNotifications = "SETNOTIFICATION";
+};
 
+// --------------------------------------------------------------
+// PP_Background_RequestType - enum for extension background page -> content script requests
+// --------------------------------------------------------------
+var PP_Background_RequestType = new function () {
+    this.NotificationsUpdated = "NotificationsUpdated"
 };
