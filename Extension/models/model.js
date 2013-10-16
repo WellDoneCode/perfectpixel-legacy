@@ -448,17 +448,13 @@ var Notification = Backbone.GSModel.extend({
     },
 
     showNotification: function() {
-        if (this.get('show')){
-            var locale = PerfectPixel.getCurrentLocale();
-            var val = this.get('text_' + locale);
-            if(!val)
-                val = this.get('text_' + PerfectPixel.getDefaultLocale());
+        var locale = PerfectPixel.getCurrentLocale();
+        var val = this.get('text_' + locale);
+        if(!val)
+            val = this.get('text_' + PerfectPixel.getDefaultLocale());
 
-            trackEvent("notification", "show", null, this.get("id"));
-            return val;
-        } else {
-            return '<div>No notifications</div>';
-        }
+        trackEvent("notification", "show", null, this.get("id"));
+        return val;
     },
 
     checkParam: function(version, maxid) {
@@ -466,6 +462,9 @@ var Notification = Backbone.GSModel.extend({
         var now = new Date(),
             expireDate = new Date(this.get("expireDate")),
             defaultDate = this.defaults.expireDate;
+
+        if (this.get('show') != 1)
+            return false;
 
         if (this.get("minVersion") > version && this.get("minVersion") != 0){
             result = false;
