@@ -25,6 +25,7 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
+    screenBordersElementId: 'chromeperfectpixel-window',
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -283,7 +284,7 @@ var PanelView = Backbone.View.extend({
     },
 
     render: function() {
-        $('body').append(this.$el).append('<div id="chromeperfectpixel-window"/>');
+        $('body').append(this.$el).append('<div id="' + this.screenBordersElementId + '"/>');
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
         this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
 
@@ -343,8 +344,6 @@ var PanelView = Backbone.View.extend({
 
         this.$el.append(panelHtml);
 
-        this.updatePanel(this.model);
-
         if (this.options.state == 'collapsed'){
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
@@ -376,15 +375,16 @@ var PanelView = Backbone.View.extend({
 
         // make panel draggable
         var panelModel = this.model;
+        var view = this;
         this.$el.draggable({
             handle: "#chromeperfectpixel-panel-header",
-            snap: "#chromeperfectpixel-window",
+            snap: "#" + this.screenBordersElementId,
             snapMode: "inner",
             scroll: false,
             stop: function( event, ui ) {
                 var $window = $(window),
                     screenWidth = $window.width(),
-                    screenHeight = $window.height(),
+                    screenHeight = $('#' + view.screenBordersElementId).height(),
                     $panel = $(event.target),
                     position = {
                         left: ui.position.left,
@@ -407,13 +407,22 @@ var PanelView = Backbone.View.extend({
 
                 new_params.position = position;
 
-                if (outOfBoundaries && ! panelModel.get('collapsed')) new_params.collapsed = true;
+                if (outOfBoundaries && ! panelModel.get('collapsed')) {
+                    new_params.collapsed = true;
+                    new_params.auto_collapsed = true;
+                }
 
                 if ((position.top == 0 || position.bottom == 0) && (position.left != 0 && position.right != 0)){
                     new_params.vertical = false;
                 }
                 else if ((position.left == 0 || position.right == 0) && (position.top != 0 && position.bottom != 0)){
                     new_params.vertical = true;
+                }
+
+                if (panelModel.get('collapsed') && panelModel.get('auto_collapsed')
+                    && position.top != 0 && position.right != 0 && position.bottom != 0 && position.left != 0){
+                    new_params.collapsed = false;
+                    new_params.auto_collapsed = false;
                 }
 
                 panelModel.save(new_params)
@@ -424,7 +433,8 @@ var PanelView = Backbone.View.extend({
                     .removeClass('attached-top attached-left attached-right attached-bottom');
             }
         });
-        if (this.options.state == 'collapsed') $panel.draggable('option', 'axis', 'y');
+
+        this.updatePanel(this.model);
 
         // Global hotkeys on
         if (ExtOptions.enableHotkeys) {
@@ -447,7 +457,7 @@ var PanelView = Backbone.View.extend({
         }
 
         this.$el.remove();
-        $('#chromeperfectpixel-window').remove();
+        $('#' + this.screenBordersElementId).remove();
     },
 
     /**

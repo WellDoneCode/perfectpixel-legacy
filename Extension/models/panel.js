@@ -8,6 +8,7 @@ var Panel = Backbone.GSModel.extend({
             bottom: 'auto'
         },
         collapsed: false,
+        auto_collapsed: false,
         hidden: false,
         state: 'closed',
         vertical: false
