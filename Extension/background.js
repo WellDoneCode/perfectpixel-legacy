@@ -35,6 +35,7 @@ var settings = new Store("settings", {
     "NewLayerUnlock": true,
     "enableStatistics": true
     // + "version" property in content script = current extension version from manifest
+    // + "defaultLocale" property in content script = default locale from manifest
 });
 
 var _gaq = _gaq || [];
@@ -208,9 +209,14 @@ chrome.extension.onRequest.addListener(
 
         // Event listener for settings
         if (request.type == PP_RequestType.GetExtensionOptions) {
-            var setingsObj = settings.toObject();
-            setingsObj.version = chrome.runtime.getManifest().version;
-            sendResponse(setingsObj);
+            var settingsObj = settings.toObject();
+            settingsObj.defaultLocale = chrome.runtime.getManifest().default_locale;
+            settingsObj.version = chrome.runtime.getManifest().version;
+            sendResponse(settingsObj);
+            /*chrome.i18n.getAcceptLanguages(function(languages) { // not used anywhere
+                settingsObj.i18n_acceptedLanguages = languages;
+                sendResponse(settingsObj);
+            })*/
         }
 
         // Event listener for tracking
@@ -267,8 +273,41 @@ chrome.extension.onRequest.addListener(
                     sendPPFileResponse(responseArgs, sendResponse);
             });
         }
+
+        //Event save closed notification
+        if (request.type == PP_RequestType.SetNotifications) {
+            if (!localStorage[request.keyName] || parseInt(localStorage[request.keyName]) < parseInt(request.notifyId)){
+                localStorage[request.keyName] = request.notifyId;
+            }
+            sendMessageToAllTabs(
+                {
+                    type: PP_Background_RequestType.NotificationsUpdated
+                });
+            sendResponse(true);
+        }
+        //Event get last viewed notification
+        if (request.type == PP_RequestType.GetNotifications) {
+            var id = localStorage[request.keyName];
+            sendResponse(id);
+        }
     }
 );
+
+// Sends message to PerfectPixel content script in specific tab
+function sendMessageToTab(tabId, data, callback)
+{
+    chrome.tabs.sendMessage(tabId, data, callback);
+}
+
+// Sends message to PerfectPixel content script in all tabs
+function sendMessageToAllTabs(data)
+{
+    chrome.tabs.query({ status:"complete" }, function(tabs) {
+        for(var i=0; i<tabs.length; i++) {
+            chrome.tabs.sendMessage(tabs[i].id, data);
+        }
+    });
+}
 
 function trackEvent(senderId, eventType, integerValue, stringValue)
 {

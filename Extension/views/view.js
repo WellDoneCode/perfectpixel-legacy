@@ -36,7 +36,8 @@ var PanelView = Backbone.View.extend({
         'change #chromeperfectpixel-opacity': 'changeOpacity',
         'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
-        'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick'
+        'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
+        'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification'
     },
 
     initialize: function(options) {
@@ -46,6 +47,8 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('remove', this.update);
         PerfectPixel.overlays.bind('change', this.update);
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
+        PerfectPixel.notificationModel.on('change:currentNotification', this.updateNotification);
+
         this.render();
 
         PerfectPixel.fetch();
@@ -197,6 +200,7 @@ var PanelView = Backbone.View.extend({
             chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
             body.addClass('collapsed');
             body.data('state', { right: panel.css('right') });
+
             body.slideUp(
                 'fast',
                 function () {
@@ -207,6 +211,12 @@ var PanelView = Backbone.View.extend({
                 }
             );
         }
+    },
+
+    closeCurrentNotification: function(e){
+        var myNotify = PerfectPixel.notificationModel.getCurrentNotification();
+        trackEvent("notification", "close", null, myNotify.get("id"));
+        PerfectPixel.notificationModel.closeCurrentNotification();
     },
 
     keyDown: function(e) {
@@ -293,6 +303,21 @@ var PanelView = Backbone.View.extend({
         }
     },
 
+    updateNotification: function() {
+        var myNotify = PerfectPixel.notificationModel.getCurrentNotification(),
+            box = $('#chromeperfectpixel-notification-box'),
+            textDiv = $('#chromeperfectpixel-notification-text'),
+            button = $('#chromeperfectpixel-closeNotification');
+        if (myNotify) {
+            textDiv.html(myNotify.getText());
+            button.data("id", myNotify.get("id"));
+            trackEvent("notification", "show", null, myNotify.get("id"));
+            box.show();
+        } else {
+            box.hide();
+        }
+    },
+
     togglePanelShown: function(){
         $('#chromeperfectpixel-panel').toggle();
         var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
@@ -313,12 +338,19 @@ var PanelView = Backbone.View.extend({
             '<div class="chromeperfectpixel-min-showHideBtn"></div>' +
             '<div class="chromeperfectpixel-min-lockBtn"></div>' +
             '</div>' +
-
             '<div id="chromeperfectpixel-panel-body">' +
+
+            '<div id="chromeperfectpixel-notification-box">' +
+            '<div id="chromeperfectpixel-notification-text"></div>' +
+            '<div id="chromeperfectpixel-closeNotification">x</div>' +
+            '</div>' +
+
+            '<div id="chromeperfectpixel-section">'+
             '<div id="chromeperfectpixel-section-opacity">' +
             '<span>' + chrome.i18n.getMessage("opacity") + ':</span>' +
             '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
             '</div>' +
+
             '<div id="chromeperfectpixel-section-origin">' +
             '<span>' + chrome.i18n.getMessage("origin") + ':</span>' +
             '<div id="chromeperfectpixel-origin-controls">' +
@@ -328,9 +360,11 @@ var PanelView = Backbone.View.extend({
             '<button id="chromeperfectpixel-xmore" data-axis="x" data-offset="-1">&rarr;</button>' +
             '<div>' +
             '<div>' +
+
             '<div class="chromeperfectpixel-coords-label">X:</div>' +
             '<input type="text" class="chromeperfectpixel-coords" data-axis="x" id="chromeperfectpixel-coordX" value="50" size="2" maxlength="4"/>' +
             '</div>' +
+
             '<div>' +
             '<div class="chromeperfectpixel-coords-label">Y:</div>' +
             '<input type="text" class="chromeperfectpixel-coords" data-axis="y" id="chromeperfectpixel-coordY" value="50" size="2" maxlength="4"/>' +
@@ -356,6 +390,7 @@ var PanelView = Backbone.View.extend({
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
             '</div>' +
+            '</div>'+
             '</div>';
 
         this.$el.append(panelHtml);
