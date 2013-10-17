@@ -353,22 +353,8 @@ var PerfectPixelModel = Backbone.Model.extend({
     initialize: function() {
         this.overlays = new OverlayCollection();
         this.overlays.bind('remove', this.overlayRemoved, this);
-
-        /*this.getCurrentExtensionVersionAsync($.proxy(function(version) {
-            this.save({ 'version': version });
-        }, this));*/
-
+        this.notificationModel = new NotificationModel();
     },
-
-    /*getCurrentExtensionVersionAsync: function(callback) {
-        chrome.extension.sendRequest(
-        {
-            type: PP_RequestType.GetExtensionVersion
-        },
-        $.proxy(function (response) {
-            callback(response);
-        }));
-    },*/
 
     getCurrentOverlay: function() {
         if (this.has('currentOverlayId')) {
@@ -411,6 +397,173 @@ var PerfectPixelModel = Backbone.Model.extend({
                 this.save({currentOverlayId: null});
             }
         }
+    },
+
+    getDefaultLocale: function() {
+        return ExtOptions.defaultLocale;
+    },
+
+    getCurrentLocale: function() {
+        // Return only global locale: "en" instead of "en-US"
+        var regex = /(.*)-.*/i
+        var matchArray = regex.exec(window.navigator.language);
+        if (matchArray != null)
+            return matchArray[1];
+        else
+            return window.navigator.language;
     }
  });
-//var PerfectPixel = new PerfectPixelModel({ id: 1 });
+
+/**
+ * Notification Model
+ * @type {*}
+ */
+var Notification = Backbone.GSModel.extend({
+
+    defaults: {
+        id: 0,
+        show: 0,
+        text:  'default text',
+        minVersion: 0,
+        maxVersion: 0,
+        expireDate: '10.10.2010'
+    },
+
+    initialize: function() {
+
+    },
+
+    getText: function() {
+        var locale = PerfectPixel.getCurrentLocale();
+        var val = this.get('text_' + locale);
+        if(!val)
+            val = this.get('text_' + PerfectPixel.getDefaultLocale());
+        return val;
+    },
+
+    checkParam: function(version, maxid) {
+        var result = true;
+        var now = new Date(),
+            expireDate = new Date(this.get("expireDate")),
+            defaultDate = this.defaults.expireDate;
+
+        if (this.get('show') != 1)
+            return false;
+
+        if (this.get("minVersion") > version && this.get("minVersion") != 0){
+            result = false;
+        }
+
+        if (this.get("maxVersion") < version && this.get("maxVersion") !=0 ){
+            result = false;
+        }
+
+        if (expireDate < now && defaultDate != this.get("expireDate")) {
+            result = false;
+        }
+        if ((parseInt(this.get("id")) < parseInt(maxid)) || (parseInt(this.get("id")) == parseInt(maxid))) {
+            result = false;
+        }
+        return result;
+    },
+
+    destroy: function(options) {
+
+    }
+});
+
+/**
+ * Notifications collection
+ * @type {*}
+ */
+var NotificationCollection = Backbone.Collection.extend({
+    defaults: {
+        model: Notification
+    },
+    model: Notification,
+    url: function() {
+        return "http://www.welldonecode.com/perfectpixel/data/notifications.json?random=" + Math.random();
+    }
+});
+
+/**
+ * Model for working with NotificationCollection
+ * @type {*}
+ */
+var NotificationModel = Backbone.Model.extend({
+
+    defaults: {
+        collectionNotifications: new NotificationCollection(),
+        currentNotification: new Notification(),
+        maxId:0
+    },
+
+    initialize: function() {
+        var that = this;
+        var allNotificationsFromRemote = new NotificationCollection();
+        allNotificationsFromRemote.fetch({
+            success: $.proxy(function(result) {
+                chrome.extension.sendRequest(
+                    {
+                        type: PP_RequestType.GetNotifications,
+                        keyName:'perfectpixel-notification'
+                    },
+                    $.proxy(function(response)
+                    {
+                        var maxid = 0;
+                        if (response){
+                            maxid = response;
+                        }
+                        that.setMaxId(maxid);
+                        that.setCollection(allNotificationsFromRemote);
+                    }, this)
+                );
+            }
+            , this)});
+    },
+
+    setCollection: function(collection){
+        var collectionResult = new NotificationCollection,
+            version = Converter._getCurrentDataVersion(),
+            maxid = this.get("maxId");
+
+        collection.each( function( notify){
+            var check = notify.checkParam(version, maxid);
+            if (check){
+                collectionResult.add(notify);
+            }
+        });
+        this.collectionNotifications = collectionResult;
+        this.setCurrentNotification();
+    },
+
+    getCurrentNotification: function(){
+        return this.currentNotification;
+    },
+
+    setCurrentNotification: function() {
+        if (this.collectionNotifications.length > 0) {
+            this.currentNotification = this.collectionNotifications.shift();
+        } else {
+            this.currentNotification = null;
+        }
+        this.trigger("change:currentNotification");
+    },
+
+    closeCurrentNotification: function() {
+        var notify = this.getCurrentNotification();
+        chrome.extension.sendRequest(
+            {
+                type: PP_RequestType.SetNotifications,
+                notifyId: notify.get("id"),
+                keyName:'perfectpixel-notification'
+            });
+        this.set("maxId", notify.get("id"));
+        // Don't need to care about changing current notification
+        // New notification is changed with PP_Background_RequestType.NotificationsUpdated request from backround page
+    },
+
+    setMaxId: function(maxid) {
+        this.set("maxId", maxid);
+    }
+});
