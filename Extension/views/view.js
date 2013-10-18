@@ -510,10 +510,6 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     render: function() {
-        var thumbHeight = 50;
-        var coeff = this.model.get('height') / thumbHeight;
-        var thumbWidth = Math.ceil(this.model.get('width') / coeff);
-
         var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
         this.$el.append(checkbox);
 
