@@ -510,16 +510,18 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     render: function() {
-        var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
-        this.$el.append(checkbox);
+        if (this.$el.find('.chromeperfectpixel-delete').size() == 0){
+            var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
+            this.$el.append(checkbox);
+
+            var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
+            deleteBtn.button(); // apply css
+            this.$el.append(deleteBtn);
+        }
 
         this.model.image.getThumbnailUrlAsync($.proxy(function(thumbUrl) {
             thumbUrl && this.$el.css({'background-image':  'url(' + thumbUrl  + ')'});
         }, this));
-
-        var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
-        deleteBtn.button(); // apply css
-        this.$el.append(deleteBtn);
 
         return this;
     },
