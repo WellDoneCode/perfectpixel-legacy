@@ -26,6 +26,7 @@ var PanelView = Backbone.View.extend({
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
     screenBordersElementId: 'chromeperfectpixel-window',
+    panelUpdatedFirstTime: true,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -64,15 +65,29 @@ var PanelView = Backbone.View.extend({
     },
 
     updatePanel: function(obj){
-        this.$el.toggleClass('collapsed', obj.attributes.collapsed);
         this.$el.toggleClass('hidden', obj.attributes.hidden);
         this.$el.toggleClass('vertical', obj.attributes.vertical);
+        if(!this.panelUpdatedFirstTime)
+        {
+            this.$el.addClass('collapsing');
+            this.$el.toggleClass('collapsed', obj.attributes.collapsed, {
+                duration: 250,
+                complete: $.proxy(function() {
+                    this.$el.removeClass('collapsing');
+                }, this)
+            });
+        }
+        else
+        {
+            this.$el.toggleClass('collapsed', obj.attributes.collapsed);
+        }
 
         var position = obj.attributes.position;
         this.$el.css(position);
         for(var index in position) {
             if (position[index] == 0) this.$el.addClass('attached-' + index)
         }
+        this.panelUpdatedFirstTime = false;
     },
 
     appendOverlay: function(overlay) {

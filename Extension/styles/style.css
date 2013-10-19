@@ -133,6 +133,12 @@
     display: none;
 }
 
+#chromeperfectpixel-panel.collapsing #chromeperfectpixel-panel-body *,
+#chromeperfectpixel-panel.collapsing h1,
+#chromeperfectpixel-panel.collapsing #chromeperfectpixel-min-buttons {
+    opacity: 0;
+}
+
 #chromeperfectpixel-panel.collapsed.dragged {
     height: 32px;
     width: 32px;
