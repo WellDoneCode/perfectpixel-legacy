@@ -209,7 +209,7 @@
 #chromeperfectpixel-header-logo
 {
     position:absolute;
-    cursor:move;
+    cursor:move !important;
     left: 8px;
     top: 8px;
     height: 16px;

@@ -57,10 +57,10 @@ var PanelView = Backbone.View.extend({
             view.listenTo(view.model, 'change', view.updatePanel);
 
             view.render();
-        });
 
-        PerfectPixel.fetch();
-        PerfectPixel.overlays.fetch();
+            PerfectPixel.fetch();
+            PerfectPixel.overlays.fetch();
+        });
     },
 
     updatePanel: function(obj){
