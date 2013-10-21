@@ -220,6 +220,7 @@ var PanelView = Backbone.View.extend({
     },
 
     keyDown: function(e) {
+        if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var distance = e.shiftKey ? this.fastMoveDistance : 1;
@@ -491,7 +492,7 @@ var OverlayItemView = Backbone.View.extend({
     events: {
         'dblclick':  'dblClick',
         'blur .title':  'titleBlur',
-        'keypress .title':  'titleKeyPress',
+        'keydown .title':  'titleKeyDown',
         'click .chromeperfectpixel-delete':  'remove',
         'click input[name="chromeperfectpixel-selectedLayer"]': 'setCurrentOverlay'
     },
@@ -514,12 +515,17 @@ var OverlayItemView = Backbone.View.extend({
         this.$el.toggleClass('current', PerfectPixel.isOverlayCurrent(this.model));
     },
 
-    titleKeyPress: function(e){
+    titleKeyDown: function(e){
+        e.stopPropagation();
         if (e.keyCode == 13){
             $(e.target).blur();
         }
+        else if (e.keyCode >= 37 && e.keyCode <= 40) { //arrows
+            //do nothing
+        }
         else if (e.target.innerText.length >= this.max_title_length) {
-            return false
+            var s = window.getSelection();
+            if (s.extentOffset == s.baseOffset) return false; // when (s.extentOffset != s.baseOffset) text is selected
         }
     },
     titleBlur: function(e){
@@ -530,7 +536,7 @@ var OverlayItemView = Backbone.View.extend({
         }
     },
 
-    dblclick: function(){
+    dblClick: function(){
         if (this.$el.find('.title').size() == 0){
             var $title = $(this.title_template).text('title').appendTo(this.$el).focus();
         }
