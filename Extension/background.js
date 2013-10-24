@@ -100,6 +100,7 @@ function injectIntoTab(tabId, after_injected_callback){
         'shared.js',
         'content.js',
         'models/model.js',
+        'models/panel.js',
         'models/converters/converter.js',
         'models/converters/version-converters.js',
         'views/view.js'
@@ -183,23 +184,14 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
     }
     if (changeInfo.status === 'complete') { //this means that tab was loaded
         if (! PP_state[tabId]) PP_state[tabId] = 'open';
-        var last_word;
-        if (PP_state[tabId] == 'collapsed'){
-            last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('collapsed');" })};
-        }
-        else if (PP_state[tabId] == 'hidden'){
-            last_word = function(){chrome.tabs.executeScript(null, { code: "togglePanel('hidden');" })};
-        }
-        injectIntoTab(tabId, last_word);
+        injectIntoTab(tabId);
     }
 });
 
 chrome.extension.onMessage.addListener(
     function(request, sender, sendResponse) {
-        if (request.type == PP_RequestType.PanelStateChange){
-            if (sender.tab){
-                PP_state[sender.tab.id] = request.state;
-            }
+        if (request.type == PP_RequestType.getTabId){
+            sendResponse({ tabId: sender.tab.id });
         }
     }
 );

@@ -77,6 +77,7 @@ var PP_RequestType = new function () {
     this.ADDFILE = "ADDFILE";
     this.GETFILE = "GETFILE";
     this.DELETEFILE = "DELETEFILE";
+    this.getTabId = "GETTABID";
     this.PanelStateChange = "PANELSTATECHANGE";
     this.GetNotifications = "GETNOTIFICATION";
     this.SetNotifications = "SETNOTIFICATION";

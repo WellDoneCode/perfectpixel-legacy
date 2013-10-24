@@ -111,6 +111,91 @@
     -webkit-transition:opacity 0.5s ease-in-out;
     -webkit-transition-delay:0.3s;
 }
+#chromeperfectpixel-window{
+    position: fixed;
+    z-index: -10;
+    left:0;
+    top:0;
+    right:0;
+    bottom:0;
+    pointer-events: none;
+}
+
+#chromeperfectpixel-panel.hidden {
+    display: none;
+}
+#chromeperfectpixel-panel.collapsed,
+#chromeperfectpixel-panel.collapsed.chromeperfectpixel-locale-ru{
+    height: 32px;
+    width: 95px;
+}
+#chromeperfectpixel-panel.collapsed #chromeperfectpixel-panel-body {
+    display: none;
+}
+
+#chromeperfectpixel-panel.collapsing #chromeperfectpixel-panel-body *,
+#chromeperfectpixel-panel.collapsing h1,
+#chromeperfectpixel-panel.collapsing #chromeperfectpixel-min-buttons {
+    opacity: 0;
+}
+
+#chromeperfectpixel-panel.collapsed.dragged {
+    height: 32px;
+    width: 32px;
+    overflow: hidden;
+}
+#chromeperfectpixel-panel.collapsed h1{
+    display: none;
+}
+#chromeperfectpixel-panel.collapsed #chromeperfectpixel-min-buttons {
+    top: 3px;
+    left: 28px;
+    position: absolute;
+    display: block;
+}
+#chromeperfectpixel-panel.collapsed  #chromeperfectpixel-min-buttons .chromeperfectpixel-min-showHideBtn {
+    float: left;
+}
+#chromeperfectpixel-panel.collapsed  #chromeperfectpixel-min-buttons .chromeperfectpixel-min-lockBtn {
+    padding-top: 7px;
+    float: left;
+}
+
+#chromeperfectpixel-panel.collapsed.vertical {
+    width: 32px;
+    height: 95px;
+}
+
+#chromeperfectpixel-panel.collapsed.vertical #chromeperfectpixel-min-buttons{
+    left: 0;
+    top: 32px;
+    position: absolute;
+}
+
+#chromeperfectpixel-panel.collapsed.vertical #chromeperfectpixel-min-buttons .chromeperfectpixel-min-showHideBtn {
+    float: none;
+}
+#chromeperfectpixel-panel.collapsed.vertical #chromeperfectpixel-min-buttons .chromeperfectpixel-min-lockBtn {
+    padding-top: 4px;
+    float: none;
+}
+
+#chromeperfectpixel-panel.attached-top {
+    border-top-left-radius: 0 ;
+    border-top-right-radius: 0 ;
+}
+#chromeperfectpixel-panel.attached-left {
+    border-top-left-radius: 0 ;
+    border-bottom-left-radius: 0 ;
+}
+#chromeperfectpixel-panel.attached-right {
+    border-top-right-radius: 0 ;
+    border-bottom-right-radius: 0 ;
+}
+#chromeperfectpixel-panel.attached-bottom {
+    border-bottom-left-radius: 0 ;
+    border-bottom-right-radius: 0 ;
+}
 
 #chromeperfectpixel-panel.chromeperfectpixel-locale-ru {
 	width: 335px;
@@ -130,13 +215,18 @@
 #chromeperfectpixel-header-logo
 {
     position:absolute;
-    cursor:move;
+    cursor:move !important;
     left: 8px;
     top: 8px;
     height: 16px;
     width: 16px;
     border: none;
     border-radius:0;
+
+    width: 32px;
+    height: 32px;
+    top: 0;
+    left: 0;
 }
 
 #chromeperfectpixel-header-showHideBtn.chromeperfectpixel-showHideBtn-enabled

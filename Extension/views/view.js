@@ -25,6 +25,8 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
+    screenBordersElementId: 'chromeperfectpixel-window',
+    panelUpdatedFirstTime: true,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -49,10 +51,43 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
         PerfectPixel.notificationModel.on('change:currentNotification', this.updateNotification);
 
-        this.render();
+        var view = this;
+        chrome.extension.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
+            view.model = new Panel({id:res.tabId});
+            view.model.fetch();
+            view.listenTo(view.model, 'change', view.updatePanel);
 
-        PerfectPixel.fetch();
-        PerfectPixel.overlays.fetch();
+            view.render();
+
+            PerfectPixel.fetch();
+            PerfectPixel.overlays.fetch();
+        });
+    },
+
+    updatePanel: function(obj){
+        this.$el.toggleClass('hidden', obj.attributes.hidden);
+        this.$el.toggleClass('vertical', obj.attributes.vertical);
+        if(!this.panelUpdatedFirstTime)
+        {
+            this.$el.addClass('collapsing');
+            this.$el.toggleClass('collapsed', obj.attributes.collapsed, {
+                duration: 250,
+                complete: $.proxy(function() {
+                    this.$el.removeClass('collapsing');
+                }, this)
+            });
+        }
+        else
+        {
+            this.$el.toggleClass('collapsed', obj.attributes.collapsed);
+        }
+
+        var position = obj.attributes.position;
+        this.$el.css(position);
+        for(var index in position) {
+            if (position[index] == 0) this.$el.addClass('attached-' + index)
+        }
+        this.panelUpdatedFirstTime = false;
     },
 
     appendOverlay: function(overlay) {
@@ -178,39 +213,7 @@ var PanelView = Backbone.View.extend({
     panelHeaderDoubleClick: function(e) {
         trackEvent(this.$(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), e.type);
 
-        var panel = this.$el;
-        var body = this.$('#chromeperfectpixel-panel-body');
-        var panelWidth = panel.width();
-
-        if (body.hasClass('collapsed')) {
-            chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'open'});
-            body.removeClass('collapsed');
-            var state = body.data('state');
-            if (! state) state = {right: 20 + 'px'};
-            $('#chromeperfectpixel-min-buttons').slideUp('fast', function(){
-                panel.animate({ right: state.right }, 'fast', function () {
-                    body.slideDown( 'fast', function () {
-                            $(this).removeAttr('style');
-                            panel.draggable('option', 'axis', '');
-                        }
-                    );
-                });
-            });
-        } else {
-            chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: 'collapsed'});
-            body.addClass('collapsed');
-            body.data('state', { right: panel.css('right') });
-
-            body.slideUp(
-                'fast',
-                function () {
-                    panel.animate({ right: (-panelWidth + 30).toString() + "px" }, function () {
-                        panel.draggable('option', 'axis', 'y');
-                        $('#chromeperfectpixel-min-buttons').slideDown('fast');
-                    });
-                }
-            );
-        }
+        this.model.toggleCollapsed();
     },
 
     closeCurrentNotification: function(e){
@@ -242,7 +245,7 @@ var PanelView = Backbone.View.extend({
                 PerfectPixel.toggleOverlayLocked();
             }
             else if (e.altKey && e.which == 72) { // Alt + H
-                this.togglePanelShown();
+                this.model.toggleHidden();
             }
             else {
                 return;
@@ -325,13 +328,13 @@ var PanelView = Backbone.View.extend({
     },
 
     render: function() {
-        $('body').append(this.$el);
+        $('body').append(this.$el).append('<div id="' + this.screenBordersElementId + '"/>');
         this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
         this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
 
         var panelHtml =
             '<div id="chromeperfectpixel-panel-header">' +
-            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ');"></div>' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ') center center no-repeat;"></div>' +
             '<h1>' + chrome.i18n.getMessage("extension_name_short") + '</h1>' +
             '</div>' +
             '<div id="chromeperfectpixel-min-buttons">' +
@@ -395,16 +398,10 @@ var PanelView = Backbone.View.extend({
 
         this.$el.append(panelHtml);
 
-        var $panel = $('#chromeperfectpixel-panel'),
-            $panel_body = $('#chromeperfectpixel-panel-body');
-
         if (this.options.state == 'collapsed'){
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
             $('#chromeperfectpixel-min-buttons').show();
-        }
-        else if (this.options.state == 'hidden'){
-            $panel.hide();
         }
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
@@ -431,17 +428,67 @@ var PanelView = Backbone.View.extend({
         })(this.$("#chromeperfectpixel-opacity"), 500);
 
         // make panel draggable
+        var panelModel = this.model;
+        var view = this;
         this.$el.draggable({
             handle: "#chromeperfectpixel-panel-header",
-            stop: function (event, ui) {
-                // change left to right
-                if ($(this).css('left')) {
-                    $(this).css('right', ($(document.body).innerWidth() - $(this).offset().left - $(this).outerWidth()).toString() + 'px');
-                    $(this).css('left', '');
+            snap: "#" + this.screenBordersElementId,
+            snapMode: "inner",
+            scroll: false,
+            stop: function( event, ui ) {
+                var $window = $(window),
+                    screenWidth = $window.width(),
+                    screenHeight = $('#' + view.screenBordersElementId).height(),
+                    $panel = $(event.target),
+                    position = {
+                        left: ui.position.left,
+                        top: ui.position.top,
+                        right: screenWidth - (ui.position.left + $panel.width()),
+                        bottom: screenHeight - (ui.position.top + $panel.height())
+                    },
+                    outOfBoundaries = false,
+                    new_params = {};
+
+                for(var index in position) {
+                    var val = position[index];
+                    if (val < 0) {
+                        outOfBoundaries = true;
+                        position[index] = 0;
+                    }
                 }
+                position.right == 0 ? position.left = 'auto' : position.right = 'auto';
+                position.bottom == 0 ? position.top = 'auto' : position.bottom = 'auto';
+
+                new_params.position = position;
+
+                if (outOfBoundaries && ! panelModel.get('collapsed')) {
+                    new_params.collapsed = true;
+                    new_params.auto_collapsed = true;
+                }
+
+                if ((position.top == 0 || position.bottom == 0) && (position.left != 0 && position.right != 0)){
+                    new_params.vertical = false;
+                }
+                else if ((position.left == 0 || position.right == 0) && (position.top != 0 && position.bottom != 0)){
+                    new_params.vertical = true;
+                }
+
+                if (panelModel.get('collapsed') && panelModel.get('auto_collapsed')
+                    && position.top != 0 && position.right != 0 && position.bottom != 0 && position.left != 0){
+                    new_params.collapsed = false;
+                    new_params.auto_collapsed = false;
+                }
+
+                panelModel.save(new_params)
+            },
+            start: function(){
+                $("#chromeperfectpixel-panel")
+                    .css({bottom:'auto',right: 'auto'})
+                    .removeClass('attached-top attached-left attached-right attached-bottom');
             }
         });
-        if (this.options.state == 'collapsed') $panel.draggable('option', 'axis', 'y');
+
+        this.updatePanel(this.model);
 
         // Global hotkeys on
         if (ExtOptions.enableHotkeys) {
@@ -464,6 +511,7 @@ var PanelView = Backbone.View.extend({
         }
 
         this.$el.remove();
+        $('#' + this.screenBordersElementId).remove();
     },
 
     /**
@@ -510,20 +558,18 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     render: function() {
-        var thumbHeight = 50;
-        var coeff = this.model.get('height') / thumbHeight;
-        var thumbWidth = Math.ceil(this.model.get('width') / coeff);
+        if (this.$el.find('.chromeperfectpixel-delete').size() == 0){
+            var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
+            this.$el.append(checkbox);
 
-        var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
-        this.$el.append(checkbox);
+            var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
+            deleteBtn.button(); // apply css
+            this.$el.append(deleteBtn);
+        }
 
         this.model.image.getThumbnailUrlAsync($.proxy(function(thumbUrl) {
             thumbUrl && this.$el.css({'background-image':  'url(' + thumbUrl  + ')'});
         }, this));
-
-        var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
-        deleteBtn.button(); // apply css
-        this.$el.append(deleteBtn);
 
         return this;
     },
