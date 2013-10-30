@@ -29,8 +29,8 @@ this.i18n = {
         "ru": "Мышь и клавиатура"
     },
     "enable_hotkeys": {
-        "en": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right<br/> Shift + ↑, ↓, ←, → - Move overlay with 10x speed",
-        "ru": "Разрешить горячие клавиши<br/><br/>Список горячих клавиш:<br/> Alt + S - Показать/Скрыть слой<br/> Alt + C - Заблокировать/Разблокировать слой<br/> ↑  - Переместить слой вверх<br/> ↓  - Переместить слой вниз<br/> ← - Переместить слой вправо<br/> → - Переместить слой влево<br/> Shift + ↑, ↓, ←, → - Перемесить слой с 10-кратной скоростью"
+        "en": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> Alt + H - Show/Hide whole control panel<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right<br/> Shift + ↑, ↓, ←, → - Move overlay with 10x speed",
+        "ru": "Разрешить горячие клавиши<br/><br/>Список горячих клавиш:<br/> Alt + S - Показать/Скрыть слой<br/> Alt + C - Заблокировать/Разблокировать слой<br/> Alt + H - Показать/Скрыть панель управления целиком<br/> ↑  - Переместить слой вверх<br/> ↓  - Переместить слой вниз<br/> ← - Переместить слой вправо<br/> → - Переместить слой влево<br/> Shift + ↑, ↓, ←, → - Перемесить слой с 10-кратной скоростью"
     },
     "behavior": {
         "en": "Behavior",
