@@ -344,6 +344,8 @@
 }
             
 #chromeperfectpixel-panel .chromeperfectpixel-layer {
+    vertical-align: middle;
+    text-align: center;
     display: block;
     border: 1px dashed black;
     padding: 5px;
@@ -352,6 +354,19 @@
 
 #chromeperfectpixel-panel .chromeperfectpixel-layer > * {
     vertical-align: middle;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layer .title {
+    line-height: 1;
+    outline: none;
+    margin-top: 20px;
+    vertical-align: top;
+    display: block;
+    color: white;
+    text-shadow: black 1px 1px 5px;
+    font-size: 20px;
+    text-align: center;
+    pointer-events: none;
 }
           
 #chromeperfectpixel-panel .chromeperfectpixel-layer input[type=checkbox],

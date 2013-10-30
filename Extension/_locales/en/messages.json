@@ -43,5 +43,8 @@
     },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Are you sure you want to delete layer?"
+    },
+    "layer_change_title_hint": {
+        "message": "Double click to add or change title"
     }
 }
