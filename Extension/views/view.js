@@ -223,6 +223,7 @@ var PanelView = Backbone.View.extend({
     },
 
     keyDown: function(e) {
+        if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var distance = e.shiftKey ? this.fastMoveDistance : 1;
@@ -533,8 +534,13 @@ var PanelView = Backbone.View.extend({
 var OverlayItemView = Backbone.View.extend({
     tagName: 'label',
     className: 'chromeperfectpixel-layer',
+    title_template: '<span class="title" contenteditable="plaintext-only"/>',
+    max_title_length: 5,
 
     events: {
+        'dblclick':  'dblClick',
+        'blur .title':  'titleBlur',
+        'keydown .title':  'titleKeyDown',
         'click .chromeperfectpixel-delete':  'remove',
         'click input[name="chromeperfectpixel-selectedLayer"]': 'setCurrentOverlay'
     },
@@ -557,6 +563,42 @@ var OverlayItemView = Backbone.View.extend({
         this.$el.toggleClass('current', PerfectPixel.isOverlayCurrent(this.model));
     },
 
+    titleKeyDown: function(e){
+        e.stopPropagation();
+        if (e.keyCode == 13){
+            $(e.target).blur();
+        }
+        else if (e.keyCode >= 37 && e.keyCode <= 40) { //arrows
+            //do nothing
+        }
+        else if (e.target.innerText.length >= this.max_title_length) {
+            var s = window.getSelection();
+            if (s.extentOffset == s.baseOffset) return false; // when (s.extentOffset != s.baseOffset) text is selected
+        }
+    },
+    titleBlur: function(e){
+        var $title = $(e.target);
+        this.model.save({title: $title.text()});
+        if (! $title.text()){
+            $title.remove();
+        }
+    },
+
+    dblClick: function(){
+        if (this.$el.find('.title').size() == 0){
+            var $title = $(this.title_template).text('title').appendTo(this.$el).focus();
+        }
+        else {
+            $title = this.$el.find('.title');
+        }
+        //select whole title text
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents($title[0]);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    },
+
     render: function() {
         if (this.$el.find('.chromeperfectpixel-delete').size() == 0){
             var checkbox = $('<input type=radio name="chromeperfectpixel-selectedLayer" />');
@@ -565,6 +607,10 @@ var OverlayItemView = Backbone.View.extend({
             var deleteBtn = ($('<button class="chromeperfectpixel-delete">&#x2718;</button>'));
             deleteBtn.button(); // apply css
             this.$el.append(deleteBtn);
+
+            this.$el.attr('title','Dblclick to add or change title')
+            var title = this.model.get('title');
+            if (title) this.$el.append($(this.title_template).text(title));
         }
 
         this.model.image.getThumbnailUrlAsync($.proxy(function(thumbUrl) {
