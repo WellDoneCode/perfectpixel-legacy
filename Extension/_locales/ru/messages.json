@@ -43,5 +43,8 @@
     },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Вы уверены, что хотите удалить этот слой?"
+    },
+    "layer_change_title_hint": {
+        "message": "Сделайте двойной клик чтобы добавить или изменить заголовок слоя"
     }
 }
