@@ -465,7 +465,8 @@
     margin-bottom: 10px;
     position: relative;
 }
-    #chromeperfectpixel-notification-text {
+    #chromeperfectpixel-notification-text,
+    #chromeperfectpixel-notification-text *{
         font-size: 12px;
         line-height: 14px;
         vertical-align: top;
