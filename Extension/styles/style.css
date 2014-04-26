@@ -49,6 +49,7 @@
     max-height:none;
     min-width:0;
     min-height:0;
+    box-sizing: initial;
     image-rendering: -webkit-optimize-contrast;
 }
 
@@ -93,6 +94,10 @@
     margin:2px;
     margin-right:0;
     padding:1px;
+}
+
+#chromeperfectpixel-panel input[type=range] {
+    display: inline;
 }
 
 #chromeperfectpixel-panel {
