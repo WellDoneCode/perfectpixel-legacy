@@ -206,7 +206,7 @@ var PanelView = Backbone.View.extend({
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            overlay.save({scale: Number(value).toFixed(1)});
+            overlay.save({scale: Number(value)});
         }
     },
 
