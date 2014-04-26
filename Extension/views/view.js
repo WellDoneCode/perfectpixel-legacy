@@ -206,7 +206,7 @@ var PanelView = Backbone.View.extend({
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            overlay.save({scale: Number(value).toFixed(1)});
+            overlay.save({scale: Number(value)});
         }
     },
 
@@ -334,6 +334,7 @@ var PanelView = Backbone.View.extend({
         this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
 
         var panelHtml =
+            '<div id="chromeperfectpixel-dropzone-decorator"></div>' +
             '<div id="chromeperfectpixel-panel-header">' +
             '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ') center center no-repeat;"></div>' +
             '<h1>' + chrome.i18n.getMessage("extension_name_short") + '</h1>' +
@@ -489,6 +490,8 @@ var PanelView = Backbone.View.extend({
             }
         });
 
+        this._initDropzone();
+
         this.updatePanel(this.model);
 
         // Global hotkeys on
@@ -525,6 +528,50 @@ var PanelView = Backbone.View.extend({
         uploader.bind('change', function () {
             self.upload(this.files[0]);
         });
+    },
+
+    _initDropzone: function() {
+        var self = this;
+        var dropzone = this.$el;
+        var decorator = this.$("#chromeperfectpixel-dropzone-decorator");
+
+        dropzone.on('dragover', function(e) {
+            e.originalEvent.dataTransfer.dropEffect = 'copy';
+            e.preventDefault();
+            e.stopPropagation();
+            decorator.addClass('chromeperfectpixel-dropzone-decorator-hover');
+        });
+        dropzone.on('dragleave', function (e) {
+            decorator.removeClass('chromeperfectpixel-dropzone-decorator-hover');
+        });
+        dropzone.on("drop", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            decorator.removeClass('chromeperfectpixel-dropzone-decorator-hover');
+
+            if(e.originalEvent.dataTransfer.files.length > 0) {
+                console.log("PP File or directory dropped");
+                var file = e.originalEvent.dataTransfer.files[0];
+                trackEvent("dropzone", e.type, "file");
+                self.upload(file);
+            }
+
+            // Just for statistics for now
+            /*try
+            {
+                var length = e.originalEvent.dataTransfer.items.length;
+                for (var i = 0; i < length; i++) {
+                    var entry = e.originalEvent.dataTransfer.items[i].webkitGetAsEntry();
+                    if (entry && (entry.isFile || entry.isDirectory))
+                    {
+                        trackEvent("dropzone", e.type, entry.isFile ? "file" : "directory");
+                    }
+                }
+            }
+            catch(e) {}*/
+        });
+
+        console.log("PP Dropzone initialized");
     }
 });
 
