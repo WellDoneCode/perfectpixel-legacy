@@ -231,18 +231,20 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var distance = e.shiftKey ? this.fastMoveDistance : 1;
-            if (e.which == 37) { // left
-                PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
-            }
-            else if (e.which == 38) { // up
-                PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
-            }
-            else if (e.which == 39) { // right
-                PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
-            }
-            else if (e.which == 40) { // down
-                PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
+            if (!$(e.target).is('input')) {
+              var distance = e.shiftKey ? this.fastMoveDistance : 1;
+              if (e.which == 37) { // left
+                  PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
+              }
+              else if (e.which == 38) { // up
+                  PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
+              }
+              else if (e.which == 39) { // right
+                  PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
+              }
+              else if (e.which == 40) { // down
+                  PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
+              }
             }
             else if (e.altKey && e.which == 83) { // Alt + s
                 PerfectPixel.toggleOverlayShown();
