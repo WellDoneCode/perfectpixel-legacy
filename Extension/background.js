@@ -33,7 +33,8 @@ var settings = new Store("settings", {
     "NewLayerMakeActive": true,
     "NewLayerShow": true,
     "NewLayerUnlock": true,
-    "enableStatistics": true
+    "enableStatistics": true,
+    "disableSupportedByAd": false
     // + "version" property in content script = current extension version from manifest
     // + "defaultLocale" property in content script = default locale from manifest
 });

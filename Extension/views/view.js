@@ -387,6 +387,12 @@ var PanelView = Backbone.View.extend({
 
             '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + chrome.i18n.getMessage("loading")  + '...</div>' +
 
+            (!ExtOptions.disableSupportedByAd ? (
+            '<div id="chromeperfectpixel-supported-by">' + chrome.i18n.getMessage("supported_by") + ':<a href="javascript:;" id="chromeperfectpixel-supported-by-disable" title="' + chrome.i18n.getMessage("supported_by_disable_tooltip") + '">' + chrome.i18n.getMessage("supported_by_disable_link") + '?</a></div>' +
+            '<div id="chromeperfectpixel-ad">' +
+                '<iframe srcdoc=\'<html id="chromeperfectpixel-sponsored"><head><link href="' + chrome.extension.getURL("styles/style.css") + '" type="text/css" rel="stylesheet"/></head><body><script type="text/javascript" src="//cdn.fusionads.net/fusion.js?zoneid=1332&serve=C6SDP2Y&placement=perfectpixel" id="_fusionads_js"></script></body></html>\'></iframe>' +
+            '</div>') : "") +
+
             '<div id="chromeperfectpixel-buttons">' +
             '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("show") + '</button>' +
             '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("lock") + '</button>' +

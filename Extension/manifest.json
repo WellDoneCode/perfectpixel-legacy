@@ -27,10 +27,8 @@
     "update_url":"http://clients2.google.com/service/update2/crx",
     "version":"1.62",
     "web_accessible_resources":[
-        "images/noise.jpg",
-        "images/icons/16.png",
-        "images/ui-bg_glass_75_e6e6e6_1x400.png",
-        "images/ui-bg_glass_75_dadada_1x400.png",
-        "images/ui-bg_glass_65_ffffff_1x400.png"
+        "images/*.*",
+        "ads/*.*",
+        "styles/style.css"
     ]
 }
