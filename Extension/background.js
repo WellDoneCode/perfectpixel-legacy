@@ -197,6 +197,33 @@ chrome.extension.onMessage.addListener(
     }
 );
 
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.ExecuteScript) {
+            chrome.tabs.executeScript(sender.tab.id, request.options, function(result) {
+                sendResponse(result);
+            });
+        }
+    }
+);
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.OpenSettingsPage) {
+            var optionsUrl = chrome.extension.getURL('fancy-settings/source/index.html');
+
+            chrome.tabs.query({url: optionsUrl}, function(tabs) {
+                if (tabs.length) {
+                    chrome.tabs.update(tabs[0].id, {active: true});
+                } else {
+                    chrome.tabs.create({url: optionsUrl});
+                }
+                sendResponse();
+            });
+        }
+    }
+);
+
 chrome.extension.onRequest.addListener(
     function (request, sender, sendResponse) {
 

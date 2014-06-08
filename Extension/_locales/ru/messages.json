@@ -52,5 +52,8 @@
     },
     "supported_by_disable_link": {
         "message": "Отключить рекламу"
+    },
+    "supported_by_disable_tooltip": {
+        "message": "На странице Настройки"
     }
 }

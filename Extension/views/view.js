@@ -388,9 +388,24 @@ var PanelView = Backbone.View.extend({
             '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + chrome.i18n.getMessage("loading")  + '...</div>' +
 
             (!ExtOptions.disableSupportedByAd ? (
-            '<div id="chromeperfectpixel-supported-by">' + chrome.i18n.getMessage("supported_by") + ':<a href="javascript:;" id="chromeperfectpixel-supported-by-disable" title="' + chrome.i18n.getMessage("supported_by_disable_tooltip") + '">' + chrome.i18n.getMessage("supported_by_disable_link") + '?</a></div>' +
+            '<div id="chromeperfectpixel-supported-by">' + chrome.i18n.getMessage("supported_by") + ':' +
+                '<a href="javascript:;" id="chromeperfectpixel-supported-by-disable" title="' + chrome.i18n.getMessage("supported_by_disable_tooltip") + '">' + chrome.i18n.getMessage("supported_by_disable_link") + '?</a>' +
+            '</div>' +
             '<div id="chromeperfectpixel-ad">' +
-                '<iframe srcdoc=\'<html id="chromeperfectpixel-sponsored"><head><link href="' + chrome.extension.getURL("styles/style.css") + '" type="text/css" rel="stylesheet"/></head><body><script type="text/javascript" src="//cdn.fusionads.net/fusion.js?zoneid=1332&serve=C6SDP2Y&placement=perfectpixel" id="_fusionads_js"></script></body></html>\'></iframe>' +
+                '<iframe name="chromeperfectpixel-ad-window" srcdoc=\'' +
+                    '<html id="chromeperfectpixel-sponsored">' +
+                    '<head>' +
+                        '<base target="_blank" />' +
+                        '<link href="' + chrome.extension.getURL("styles/style.css") + '" type="text/css" rel="stylesheet"/>' +
+                        //'<script type="text/javascript" src="' + chrome.extension.getURL("3rd-party/jquery-1.9.1.min.js") + '"></script>' +
+                        //'<script type="text/javascript" src="' + chrome.extension.getURL("shared.js") + '"></script>' +
+                        //'<script type="text/javascript" src="' + chrome.extension.getURL("ads/ads.js") + '"></script>' +
+                    '</head>' +
+                    '<body>' +
+                        '<script type="text/javascript" src="//cdn.fusionads.net/fusion.js?zoneid=1332&serve=C6SDP2Y&placement=perfectpixel" id="_fusionads_js"></script>' +
+                    '</body>' +
+                    '</html>' +
+                '\'></iframe>' +
             '</div>') : "") +
 
             '<div id="chromeperfectpixel-buttons">' +
@@ -401,12 +416,34 @@ var PanelView = Backbone.View.extend({
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
             '</div>' +
-            '</div>'+
+            '</div>' +
             '</div>';
 
         this.$el.append(panelHtml);
 
-        if (this.options.state == 'collapsed'){
+        trackEvent("ads", "page_loaded");
+        if(!ExtOptions.disableSupportedByAd) {
+            $("#chromeperfectpixel-supported-by-disable").click(function() {
+                trackEvent("ads", "disable_ads_link_click");
+                chrome.extension.sendMessage({
+                    type: PP_RequestType.OpenSettingsPage
+                });
+            });
+
+            trackEvent("ads", "ads_loaded");
+            // Inject content script for ads tracking
+            /*chrome.extension.sendMessage({
+                type: PP_RequestType.ExecuteScript,
+                options: {
+                    file: chrome.extension.getURL("ads/ads.js"),
+                    allFrames: true,
+                    //matchAboutBlank: true, // TODO will be implemented in Chrome 37
+                    runAt: "document_end"
+                }
+            });*/
+        }
+
+        if (this.options.state == 'collapsed') {
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
             $('#chromeperfectpixel-min-buttons').show();

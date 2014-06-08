@@ -537,7 +537,7 @@
     text-decoration: none;
     border-bottom:1px dotted;
     margin-bottom:-1px;
-    cursor: help;
+    cursor: pointer;
     color:#999;
 }
 

@@ -54,6 +54,6 @@
         "message": "Disable ads"
     },
     "supported_by_disable_tooltip": {
-        "message": "Can be disabled in extension options page"
+        "message": "In extension options page"
     }
 }
