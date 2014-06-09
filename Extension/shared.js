@@ -81,6 +81,8 @@ var PP_RequestType = new function () {
     this.PanelStateChange = "PANELSTATECHANGE";
     this.GetNotifications = "GETNOTIFICATION";
     this.SetNotifications = "SETNOTIFICATION";
+    this.ExecuteScript = "EXECUTESCRIPT";
+    this.OpenSettingsPage = "OPENSETTINGSPAGE";
 };
 
 // --------------------------------------------------------------
