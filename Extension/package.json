@@ -1,0 +1,13 @@
+{
+  "name": "PerfectPixel",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Start develop your websites with per-pixel accuracy!",
+  "author": "Alexey Belozerov, Ilya Stepanov",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-cssmin": "~0.9.0",
+    "grunt-contrib-copy": "~0.5.0"
+  }
+}

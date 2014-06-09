@@ -33,7 +33,8 @@ var settings = new Store("settings", {
     "NewLayerMakeActive": true,
     "NewLayerShow": true,
     "NewLayerUnlock": true,
-    "enableStatistics": true
+    "enableStatistics": true,
+    "disableSupportedByAd": false
     // + "version" property in content script = current extension version from manifest
     // + "defaultLocale" property in content script = default locale from manifest
 });
@@ -192,6 +193,33 @@ chrome.extension.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.type == PP_RequestType.getTabId){
             sendResponse({ tabId: sender.tab.id });
+        }
+    }
+);
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.ExecuteScript) {
+            chrome.tabs.executeScript(sender.tab.id, request.options, function(result) {
+                sendResponse(result);
+            });
+        }
+    }
+);
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.OpenSettingsPage) {
+            var optionsUrl = chrome.extension.getURL('fancy-settings/source/index.html');
+
+            chrome.tabs.query({url: optionsUrl}, function(tabs) {
+                if (tabs.length) {
+                    chrome.tabs.update(tabs[0].id, {active: true});
+                } else {
+                    chrome.tabs.create({url: optionsUrl});
+                }
+                sendResponse();
+            });
         }
     }
 );
