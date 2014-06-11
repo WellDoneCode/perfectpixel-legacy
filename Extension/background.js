@@ -75,8 +75,8 @@ var PP_state = [];
 //      "js": [ "jquery-1.6.2.min.js", "jquery-ui.js", "pp-shared.js", "storage/pp-storage-localStorage.js", "storage/pp-storage-filesystem.js", "pp-content.js"]
 //  }]
 
-function togglePanel(){
-    chrome.tabs.executeScript(null, { code: "togglePanel();" });
+function togglePanel(tabId){
+    chrome.tabs.executeScript(tabId, { code: "togglePanel();" });
 }
 
 function injectIntoTab(tabId, after_injected_callback){
@@ -118,7 +118,7 @@ function injectIntoTab(tabId, after_injected_callback){
         if (typeof(after_injected_callback) == 'function'){
             after_injected_callback();
         } else {
-            togglePanel();
+            togglePanel(tabId);
         }
     });
 }
@@ -168,7 +168,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
     }
     else {
         PP_state[tab.id] = 'closed';
-        togglePanel();
+        togglePanel(tab.id);
     }
 });
 
