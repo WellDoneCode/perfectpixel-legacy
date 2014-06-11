@@ -44,8 +44,14 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
 
 function togglePanel(state)  {
     if (this.panelView) {
-        this.panelView.destroy();
-        delete this.panelView;
+
+        if(this.panelView.isFrozen()) {
+            this.panelView.unfreeze();
+        } else {
+            this.panelView.freeze();
+        }
+        //this.panelView.destroy();
+        //delete this.panelView;
     }
     else {
         chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, $.proxy(function (theOptions) {
