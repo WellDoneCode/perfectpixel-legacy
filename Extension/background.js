@@ -75,8 +75,8 @@ var PP_state = [];
 //      "js": [ "jquery-1.6.2.min.js", "jquery-ui.js", "pp-shared.js", "storage/pp-storage-localStorage.js", "storage/pp-storage-filesystem.js", "pp-content.js"]
 //  }]
 
-function togglePanel(){
-    chrome.tabs.executeScript(null, { code: "togglePanel();" });
+function togglePanel(tabId){
+    chrome.tabs.executeScript(tabId, { code: "togglePanel();" });
 }
 
 function injectIntoTab(tabId, after_injected_callback){
@@ -118,7 +118,7 @@ function injectIntoTab(tabId, after_injected_callback){
         if (typeof(after_injected_callback) == 'function'){
             after_injected_callback();
         } else {
-            togglePanel();
+            togglePanel(tabId);
         }
     });
 }
@@ -162,13 +162,16 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 //React when a browser' action icon is clicked.
 chrome.browserAction.onClicked.addListener(function (tab) {
     var pp_tab_state = PP_state[tab.id];
-    if (! pp_tab_state || pp_tab_state == 'closed'){
+    if(!pp_tab_state) {
         PP_state[tab.id] = 'open';
         injectIntoTab(tab.id);
     }
     else {
-        PP_state[tab.id] = 'closed';
-        togglePanel();
+        if(pp_tab_state == 'open')
+            PP_state[tab.id] = 'closed';
+        else if (pp_tab_state == 'closed')
+            PP_state[tab.id] = 'open';
+        togglePanel(tab.id);
     }
 });
 
@@ -177,12 +180,14 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
     var pp_tab_state = PP_state[tabId];
     if (!settings.get('rememberPanelOpenClosedState')){
         // we need to set this to 'closed' to prevent issue with page reloading while panel is opened
-        PP_state[tabId] = 'closed';
+        //PP_state[tabId] = 'closed';
+        delete PP_state[tabId];
         return;
     }
     else if (! pp_tab_state || pp_tab_state == 'closed') {
         return;
     }
+    // if pp_tab_state == "open" - need to open it
     if (changeInfo.status === 'complete') { //this means that tab was loaded
         if (! PP_state[tabId]) PP_state[tabId] = 'open';
         injectIntoTab(tabId);
