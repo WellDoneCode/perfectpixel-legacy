@@ -46,5 +46,14 @@
     },
     "layer_change_title_hint": {
         "message": "Double click to add or change title"
+    },
+    "supported_by": {
+        "message": "Supported by"
+    },
+    "supported_by_disable_link": {
+        "message": "Disable ads"
+    },
+    "supported_by_disable_tooltip": {
+        "message": "In extension options page"
     }
 }

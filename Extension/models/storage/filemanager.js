@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2014 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  *
