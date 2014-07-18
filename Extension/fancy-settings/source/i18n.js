@@ -11,7 +11,6 @@ this.i18n = {
         "en": "No matches were found.",
         "ru": "Ничего не найдено"
     },
-
     "general": {
         "en": "General",
         "ru": "Общие настройки"
@@ -19,6 +18,14 @@ this.i18n = {
     "debug": {
         "en": "Debug",
         "ru": "Дебаг"
+    },
+    "supported_by_ad": {
+        "en": "Supported by Ads",
+        "ru": "Реклама спонсора"
+    },
+    "disable_supported_by_ad": {
+        "en": "Disable",
+        "ru": "Отключить"
     },
     "enable_debug_mode": {
         "en": "Enable DEBUG mode",

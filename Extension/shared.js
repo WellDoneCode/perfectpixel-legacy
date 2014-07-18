@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2014 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  * 
@@ -81,6 +81,8 @@ var PP_RequestType = new function () {
     this.PanelStateChange = "PANELSTATECHANGE";
     this.GetNotifications = "GETNOTIFICATION";
     this.SetNotifications = "SETNOTIFICATION";
+    this.ExecuteScript = "EXECUTESCRIPT";
+    this.OpenSettingsPage = "OPENSETTINGSPAGE";
 };
 
 // --------------------------------------------------------------

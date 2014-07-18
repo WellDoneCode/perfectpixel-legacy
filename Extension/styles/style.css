@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2014 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  * 
@@ -518,4 +518,68 @@
 
 #chromeperfectpixel-dropzone-decorator.chromeperfectpixel-dropzone-decorator-hover {
     opacity: 0.3;
+}
+
+/* Ads */
+
+#chromeperfectpixel-panel #chromeperfectpixel-supported-by {
+    margin-top: 8px;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-supported-by-disable {
+    float:right;
+    color:#aaa;
+    text-decoration: none;
+    margin-bottom: 0;
+}
+
+#chromeperfectpixel-panel #chromeperfectpixel-supported-by-disable:hover {
+    text-decoration: none;
+    border-bottom:1px dotted;
+    margin-bottom:-1px;
+    cursor: pointer;
+    color:#999;
+}
+
+#chromeperfectpixel-ad,
+#chromeperfectpixel-ad iframe {
+    max-height: 117px;
+}
+
+#chromeperfectpixel-sponsored body {
+    font: 10pt/10pt sans-serif;
+    margin: 10px 0;
+}
+
+#chromeperfectpixel-sponsored body .fusion-wrap {
+    display: block;
+}
+
+#chromeperfectpixel-sponsored body .fusion-img {
+    float: left;
+    margin: 0px 10px 5px 0;
+}
+
+#chromeperfectpixel-sponsored body .fusion-text {
+    font-size: 13px;
+    line-height: 17px;
+    color: #333;
+    display: block;
+    text-decoration: none;
+}
+
+#chromeperfectpixel-sponsored body .fusion-text:hover {
+    color: #0700ff;
+}
+
+#chromeperfectpixel-sponsored body .fusion-poweredby {
+    margin: 0;
+    line-height: 17px;
+    font-size: 13px;
+    color: #aaa;
+    text-decoration: none;
+}
+
+#chromeperfectpixel-sponsored body .fusion-poweredby:hover {
+    color: #999;
 }

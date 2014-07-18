@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Alex Belozerov, Ilya Stepanov
+ * Copyright 2011-2014 Alex Belozerov, Ilya Stepanov
  * 
  * This file is part of PerfectPixel.
  *
@@ -27,6 +27,7 @@ var PanelView = Backbone.View.extend({
     fastMoveDistance: 10,
     screenBordersElementId: 'chromeperfectpixel-window',
     panelUpdatedFirstTime: true,
+    _isFrozen: false,
 
     events: {
         'click .chromeperfectpixel-showHideBtn': 'toggleOverlayShown',
@@ -395,12 +396,12 @@ var PanelView = Backbone.View.extend({
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
             '</div>' +
-            '</div>'+
+            '</div>' +
             '</div>';
 
         this.$el.append(panelHtml);
 
-        if (this.options.state == 'collapsed'){
+        if (this.options.state == 'collapsed') {
             $panel_body.hide().addClass('collapsed');
             $panel.css('right',(30 - $panel.width()) + 'px');
             $('#chromeperfectpixel-min-buttons').show();
@@ -572,6 +573,38 @@ var PanelView = Backbone.View.extend({
         });
 
         console.log("PP Dropzone initialized");
+    },
+
+    isFrozen: function() {
+        return this._isFrozen;
+    },
+
+    /**
+     * Hide panel, disable all global events
+     */
+    freeze: function() {
+        this.$el.hide();
+        if (this.overlayView) {
+            this.overlayView.freeze();
+        }
+        if (ExtOptions.enableHotkeys) {
+            $('body').off('keydown', this.keyDown);
+        }
+        this._isFrozen = true;
+    },
+
+    /**
+     * Show panel, enable all global events
+     */
+    unfreeze: function() {
+        this.$el.show();
+        if (this.overlayView) {
+            this.overlayView.unfreeze();
+        }
+        if (ExtOptions.enableHotkeys) {
+            $('body').on('keydown', this.keyDown);
+        }
+        this._isFrozen = false;
     }
 });
 
@@ -694,6 +727,7 @@ var OverlayView = Backbone.View.extend({
     id: 'chromeperfectpixel-overlay_3985123731465987',
     zIndex: 2147483646,
     smartMovementStickBorder: 1,
+    _wasVisibleUponFrozen: false,
 
     events: {
         'mousewheel': 'mousewheel'
@@ -826,5 +860,15 @@ var OverlayView = Backbone.View.extend({
 
     unrender: function() {
         $(this.el).remove();
+    },
+
+    freeze: function() {
+        this._wasVisibleUponFrozen = $(this.el).is(':visible');
+        this.$el.hide();
+    },
+
+    unfreeze: function() {
+        if(this._wasVisibleUponFrozen)
+            this.$el.show();
     }
 });
