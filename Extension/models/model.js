@@ -372,6 +372,39 @@ var PerfectPixelModel = Backbone.Model.extend({
         return this.get('currentOverlayId') === overlay.id
     },
 
+    moveCurrentOverlay: function(props) {
+        var overlay = this.getCurrentOverlay();
+        if (overlay) {
+          if (this.get('overlayShown') && !this.get('overlayLocked')) {
+            overlay.save(props);
+          }
+          return {x: overlay.get('x'), y: overlay.get('y')};
+        }
+        return {x: null, y: null};
+    },
+
+    scaleCurrentOverlay: function(props) {
+        var overlay = this.getCurrentOverlay();
+        if (overlay) {
+          if (this.get('overlayShown') && !this.get('overlayLocked')) {
+              overlay.save(props);
+          }
+          return {scale: overlay.get('scale')};
+        }
+        return {scale: null};
+    },
+
+    changeCurrentOverlayOpacity: function(props) {
+        var overlay = this.getCurrentOverlay();
+        if (overlay) {
+          if (this.get('overlayShown') && !this.get('overlayLocked')) {
+              overlay.save(props);
+          }
+          return {opacity: overlay.get('opacity')};
+        }
+        return {opacity: null};
+    },
+
     toggleOverlayShown: function() {
         this.save({overlayShown: !this.get('overlayShown')});
     },
