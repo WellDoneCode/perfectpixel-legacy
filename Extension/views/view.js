@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * PerfectPixel is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -159,9 +159,9 @@ var PanelView = Backbone.View.extend({
             var offset = button.data('offset');
             if (e.shiftKey) offset *= this.fastMoveDistance;
             if (axis == "x") {
-                overlay.save({x: overlay.get('x') - offset});
+                PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - offset});
             } else if (axis == "y") {
-                overlay.save({y: overlay.get('y') - offset});
+                PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - offset});
             }
         }
     },
@@ -176,10 +176,12 @@ var PanelView = Backbone.View.extend({
             isNaN(value) && (value = 0);
             switch (axis) {
                 case 'x':
-                    overlay.save({x: value});
+                    var currentValue = PerfectPixel.moveCurrentOverlay({x: value});
+                    input.val(currentValue.x || '');
                     break;
                 case 'y':
-                    overlay.save({y: value});
+                    var currentValue = PerfectPixel.moveCurrentOverlay({y: value});
+                    input.val(currentValue.y || '');
                     break;
                 default:
                     break;
@@ -193,8 +195,10 @@ var PanelView = Backbone.View.extend({
         }
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var value = this.$(e.currentTarget).val();
-            overlay.save({opacity: Number(value).toFixed(1)});
+            var input = this.$(e.currentTarget);
+            var value = input.val();
+            var returnValue = PerfectPixel.changeCurrentOverlayOpacity({opacity: Number(value).toFixed(1)});
+            input.val(returnValue.opacity || 1);
         }
     },
 
@@ -203,11 +207,13 @@ var PanelView = Backbone.View.extend({
     },
 
     changeScale: function(e) {
-        var value = this.$(e.currentTarget).val();
+        var input = this.$(e.currentTarget);
+        var value = input.val();
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            overlay.save({scale: Number(value)});
+            var returnValue = PerfectPixel.scaleCurrentOverlay({scale: Number(value).toFixed(1)});
+            input.val(returnValue.scale || 1);
         }
     },
 
@@ -227,18 +233,20 @@ var PanelView = Backbone.View.extend({
         if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var distance = e.shiftKey ? this.fastMoveDistance : 1;
-            if (e.which == 37) { // left
-                overlay.save({x: overlay.get('x') - distance});
-            }
-            else if (e.which == 38) { // up
-                overlay.save({y: overlay.get('y') - distance});
-            }
-            else if (e.which == 39) { // right
-                overlay.save({x: overlay.get('x') + distance});
-            }
-            else if (e.which == 40) { // down
-                overlay.save({y: overlay.get('y') + distance});
+            if (!$(e.target).is('input')) {
+              var distance = e.shiftKey ? this.fastMoveDistance : 1;
+              if (e.which == 37) { // left
+                  PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
+              }
+              else if (e.which == 38) { // up
+                  PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
+              }
+              else if (e.which == 39) { // right
+                  PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
+              }
+              else if (e.which == 40) { // down
+                  PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
+              }
             }
             else if (e.altKey && e.which == 83) { // Alt + s
                 PerfectPixel.toggleOverlayShown();
@@ -835,7 +843,7 @@ var OverlayView = Backbone.View.extend({
     stopDrag: function(e, ui) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            overlay.save({x: ui.position.left, y: ui.position.top});
+            PerfectPixel.moveCurrentOverlay({x: ui.position.left, y: ui.position.top});
         }
     },
 
