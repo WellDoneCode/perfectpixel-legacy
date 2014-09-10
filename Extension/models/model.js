@@ -372,6 +372,10 @@ var PerfectPixelModel = Backbone.Model.extend({
         return this.get('currentOverlayId') === overlay.id
     },
 
+    isOverlayLocked: function() {
+        return this.get('overlayLocked')
+    },
+
     moveCurrentOverlay: function(props) {
         var overlay = this.getCurrentOverlay();
         if (overlay) {
