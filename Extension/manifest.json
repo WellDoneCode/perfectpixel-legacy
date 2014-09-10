@@ -10,6 +10,7 @@
     },
     "browser_action":{
         "default_icon":"images/icons/icon_disabled.png",
+        "default_title": "PerfectPixel",
         "default_popup":"popups/tab-not-allowed.html"
     },
     "content_security_policy":"script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
@@ -25,7 +26,7 @@
     "options_page":"fancy-settings/source/index.html",
     "permissions":[ "tabs", "\u003Call_urls\u003E", "unlimitedStorage" ],
     "update_url":"http://clients2.google.com/service/update2/crx",
-    "version":"1.64",
+    "version":"1.67",
     "web_accessible_resources":[
         "images/*.*",
         "ads/*.*",

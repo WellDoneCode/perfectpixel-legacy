@@ -36,8 +36,12 @@ this.i18n = {
         "ru": "Мышь и клавиатура"
     },
     "enable_hotkeys": {
-        "en": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> Alt + H - Show/Hide whole control panel<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right<br/> Shift + ↑, ↓, ←, → - Move overlay with 10x speed",
-        "ru": "Разрешить горячие клавиши<br/><br/>Список горячих клавиш:<br/> Alt + S - Показать/Скрыть слой<br/> Alt + C - Заблокировать/Разблокировать слой<br/> Alt + H - Показать/Скрыть панель управления целиком<br/> ↑  - Переместить слой вверх<br/> ↓  - Переместить слой вниз<br/> ← - Переместить слой вправо<br/> → - Переместить слой влево<br/> Shift + ↑, ↓, ←, → - Перемесить слой с 10-кратной скоростью"
+        "en": "Enable Hotkeys<br/><br/>Hotkeys list:<br/> Alt + S - Show/Hide overlay<br/> Alt + C - Lock/Unlock overlay<br/> Alt + H - Show/Hide whole control panel<br/> =  - Increase opacity<br/> -  - Decrease opacity<br/> ↑  - Move overlay up<br/> ↓  - Move overlay down<br/> ← - Move overlay left<br/> → - Move overlay right<br/> Shift + ↑, ↓, ←, → - Move overlay with 10x speed<br/><br/>",
+        "ru": "Включить горячие клавиши<br/><br/>Список горячих клавиш:<br/> Alt + S - Показать/Скрыть слой<br/> Alt + C - Заблокировать/Разблокировать слой<br/> Alt + H - Показать/Скрыть панель управления целиком<br/> =  - Увеличить непрозрачность<br/> -  - Уменьшить непрозрачность<br/> ↑  - Переместить слой вверх<br/> ↓  - Переместить слой вниз<br/> ← - Переместить слой вправо<br/> → - Переместить слой влево<br/> Shift + ↑, ↓, ←, → - Перемесить слой с 10-кратной скоростью<br/><br/>"
+    },
+    "enable_mousewheel_opacity": {
+        "en": "Enable mousewheel opacity change",
+        "ru": "Включить изменение прозрачности колесом мыши"
     },
     "behavior": {
         "en": "Behavior",
@@ -58,6 +62,10 @@ this.i18n = {
     "place_to_current_scroll_position": {
         "en": "Place to current scroll position",
         "ru": "Поместить на текущую позицию прокрутки"
+    },
+    "allow_position_change_when_locked": {
+        "en": "Allow position, opacity, scale  change when overlay is locked or hidden",
+        "ru": "Разрешить изменение позиции, прозрачности и масштаба слоя когда он заблокирован или невидим"
     },
     "make_active": {
         "en": "Make active",

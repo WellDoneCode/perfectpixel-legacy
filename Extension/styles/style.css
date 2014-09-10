@@ -53,6 +53,10 @@
     image-rendering: -webkit-optimize-contrast;
 }
 
+img.chromeperfectpixel-overlay {
+    visibility: visible;
+}
+
 /* Chrome default style values */
 #chromeperfectpixel-panel textarea:disabled,
 #chromeperfectpixel-panel input[type="color"]:disabled,

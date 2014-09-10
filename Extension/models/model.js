@@ -62,8 +62,8 @@ Backbone.GSModel = Backbone.Model.extend({
 var Overlay = Backbone.GSModel.extend({
 
     defaults: {
-        x: 50,
-        y: 50,
+        x: 0,
+        y: 0,
         width: 300,
         height: 300,
         opacity: 0.5,
@@ -375,10 +375,11 @@ var PerfectPixelModel = Backbone.Model.extend({
     moveCurrentOverlay: function(props) {
         var overlay = this.getCurrentOverlay();
         if (overlay) {
-          if (this.get('overlayShown') && !this.get('overlayLocked')) {
-            overlay.save(props);
-          }
-          return {x: overlay.get('x'), y: overlay.get('y')};
+            if (ExtOptions.allowPositionChangeWhenLocked ||
+                (this.get('overlayShown') && !this.get('overlayLocked'))) {
+                overlay.save(props);
+            }
+            return {x: overlay.get('x'), y: overlay.get('y')};
         }
         return {x: null, y: null};
     },
@@ -386,10 +387,11 @@ var PerfectPixelModel = Backbone.Model.extend({
     scaleCurrentOverlay: function(props) {
         var overlay = this.getCurrentOverlay();
         if (overlay) {
-          if (this.get('overlayShown') && !this.get('overlayLocked')) {
-              overlay.save(props);
-          }
-          return {scale: overlay.get('scale')};
+            if (ExtOptions.allowPositionChangeWhenLocked ||
+                (this.get('overlayShown') && !this.get('overlayLocked'))) {
+                overlay.save(props);
+            }
+            return {scale: overlay.get('scale')};
         }
         return {scale: null};
     },
@@ -397,10 +399,11 @@ var PerfectPixelModel = Backbone.Model.extend({
     changeCurrentOverlayOpacity: function(props) {
         var overlay = this.getCurrentOverlay();
         if (overlay) {
-          if (this.get('overlayShown') && !this.get('overlayLocked')) {
-              overlay.save(props);
-          }
-          return {opacity: overlay.get('opacity')};
+            if (ExtOptions.allowPositionChangeWhenLocked ||
+                (this.get('overlayShown') && !this.get('overlayLocked'))) {
+                overlay.save(props);
+            }
+            return {opacity: overlay.get('opacity')};
         }
         return {opacity: null};
     },

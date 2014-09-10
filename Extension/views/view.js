@@ -25,6 +25,7 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
+    opacityChangeDistance: 0.1,
     screenBordersElementId: 'chromeperfectpixel-window',
     panelUpdatedFirstTime: true,
     _isFrozen: false,
@@ -232,21 +233,32 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
+        var isTargetPanelInputs = $(e.target).is('input#chromeperfectpixel-opacity')
+            || $(e.target).is('input#chromeperfectpixel-coordX')
+            || $(e.target).is('input#chromeperfectpixel-coordY');
         if (overlay) {
-            if (!$(e.target).is('input')) {
-              var distance = e.shiftKey ? this.fastMoveDistance : 1;
-              if (e.which == 37) { // left
-                  PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
-              }
-              else if (e.which == 38) { // up
-                  PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
-              }
-              else if (e.which == 39) { // right
-                  PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
-              }
-              else if (e.which == 40) { // down
-                  PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
-              }
+            var distance = e.shiftKey ? this.fastMoveDistance : 1;
+            if (e.which == 37 && !isTargetPanelInputs) { // left
+              PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
+            }
+            else if (e.which == 38 && !isTargetPanelInputs) { // up
+              PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
+            }
+            else if (e.which == 39 && !isTargetPanelInputs) { // right
+              PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
+            }
+            else if (e.which == 40 && !isTargetPanelInputs) { // down
+              PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
+            }
+            else if (e.which == 189 || e.which == 109) { // "-"
+                PerfectPixel.changeCurrentOverlayOpacity({
+                    opacity: Number(Number(overlay.get('opacity')) - this.opacityChangeDistance).toFixed(1)
+                });
+            }
+            else if (e.which == 187 || e.which == 107) { // "+"
+                PerfectPixel.changeCurrentOverlayOpacity({
+                    opacity: Number(Number(overlay.get('opacity')) + this.opacityChangeDistance).toFixed(1)
+                });
             }
             else if (e.altKey && e.which == 83) { // Alt + s
                 PerfectPixel.toggleOverlayShown();
@@ -778,16 +790,26 @@ var OverlayView = Backbone.View.extend({
     },
 
     mousewheel: function(e) {
-        if (e.originalEvent.wheelDelta < 0) {
-            this.model.save({opacity: Number(this.model.get('opacity')) - 0.05});
-        } else {
-            this.model.save({opacity: Number(this.model.get('opacity')) + 0.05});
+        if(ExtOptions.enableMousewheelOpacity) {
+            if (e.originalEvent.wheelDelta < 0) {
+                this.model.save({opacity: Number(this.model.get('opacity')) - 0.05});
+            } else {
+                this.model.save({opacity: Number(this.model.get('opacity')) + 0.05});
+            }
+            e.stopPropagation();
+            e.preventDefault();
         }
-        e.stopPropagation();
-        e.preventDefault();
     },
 
     startDrag: function(e, ui) {
+        // If focus is on PP panel input's remove it to allow arrow hotkeys work on overlay
+        var focusedElem = $(getFocusedElement());
+        if(focusedElem && (focusedElem.is('input#chromeperfectpixel-opacity')
+            || focusedElem.is('input#chromeperfectpixel-coordX')
+            || focusedElem.is('input#chromeperfectpixel-coordY'))) {
+            focusedElem.blur();
+        }
+
         // For Smart movement
         ui.helper.data('PPSmart.originalPosition', ui.position || {top: 0, left: 0});
         ui.helper.data('PPSmart.stickBorder', null);
@@ -880,3 +902,11 @@ var OverlayView = Backbone.View.extend({
             this.$el.show();
     }
 });
+
+function getFocusedElement() {
+    var el;
+    if ((el = document.activeElement) && el != document.body)
+        return el;
+    else
+        return null;
+}
