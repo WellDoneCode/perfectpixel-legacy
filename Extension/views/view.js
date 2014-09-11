@@ -233,21 +233,32 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
-        var isTargetPanelInputs = $(e.target).is('input#chromeperfectpixel-opacity')
-            || $(e.target).is('input#chromeperfectpixel-coordX')
-            || $(e.target).is('input#chromeperfectpixel-coordY');
-        if (overlay) {
-            var distance = e.shiftKey ? this.fastMoveDistance : 1;
-            if (e.which == 37 && !isTargetPanelInputs) { // left
+        var isTargetInput = $(e.target).is('input');
+
+        if (! overlay) return;
+
+        var distance = e.shiftKey ? this.fastMoveDistance : 1;
+
+        if (e.altKey && e.which == 83) { // Alt + s
+            PerfectPixel.toggleOverlayShown();
+        }
+        else if (e.altKey && e.which == 67) { // Alt + c
+            PerfectPixel.toggleOverlayLocked();
+        }
+        else if (e.altKey && e.which == 72) { // Alt + H
+            this.model.toggleHidden();
+        }
+        else if (! PerfectPixel.isOverlayLocked()) {
+            if (e.which == 37 && !isTargetInput) { // left
               PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
             }
-            else if (e.which == 38 && !isTargetPanelInputs) { // up
+            else if (e.which == 38 && !isTargetInput) { // up
               PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
             }
-            else if (e.which == 39 && !isTargetPanelInputs) { // right
+            else if (e.which == 39 && !isTargetInput) { // right
               PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
             }
-            else if (e.which == 40 && !isTargetPanelInputs) { // down
+            else if (e.which == 40 && !isTargetInput) { // down
               PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
             }
             else if (e.which == 189 || e.which == 109) { // "-"
@@ -260,22 +271,16 @@ var PanelView = Backbone.View.extend({
                     opacity: Number(Number(overlay.get('opacity')) + this.opacityChangeDistance).toFixed(1)
                 });
             }
-            else if (e.altKey && e.which == 83) { // Alt + s
-                PerfectPixel.toggleOverlayShown();
-            }
-            else if (e.altKey && e.which == 67) { // Alt + c
-                PerfectPixel.toggleOverlayLocked();
-            }
-            else if (e.altKey && e.which == 72) { // Alt + H
-                this.model.toggleHidden();
-            }
             else {
                 return;
             }
-
-            e.stopPropagation();
-            e.preventDefault();
         }
+        else{
+            return;
+        }
+
+        e.stopPropagation();
+        e.preventDefault();
     },
 
     update: function() {
