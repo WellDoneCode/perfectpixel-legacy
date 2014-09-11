@@ -233,9 +233,7 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
-        var isTargetPanelInputs = $(e.target).is('input#chromeperfectpixel-opacity')
-            || $(e.target).is('input#chromeperfectpixel-coordX')
-            || $(e.target).is('input#chromeperfectpixel-coordY');
+        var isTargetInput = $(e.target).is('input');
 
         if (! overlay) return;
 
@@ -251,16 +249,16 @@ var PanelView = Backbone.View.extend({
             this.model.toggleHidden();
         }
         else if (! PerfectPixel.isOverlayLocked()) {
-            if (e.which == 37 && !isTargetPanelInputs) { // left
+            if (e.which == 37 && !isTargetInput) { // left
               PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
             }
-            else if (e.which == 38 && !isTargetPanelInputs) { // up
+            else if (e.which == 38 && !isTargetInput) { // up
               PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
             }
-            else if (e.which == 39 && !isTargetPanelInputs) { // right
+            else if (e.which == 39 && !isTargetInput) { // right
               PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
             }
-            else if (e.which == 40 && !isTargetPanelInputs) { // down
+            else if (e.which == 40 && !isTargetInput) { // down
               PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
             }
             else if (e.which == 189 || e.which == 109) { // "-"
