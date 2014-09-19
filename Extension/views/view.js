@@ -41,7 +41,87 @@ var PanelView = Backbone.View.extend({
         'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
-        'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification'
+        'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification',
+        'click #chromeperfectpixel-pasteBtn': 'startPasteImages'
+    },
+
+
+    startPasteImages: function(){
+        var blur_event_delay = 100;
+        var restore_title_delay = 3000;
+
+        var $overlay = $('#chromeperfectpixel-paste-overlay');
+        var $catcher = $('#chromeperfectpixel-paste-catcher');
+        var pasteOverlayChangeText = function(title,hint){
+            $overlay.find('.title').text(title);
+            $overlay.find('.hint').text(hint);
+        };
+        var view = this;
+        var restore_title_timeout = null;
+        var blur_wait_timeout = null;
+        var off_events = function(){
+            console.log('off_events');
+            $catcher.off('focus');
+            $catcher.off('blur');
+            $catcher.off('paste');
+        };
+
+        $catcher.on('focus',function(){
+            pasteOverlayChangeText(
+                chrome.i18n.getMessage('paste_active_title'),
+                chrome.i18n.getMessage('paste_active_hint')
+            )
+        });
+        $catcher.on('blur',function(){
+            // We need timeout here to prevent text change while overlay closes
+            blur_wait_timeout = setTimeout(function(){
+                if (restore_title_timeout) clearTimeout(restore_title_timeout);
+                pasteOverlayChangeText(
+                    chrome.i18n.getMessage('paste_focus_lost_title'),
+                    chrome.i18n.getMessage('paste_focus_lost_hint')
+                )
+            }, blur_event_delay)
+        });
+
+        $overlay.removeClass('hidden');
+        $catcher.focus();
+
+        $overlay.find('.cancel').one('click',function(){
+            off_events();
+            $overlay.addClass('hidden');
+        });
+
+        $catcher.on('paste',function(event){
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items,
+                clipboard_has_image = false;
+
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") === 0) {
+                    var blob = items[i].getAsFile();
+                    if (blob !== null) {
+                        clipboard_has_image = true;
+                        view.upload(blob);
+                    }
+                }
+            }
+            if (clipboard_has_image){
+                event.preventDefault();
+                off_events();
+                $('#chromeperfectpixel-paste-overlay').addClass('hidden');
+            }
+            else{
+                pasteOverlayChangeText(
+                    chrome.i18n.getMessage('paste_no_images_title'),
+                    chrome.i18n.getMessage('paste_no_images_hint')
+                );
+                restore_title_timeout = setTimeout(function(){
+                    pasteOverlayChangeText(
+                        chrome.i18n.getMessage('paste_active_title'),
+                        chrome.i18n.getMessage('paste_active_hint')
+                    );
+                },restore_title_delay)
+            }
+        });
     },
 
     initialize: function(options) {
@@ -419,6 +499,13 @@ var PanelView = Backbone.View.extend({
             '<div id="chromeperfectpixel-upload-area">' +
             '<button id="chromeperfectpixel-fakefile">' + chrome.i18n.getMessage("add_new_layer") + '</button>' +
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
+            '</div>' +
+            '<button id="chromeperfectpixel-pasteBtn" style="margin-left: 5px; float:left;">Paste new layer</button>' +
+            '<div id="chromeperfectpixel-paste-overlay" class="hidden">' +
+            '<input type="text" id="chromeperfectpixel-paste-catcher">' +
+            '<div class="title">' + chrome.i18n.getMessage('paste_active_title') + '</div>' +
+            '<div class="hint">' + chrome.i18n.getMessage('paste_active_hint') + '</div>' +
+            '<div class="cancel">' + chrome.i18n.getMessage('cancel') + '</div>' +
             '</div>' +
             '</div>' +
             '</div>' +

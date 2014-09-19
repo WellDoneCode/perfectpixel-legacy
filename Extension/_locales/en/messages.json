@@ -55,5 +55,26 @@
     },
     "supported_by_disable_tooltip": {
         "message": "In extension options page"
+    },
+    "cancel": {
+        "message": "Cancel"
+    },
+    "paste_active_title": {
+        "message": "Paste"
+    },
+    "paste_active_hint": {
+        "message": "hit cmd+V or ctrl+V"
+    },
+    "paste_no_images_title": {
+        "message": "Error"
+    },
+    "paste_no_images_hint": {
+        "message": "clipboard contains no images"
+    },
+    "paste_focus_lost_title": {
+        "message": "Click here"
+    },
+    "paste_focus_lost_hint": {
+        "message": "focus was lost"
     }
 }

@@ -55,5 +55,26 @@
     },
     "supported_by_disable_tooltip": {
         "message": "На странице Настройки"
+    },
+    "cancel": {
+        "message": "Отмена"
+    },
+    "paste_active_title": {
+        "message": "Вставить"
+    },
+    "paste_active_hint": {
+        "message": "нажмите cmd+V или ctrl+V"
+    },
+    "paste_no_images_title": {
+        "message": "Ошибка"
+    },
+    "paste_no_images_hint": {
+        "message": "в буфере обмена нет картинок"
+    },
+    "paste_focus_lost_title": {
+        "message": "Кликните"
+    },
+    "paste_focus_lost_hint": {
+        "message": "потерян фокус"
     }
 }
