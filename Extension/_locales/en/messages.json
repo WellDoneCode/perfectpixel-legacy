@@ -41,6 +41,9 @@
     "add_new_layer": {
         "message": "Add new layer"
     },
+    "paste_new_layer": {
+        "message": "Paste new layer"
+    },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Are you sure you want to delete layer?"
     },

@@ -60,7 +60,6 @@ var PanelView = Backbone.View.extend({
         var restore_title_timeout = null;
         var blur_wait_timeout = null;
         var off_events = function(){
-            console.log('off_events');
             $catcher.off('focus');
             $catcher.off('blur');
             $catcher.off('paste');
@@ -500,7 +499,7 @@ var PanelView = Backbone.View.extend({
             '<button id="chromeperfectpixel-fakefile">' + chrome.i18n.getMessage("add_new_layer") + '</button>' +
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
-            '<button id="chromeperfectpixel-pasteBtn" style="margin-left: 5px; float:left;">Paste new layer</button>' +
+            '<button id="chromeperfectpixel-pasteBtn" style="float:left;">' + chrome.i18n.getMessage("paste_new_layer") + '</button>' +
             '<div id="chromeperfectpixel-paste-overlay" class="hidden">' +
             '<input type="text" id="chromeperfectpixel-paste-catcher">' +
             '<div class="title">' + chrome.i18n.getMessage('paste_active_title') + '</div>' +

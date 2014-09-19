@@ -41,6 +41,9 @@
     "add_new_layer": {
         "message": "Добавить новый слой"
     },
+    "paste_new_layer": {
+        "message": "Вставить новый слой"
+    },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Вы уверены, что хотите удалить этот слой?"
     },
