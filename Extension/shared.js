@@ -83,6 +83,7 @@ var PP_RequestType = new function () {
     this.SetNotifications = "SETNOTIFICATION";
     this.ExecuteScript = "EXECUTESCRIPT";
     this.OpenSettingsPage = "OPENSETTINGSPAGE";
+    this.GrabImageFromClipboard = "GRABIMAGEFROMCLIPBOARD";
 };
 
 // --------------------------------------------------------------

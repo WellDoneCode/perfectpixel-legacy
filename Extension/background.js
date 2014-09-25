@@ -65,6 +65,7 @@ $(document).ready(function () {
             check_if_PP_available_for_tab(tabs[i]);
         }
     });
+    $('<input type="text" id="image-catcher"/>').appendTo('body');
 });
 
 // here we store panel' state for every tab
@@ -227,6 +228,35 @@ chrome.extension.onMessage.addListener(
                 }
                 sendResponse();
             });
+        }
+    }
+);
+
+chrome.extension.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.type == PP_RequestType.GrabImageFromClipboard) {
+            $('#image-catcher').on('paste',function(event){
+                console.log('paste catched');
+                var items = (event.clipboardData || event.originalEvent.clipboardData).items,
+                    clipboard_has_image = false;
+
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") === 0) {
+                        var blob = items[i].getAsFile();
+                        if (blob !== null) {
+                            clipboard_has_image = true;
+                            sendResponse(blob);
+                            return;
+                            //view.upload(blob);
+                        }
+                    }
+                }
+                if (! clipboard_has_image){
+                    alert('No images in clipboard');
+                }
+            });
+            $('#image-catcher').focus();
+            document.execCommand('paste');
         }
     }
 );
