@@ -84,6 +84,14 @@ function togglePanel(tabId){
 function injectIntoTab(tabId, after_injected_callback){
     if (settings.get("enableStatistics")) {
         _gaq.push(['_trackPageview']); // Tracking
+
+        // Track settings on each load
+        var settingsAsObj = settings.toObject();
+        for(var optionName in settingsAsObj) {
+            var optionValue = settingsAsObj[optionName];
+            var uncapitalizedOptionName = optionName.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+            trackEvent("settings", uncapitalizedOptionName, null, String(optionValue), true); // Put in queue
+        }
     }
 
     chrome.tabs.insertCSS(tabId, { file: "styles/style.css" });
@@ -167,8 +175,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
     if(!pp_tab_state) {
         PP_state[tab.id] = 'open';
         injectIntoTab(tab.id);
-    }
-    else {
+    } else {
         if(pp_tab_state == 'open')
             PP_state[tab.id] = 'closed';
         else if (pp_tab_state == 'closed')
@@ -336,9 +343,10 @@ function sendMessageToAllTabs(data)
     });
 }
 
-function trackEvent(senderId, eventType, integerValue, stringValue)
+var _trackEventsQueue = [];
+function trackEvent(senderId, eventType, integerValue, stringValue, putInQueue)
 {
-    if (settings.get("enableStatistics")) {
+    if (senderId == "settings" || settings.get("enableStatistics")) {
         var params = ['_trackEvent', senderId, eventType];
 
         if (integerValue && !isNaN(integerValue) && isFinite(integerValue)) {
@@ -354,9 +362,19 @@ function trackEvent(senderId, eventType, integerValue, stringValue)
             params.push(stringValue);
         }
 
-        _gaq.push(params);
+        if(putInQueue) {
+            _trackEventsQueue.push(params);
+        } else {
+            _gaq.push(params);
+        }
     }
 }
+setInterval(function() {
+    if(_trackEventsQueue.length > 0) {
+        var eventParams = _trackEventsQueue.pop();
+        _gaq.push(eventParams);
+    }
+}, 1000);
 
 function sendPPFileResponse(ppFile, sendResponse) {
     if (ppFile instanceof PPFile)
