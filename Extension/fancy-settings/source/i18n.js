@@ -64,8 +64,12 @@ this.i18n = {
         "ru": "Поместить на текущую позицию прокрутки"
     },
     "allow_position_change_when_locked": {
-        "en": "Allow position, opacity, scale  change when overlay is locked or hidden",
+        "en": "Allow position, opacity, scale change when overlay is locked or hidden",
         "ru": "Разрешить изменение позиции, прозрачности и масштаба слоя когда он заблокирован или невидим"
+    },
+    "allow_hotkeys_position_change_when_locked": {
+        "en": "Allow hotkeys position, opacity, scale change when overlay is locked or hidden<br>(works only if prev option is ON)",
+        "ru": "Разрешить изменение позиции, прозрачности и масштаба слоя с помощью горячих клавиш когда он заблокирован или невидим<br>(работает только если активна предыдущая опция)"
     },
     "make_active": {
         "en": "Make active",

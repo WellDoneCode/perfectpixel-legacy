@@ -248,7 +248,7 @@ var PanelView = Backbone.View.extend({
         else if (e.altKey && e.which == 72) { // Alt + H
             this.model.toggleHidden();
         }
-        else if (! PerfectPixel.isOverlayLocked()) {
+        else if (ExtOptions.allowHotkeysPositionChangeWhenLocked || ! PerfectPixel.isOverlayLocked()) {
             if (e.which == 37 && !isTargetInput) { // left
               PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
             }

@@ -54,6 +54,13 @@ this.manifest = {
         },
         {
             "tab": this.i18n.get("general"),
+            "group": this.i18n.get("behavior"),
+            "name": "allowHotkeysPositionChangeWhenLocked",
+            "type": "checkbox",
+            "label": this.i18n.get("allow_hotkeys_position_change_when_locked")
+        },
+        {
+            "tab": this.i18n.get("general"),
             "group": this.i18n.get("new_layer_behavior"),
             "name": "NewLayerMoveToScrollPosition",
             "type": "checkbox",
