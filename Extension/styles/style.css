@@ -55,6 +55,7 @@
 
 img.chromeperfectpixel-overlay {
     visibility: visible;
+    max-width: none !important;
 }
 
 /* Chrome default style values */
