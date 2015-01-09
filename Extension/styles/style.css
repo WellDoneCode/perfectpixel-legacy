@@ -1,18 +1,18 @@
 /*
  * Copyright 2011-2014 Alex Belozerov, Ilya Stepanov
- * 
+ *
  * This file is part of PerfectPixel.
- * 
+ *
  * PerfectPixel is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * PerfectPixel is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -84,7 +84,9 @@ img.chromeperfectpixel-overlay {
     border: 2px inset;
 }
 
-#chromeperfectpixel-panel label input, label textarea, label select {
+#chromeperfectpixel-panel label input,
+#chromeperfectpixel-panel label textarea,
+#chromeperfectpixel-panel label select {
     display: inline;
 }
 
@@ -343,7 +345,7 @@ img.chromeperfectpixel-overlay {
     }
 
 #chromeperfectpixel-panel button {
-    padding: 5px;    
+    padding: 5px;
 }
 
 #chromeperfectpixel-panel button span {
@@ -354,7 +356,7 @@ img.chromeperfectpixel-overlay {
     /*border: 1px solid blue;*/
     padding: 5px 0 5px 0;
 }
-            
+
 #chromeperfectpixel-panel .chromeperfectpixel-layer {
     vertical-align: middle;
     text-align: center;
@@ -380,7 +382,7 @@ img.chromeperfectpixel-overlay {
     text-align: center;
     pointer-events: none;
 }
-          
+
 #chromeperfectpixel-panel .chromeperfectpixel-layer input[type=checkbox],
 #chromeperfectpixel-panel .chromeperfectpixel-layer input[type=radio]
 {
@@ -393,7 +395,7 @@ img.chromeperfectpixel-overlay {
     overflow: hidden;
     text-align:center !important;
 }
-            
+
 #chromeperfectpixel-panel .chromeperfectpixel-layer .chromeperfectpixel-delete {
     margin: 0 0 0 15px;
 }
