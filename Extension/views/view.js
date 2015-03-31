@@ -306,7 +306,7 @@ var PanelView = Backbone.View.extend({
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
-        var min_btns = this.$('.chromeperfectpixel-min-showHideBtn,.chromeperfectpixel-min-lockBtn');
+        var min_btns = this.$('.chromeperfectpixel-min-showHideBtn,.chromeperfectpixel-min-lockBtn,#chromeperfectpixel-invertcolors');
         isNoOverlays ? min_btns.attr('disabled','') : min_btns.removeAttr('disabled');
         this.$('.chromeperfectpixel-showHideBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
@@ -416,6 +416,7 @@ var PanelView = Backbone.View.extend({
             '<div id="chromeperfectpixel-buttons">' +
             '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("show") + '</button>' +
             '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("lock") + '</button>' +
+            '<button id="chromeperfectpixel-invertcolors">' + chrome.i18n.getMessage("invert_colors") + '</button>' +
             '<div id="chromeperfectpixel-upload-area">' +
             '<button id="chromeperfectpixel-fakefile">' + chrome.i18n.getMessage("add_new_layer") + '</button>' +
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
@@ -437,6 +438,26 @@ var PanelView = Backbone.View.extend({
             $(this).parent().find('input[type=file]').click();
         });
         this._bindFileUploader();
+
+        this.$('#chromeperfectpixel-invertcolors').bind('click', function() {
+            if (!$('#chromeperfectpixel-invertcolors').hasClass('inverted')) {
+                $('#chromeperfectpixel-invertcolors').addClass('inverted');
+                if ( this.overlayView ) {
+                    this.overlayView.$el.css({
+                        '-webkit-filter': 'invert(100%)',
+                        'filter': 'invert(100%)'
+                    });
+                }
+            } else {
+                $('#chromeperfectpixel-invertcolors').removeClass('inverted');
+                if ( this.overlayView ) {
+                    this.overlayView.$el.css({
+                        '-webkit-filter': 'invert(0%)',
+                        'filter': 'invert(0%)'
+                    });
+                }
+            }
+        }.bind(this));
 
         // Workaround to catch single value of opacity during opacity HTML element change
         (function(el, timeout) {
