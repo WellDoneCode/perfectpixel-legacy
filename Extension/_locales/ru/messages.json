@@ -55,5 +55,8 @@
     },
     "supported_by_disable_tooltip": {
         "message": "На странице Настройки"
+    },
+    "invert_colors": {
+        "message": "Инверсия"
     }
 }

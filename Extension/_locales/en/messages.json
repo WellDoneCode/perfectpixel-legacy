@@ -55,5 +55,8 @@
     },
     "supported_by_disable_tooltip": {
         "message": "In extension options page"
+    },
+    "invert_colors": {
+        "message": "Invert"
     }
 }
