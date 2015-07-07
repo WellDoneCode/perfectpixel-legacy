@@ -58,5 +58,8 @@
     },
     "invert_colors": {
         "message": "Инверсия"
+    },
+    "uninvert_colors": {
+        "message": "Убрать инверсию"
     }
 }

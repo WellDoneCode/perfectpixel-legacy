@@ -345,6 +345,7 @@ var PerfectPixelModel = Backbone.Model.extend({
         currentOverlayId: null,
         overlayShown: false,
         overlayLocked: false,
+        overlayInverted: false,
         version: 0 // Version is always set by Converter class
     },
 
@@ -426,6 +427,10 @@ var PerfectPixelModel = Backbone.Model.extend({
 
     unlockOverlay: function() {
         this.save({overlayLocked: false});
+    },
+
+    toggleOverlayInverted: function() {
+        this.save({overlayInverted: !this.get('overlayInverted')});
     },
 
     overlayRemoved: function(overlay) {

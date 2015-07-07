@@ -35,6 +35,7 @@ var PanelView = Backbone.View.extend({
         'click .chromeperfectpixel-min-showHideBtn': 'toggleOverlayShown',
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
         'click .chromeperfectpixel-min-lockBtn': 'toggleOverlayLocked',
+        'click .chromeperfectpixel-invertcolorsBtn': 'toggleOverlayInverted',
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
@@ -151,6 +152,12 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.toggleOverlayLocked();
     },
 
+    toggleOverlayInverted: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
+        trackEvent('overlay', PerfectPixel.get('overlayInverted') ? 'un-invert' : 'invert');
+        PerfectPixel.toggleOverlayInverted();
+    },
+
     originButtonClick: function(e) {
         var button = this.$(e.currentTarget);
         trackEvent("coords", button.attr('id').replace("chromeperfectpixel-", ""));
@@ -248,6 +255,9 @@ var PanelView = Backbone.View.extend({
         else if (e.altKey && e.which == 72) { // Alt + H
             this.model.toggleHidden();
         }
+        else if (e.altKey && e.which == 73) { // Alt + I
+            PerfectPixel.toggleOverlayInverted();
+        }
         else if (ExtOptions.allowHotkeysPositionChangeWhenLocked || ! PerfectPixel.isOverlayLocked()) {
             if (e.which == 37 && !isTargetInput) { // left
               PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
@@ -303,6 +313,7 @@ var PanelView = Backbone.View.extend({
 
         if (this.overlayView) {
             this.overlayView.setLocked(PerfectPixel.get('overlayLocked'));
+            this.overlayView.setInverted(PerfectPixel.get('overlayInverted'));
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
@@ -310,12 +321,16 @@ var PanelView = Backbone.View.extend({
         isNoOverlays ? min_btns.attr('disabled','') : min_btns.removeAttr('disabled');
         this.$('.chromeperfectpixel-showHideBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
-        this.$('.chromeperfectpixel-invertcolorsBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn span').text(
             PerfectPixel.get('overlayLocked')
                 ? ExtensionService.getLocalizedMessage('unlock')
                 : ExtensionService.getLocalizedMessage('lock'));
         this.$('.chromeperfectpixel-min-lockBtn').text(PerfectPixel.get('overlayLocked') ? 'l' : 'u');
+        this.$('.chromeperfectpixel-invertcolorsBtn').button({ disabled: isNoOverlays });
+        this.$('.chromeperfectpixel-invertcolorsBtn span').text(
+            PerfectPixel.get('overlayInverted')
+                ? ExtensionService.getLocalizedMessage('uninvert_colors')
+                : ExtensionService.getLocalizedMessage('invert_colors'));
         this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
         this.$('input').not('input[type=file]').attr('disabled', function() {
             return isNoOverlays;
@@ -439,26 +454,6 @@ var PanelView = Backbone.View.extend({
             $(this).parent().find('input[type=file]').click();
         });
         this._bindFileUploader();
-
-        this.$('.chromeperfectpixel-invertcolorsBtn').bind('click', function() {
-            if (!$('.chromeperfectpixel-invertcolorsBtn').hasClass('inverted')) {
-                $('.chromeperfectpixel-invertcolorsBtn').addClass('inverted');
-                if ( this.overlayView ) {
-                    this.overlayView.$el.css({
-                        '-webkit-filter': 'invert(100%)',
-                        'filter': 'invert(100%)'
-                    });
-                }
-            } else {
-                $('.chromeperfectpixel-invertcolorsBtn').removeClass('inverted');
-                if ( this.overlayView ) {
-                    this.overlayView.$el.css({
-                        '-webkit-filter': 'invert(0%)',
-                        'filter': 'invert(0%)'
-                    });
-                }
-            }
-        }.bind(this));
 
         // Workaround to catch single value of opacity during opacity HTML element change
         (function(el, timeout) {
@@ -814,6 +809,13 @@ var OverlayView = Backbone.View.extend({
 
     setLocked: function(value) {
         this.$el.css('pointer-events', value ? 'none' : 'auto');
+    },
+
+    setInverted: function(value) {
+        this.$el.css({
+            '-webkit-filter': value ? 'invert(100%)' : '',
+            'filter': value ? 'invert(100%)': ''
+        });
     },
 
     mousewheel: function(e) {

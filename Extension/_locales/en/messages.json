@@ -58,5 +58,8 @@
     },
     "invert_colors": {
         "message": "Invert"
+    },
+    "uninvert_colors": {
+        "message": "Invert back"
     }
 }
