@@ -20,7 +20,7 @@
 // ----------------------------------------------
 // GlobalStorage - for storing really global data
 // ----------------------------------------------
-var GlobalStorage = new function () {
+/*var GlobalStorage = new function () {
     this.getOptions = function () {
         var options = {};
         try {
@@ -49,7 +49,7 @@ var GlobalStorage = new function () {
             return {};
         }
     }
-};
+};*/
 
 // Converts any ArrayBuffer to a string
 //  (a comma-separated list of ASCII ordinals,

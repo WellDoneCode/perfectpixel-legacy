@@ -191,7 +191,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
             // 1. Add full size image to storage
             console.log("PP Add file operation");
-            chrome.extension.sendRequest(
+            ExtensionService.sendMessage(
                 {
                     type: PP_RequestType.ADDFILE,
                     fileData: bufferToString(e.target.result),
@@ -219,7 +219,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
                                     // 3. Add thumbnail image to storage
                                     console.log("PP Add file operation - thumbnail");
-                                    chrome.extension.sendRequest(
+                                    ExtensionService.sendMessage(
                                         {
                                             type: PP_RequestType.ADDFILE,
                                             fileData: bufferToString(resizedBlobBuffer),
@@ -275,7 +275,7 @@ var OverlayImage = Backbone.GSModel.extend({
         if (filename) {
             console.time("PP Profiling _getImageUrlByFilename " + filename);
             var self = this;
-            chrome.extension.sendRequest({
+            ExtensionService.sendMessage({
                     type: PP_RequestType.GETFILE,
                     fileName: filename
                 },
@@ -319,7 +319,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
         console.log("PP Delete files operation " + filesToDelete.toString());
 
-        chrome.extension.sendRequest(
+        ExtensionService.sendMessage(
         {
             type: PP_RequestType.DELETEFILE,
             fileName: filesToDelete
@@ -543,7 +543,7 @@ var NotificationModel = Backbone.Model.extend({
         var allNotificationsFromRemote = new NotificationCollection();
         allNotificationsFromRemote.fetch({
             success: $.proxy(function(result) {
-                chrome.extension.sendRequest(
+                ExtensionService.sendMessage(
                     {
                         type: PP_RequestType.GetNotifications,
                         keyName:'perfectpixel-notification'
@@ -564,7 +564,7 @@ var NotificationModel = Backbone.Model.extend({
 
     setCollection: function(collection){
         var collectionResult = new NotificationCollection,
-            version = Converter._getCurrentDataVersion(),
+            version = Converter._getCurrentExtensionVersion(),
             maxid = this.get("maxId");
 
         collection.each( function( notify){
@@ -592,7 +592,7 @@ var NotificationModel = Backbone.Model.extend({
 
     closeCurrentNotification: function() {
         var notify = this.getCurrentNotification();
-        chrome.extension.sendRequest(
+        ExtensionService.sendMessage(
             {
                 type: PP_RequestType.SetNotifications,
                 notifyId: notify.get("id"),

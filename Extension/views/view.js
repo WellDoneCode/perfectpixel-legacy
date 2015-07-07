@@ -54,7 +54,7 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.notificationModel.on('change:currentNotification', this.updateNotification);
 
         var view = this;
-        chrome.extension.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
+        ExtensionService.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
             view.model = new Panel({id:res.tabId});
             view.model.fetch();
             view.listenTo(view.model, 'change', view.updatePanel);
@@ -213,8 +213,8 @@ var PanelView = Backbone.View.extend({
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var returnValue = PerfectPixel.scaleCurrentOverlay({scale: Number(value).toFixed(1)});
-            input.val(returnValue.scale || 1);
+            var returnValue = PerfectPixel.scaleCurrentOverlay({scale: Number(value).toFixed(2)});
+            input.val(Number(returnValue.scale) || 1);
         }
     },
 
@@ -290,14 +290,14 @@ var PanelView = Backbone.View.extend({
                 this.overlayView = new OverlayView();
                 $('body').append(this.overlayView.render().el);
             }
-            this.$('.chromeperfectpixel-showHideBtn span').text(chrome.i18n.getMessage('hide'));
+            this.$('.chromeperfectpixel-showHideBtn span').text(ExtensionService.getLocalizedMessage('hide'));
             this.$('.chromeperfectpixel-min-showHideBtn').text('v');
         } else {
             if (this.overlayView) {
                 this.overlayView.unrender();
                 delete this.overlayView;
             }
-            this.$('.chromeperfectpixel-showHideBtn span').text(chrome.i18n.getMessage('show'));
+            this.$('.chromeperfectpixel-showHideBtn span').text(ExtensionService.getLocalizedMessage('show'));
             this.$('.chromeperfectpixel-min-showHideBtn').text('i');
         }
 
@@ -312,8 +312,8 @@ var PanelView = Backbone.View.extend({
         this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn span').text(
             PerfectPixel.get('overlayLocked')
-                ? chrome.i18n.getMessage('unlock')
-                : chrome.i18n.getMessage('lock'));
+                ? ExtensionService.getLocalizedMessage('unlock')
+                : ExtensionService.getLocalizedMessage('lock'));
         this.$('.chromeperfectpixel-min-lockBtn').text(PerfectPixel.get('overlayLocked') ? 'l' : 'u');
         this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
         this.$('input').not('input[type=file]').attr('disabled', function() {
@@ -323,8 +323,8 @@ var PanelView = Backbone.View.extend({
         if (overlay) {
             this.$('#chromeperfectpixel-coordX').val(overlay.get('x'));
             this.$('#chromeperfectpixel-coordY').val(overlay.get('y'));
-            this.$('#chromeperfectpixel-opacity').val(overlay.get('opacity'));
-            this.$('#chromeperfectpixel-scale').val(overlay.get('scale'));
+            this.$('#chromeperfectpixel-opacity').val(Number(overlay.get('opacity')));
+            this.$('#chromeperfectpixel-scale').val(Number(overlay.get('scale')));
         } else {
             this.$('#chromeperfectpixel-coordX').val('');
             this.$('#chromeperfectpixel-coordY').val('');
@@ -351,19 +351,19 @@ var PanelView = Backbone.View.extend({
     togglePanelShown: function(){
         $('#chromeperfectpixel-panel').toggle();
         var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
-        chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: new_state});
+        ExtensionService.sendMessage({type: PP_RequestType.PanelStateChange, state: new_state});
     },
 
     render: function() {
         $('body').append(this.$el).append('<div id="' + this.screenBordersElementId + '"/>');
-        this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
-        this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
+        this.$el.css('background', 'url(' + ExtensionService.getResourceUrl('images/noise.jpg') + ')');
+        this.$el.addClass(ExtensionService.getLocalizedMessage("panel_css_class"));
 
         var panelHtml =
             '<div id="chromeperfectpixel-dropzone-decorator"></div>' +
             '<div id="chromeperfectpixel-panel-header">' +
-            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ') center center no-repeat;"></div>' +
-            '<h1>' + chrome.i18n.getMessage("extension_name_short") + '</h1>' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + ExtensionService.getResourceUrl("images/icons/16.png") + ') center center no-repeat;"></div>' +
+            '<h1>' + ExtensionService.getLocalizedMessage("extension_name_short") + '</h1>' +
             '</div>' +
             '<div id="chromeperfectpixel-min-buttons">' +
             '<div class="chromeperfectpixel-min-showHideBtn"></div>' +
@@ -378,12 +378,12 @@ var PanelView = Backbone.View.extend({
 
             '<div id="chromeperfectpixel-section">'+
             '<div id="chromeperfectpixel-section-opacity">' +
-            '<span>' + chrome.i18n.getMessage("opacity") + ':</span>' +
+            '<span>' + ExtensionService.getLocalizedMessage("opacity") + ':</span>' +
             '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
             '</div>' +
 
             '<div id="chromeperfectpixel-section-origin">' +
-            '<span>' + chrome.i18n.getMessage("origin") + ':</span>' +
+            '<span>' + ExtensionService.getLocalizedMessage("origin") + ':</span>' +
             '<div id="chromeperfectpixel-origin-controls">' +
             '<button id="chromeperfectpixel-ymore" data-axis="y" data-offset="-1">&darr;</button>' +
             '<button id="chromeperfectpixel-yless" data-axis="y" data-offset="1">&uarr;</button>' +
@@ -404,20 +404,20 @@ var PanelView = Backbone.View.extend({
             '</div>' +
             '</div>' +
 
-            '<div>' + chrome.i18n.getMessage("layers") + ':</div>' +
+            '<div>' + ExtensionService.getLocalizedMessage("layers") + ':</div>' +
             '<div id="chromeperfectpixel-section-scale">' +
-            '<div id="chromeperfectpixel-section-scale-label">' + chrome.i18n.getMessage("scale") + ':</div>' +
+            '<div id="chromeperfectpixel-section-scale-label">' + ExtensionService.getLocalizedMessage("scale") + ':</div>' +
             '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
             '</div>' +
             '<div id="chromeperfectpixel-layers"></div>' +
 
-            '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + chrome.i18n.getMessage("loading")  + '...</div>' +
+            '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + ExtensionService.getLocalizedMessage("loading")  + '...</div>' +
 
             '<div id="chromeperfectpixel-buttons">' +
-            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("show") + '</button>' +
-            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("lock") + '</button>' +
+            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("show") + '</button>' +
+            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("lock") + '</button>' +
             '<div id="chromeperfectpixel-upload-area">' +
-            '<button id="chromeperfectpixel-fakefile">' + chrome.i18n.getMessage("add_new_layer") + '</button>' +
+            '<button id="chromeperfectpixel-fakefile">' + ExtensionService.getLocalizedMessage("add_new_layer") + '</button>' +
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
             '</div>' +
@@ -715,7 +715,7 @@ var OverlayItemView = Backbone.View.extend({
             deleteBtn.button(); // apply css
             this.$el.append(deleteBtn);
 
-            this.$el.attr('title', chrome.i18n.getMessage("layer_change_title_hint"))
+            this.$el.attr('title', ExtensionService.getLocalizedMessage("layer_change_title_hint"))
             var title = this.model.get('title');
             if (title) this.$el.append($(this.title_template).text(title));
         }
@@ -732,7 +732,7 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     remove: function() {
-        var deleteLayerConfirmationMessage = chrome.i18n.getMessage('are_you_sure_you_want_to_delete_layer');
+        var deleteLayerConfirmationMessage = ExtensionService.getLocalizedMessage('are_you_sure_you_want_to_delete_layer');
         trackEvent("layer", "delete", undefined, "attempt");
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer", "delete", undefined, "confirmed");

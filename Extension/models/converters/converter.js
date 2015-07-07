@@ -8,7 +8,7 @@
 
 var Converter = {
 
-    LEGACY_VERSION_NUM: "1.22",
+    //LEGACY_VERSION_NUM: "1.22",
 
     /**
      * Apply converter needed to current data storage
@@ -42,12 +42,15 @@ var Converter = {
     },
 
     _getCurrentDataVersion: function() {
-        var instanceId = localStorage["perfectpixel"];
+        /*var instanceId = localStorage["perfectpixel"];
         var instanceData = localStorage["perfectpixel-" + instanceId];
         if(!instanceId && !instanceData)
             return this.LEGACY_VERSION_NUM;
         else
-            return $.parseJSON(instanceData).version;
+            return $.parseJSON(instanceData).version;*/
+        var PerfectPixel = new PerfectPixelModel({ id: 1 });
+        PerfectPixel.fetch();
+        return PerfectPixel.get("version");
     },
 
     _convert: function() {

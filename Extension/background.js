@@ -110,12 +110,13 @@ function injectIntoTab(tabId, after_injected_callback){
         '3rd-party/canvas-to-blob.min.js',
         'imagetools.js',
         'shared.js',
-        'content.js',
         'models/model.js',
         'models/panel.js',
+        'models/extensionService.js',
         'models/converters/converter.js',
         'models/converters/version-converters.js',
-        'views/view.js'
+        'views/view.js',
+        'content.js'
     ];
     function executeScripts(scripts, after_executed_callback) {
         var script = scripts.shift();
@@ -204,27 +205,20 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
     }
 });
 
-chrome.extension.onMessage.addListener(
+chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+
         if (request.type == PP_RequestType.getTabId){
             sendResponse({ tabId: sender.tab.id });
         }
-    }
-);
 
-chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.type == PP_RequestType.ExecuteScript) {
+        else if (request.type == PP_RequestType.ExecuteScript) {
             chrome.tabs.executeScript(sender.tab.id, request.options, function(result) {
                 sendResponse(result);
             });
         }
-    }
-);
 
-chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.type == PP_RequestType.OpenSettingsPage) {
+        else if (request.type == PP_RequestType.OpenSettingsPage) {
             var optionsUrl = chrome.extension.getURL('fancy-settings/source/index.html');
 
             chrome.tabs.query({url: optionsUrl}, function(tabs) {
@@ -236,14 +230,9 @@ chrome.extension.onMessage.addListener(
                 sendResponse();
             });
         }
-    }
-);
-
-chrome.extension.onRequest.addListener(
-    function (request, sender, sendResponse) {
 
         // Event listener for settings
-        if (request.type == PP_RequestType.GetExtensionOptions) {
+        else if (request.type == PP_RequestType.GetExtensionOptions) {
             var settingsObj = settings.toObject();
             settingsObj.defaultLocale = chrome.runtime.getManifest().default_locale;
             settingsObj.version = chrome.runtime.getManifest().version;
@@ -255,7 +244,7 @@ chrome.extension.onRequest.addListener(
         }
 
         // Event listener for tracking
-        if (request.type == PP_RequestType.TrackEvent) {
+        else if (request.type == PP_RequestType.TrackEvent) {
             var senderId = String(request.senderId);
             var eventType = String(request.eventType);
             var integerValue = Number(request.integerValue);
@@ -267,7 +256,7 @@ chrome.extension.onRequest.addListener(
         }
 
         // Event listener for file operations
-        if (request.type == PP_RequestType.GETFILE
+        else if (request.type == PP_RequestType.GETFILE
         || request.type == PP_RequestType.ADDFILE
         || request.type == PP_RequestType.DELETEFILE) {
 
@@ -310,7 +299,7 @@ chrome.extension.onRequest.addListener(
         }
 
         //Event save closed notification
-        if (request.type == PP_RequestType.SetNotifications) {
+        else if (request.type == PP_RequestType.SetNotifications) {
             if (!localStorage[request.keyName] || parseInt(localStorage[request.keyName]) < parseInt(request.notifyId)){
                 localStorage[request.keyName] = request.notifyId;
             }
@@ -320,11 +309,14 @@ chrome.extension.onRequest.addListener(
                 });
             sendResponse(true);
         }
+
         //Event get last viewed notification
-        if (request.type == PP_RequestType.GetNotifications) {
+        else if (request.type == PP_RequestType.GetNotifications) {
             var id = localStorage[request.keyName];
             sendResponse(id);
         }
+
+        return true;
     }
 );
 

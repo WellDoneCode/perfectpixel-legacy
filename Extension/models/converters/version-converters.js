@@ -13,11 +13,8 @@ var VersionConverter = {
 
 };
 
-var VersionConverter_FromLegacy = _.extend(VersionConverter, {
+/*var VersionConverter_FromLegacy = _.extend(VersionConverter, {
 
-    /**
-     * Overriden
-     */
     convert: function(currentDataVersion, targetDataVersion) {
         // Get old data
         var currentOverlayId = Number(localStorage["currentOverlayId"] || -1);
@@ -83,7 +80,7 @@ var VersionConverter_FromLegacy = _.extend(VersionConverter, {
         }
     }
 
-});
+});*/
 
 var VersionConverter_SimpleVersionUpdater = _.extend(VersionConverter, {
 
