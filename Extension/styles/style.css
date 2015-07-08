@@ -281,8 +281,11 @@ img.chromeperfectpixel-overlay {
     background: transparent;
 }
 
+#chromeperfectpixel-panel.chromeperfectpixel-locale-ru #chromeperfectpixel-section-opacity span {
+    padding-right:19px;
+}
 #chromeperfectpixel-panel.chromeperfectpixel-locale-ru #chromeperfectpixel-section-opacity input[type=range] {
-	width: 205px;
+    width: 205px;
 }
 
 #chromeperfectpixel-panel #chromeperfectpixel-section-origin {
