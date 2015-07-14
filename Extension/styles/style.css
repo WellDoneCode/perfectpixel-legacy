@@ -231,16 +231,13 @@ img.chromeperfectpixel-overlay {
 #chromeperfectpixel-header-logo
 {
     position:absolute;
-    cursor:move !important;
-    left: 8px;
-    top: 8px;
-    height: 16px;
-    width: 16px;
+    cursor:pointer !important;
     border: none;
     border-radius:0;
 
-    width: 32px;
-    height: 32px;
+    width: 16px;
+    height: 16px;
+    margin: 8px;
     top: 0;
     left: 0;
 }

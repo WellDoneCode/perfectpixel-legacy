@@ -42,6 +42,7 @@ var PanelView = Backbone.View.extend({
         'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
+        'click #chromeperfectpixel-header-logo': 'panelHeaderDoubleClick',
         'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification'
     },
 
@@ -64,6 +65,17 @@ var PanelView = Backbone.View.extend({
 
             PerfectPixel.fetch();
             PerfectPixel.overlays.fetch();
+
+            if(view._isMobileEnvironment()) {
+                view.model.set("collapsed", true);
+                view.model.set({
+                    position: {
+                        top: 0,
+                        right:0,
+                        left:"auto"
+                    }
+                });
+            }
         });
     },
 
@@ -246,16 +258,16 @@ var PanelView = Backbone.View.extend({
 
         var distance = e.shiftKey ? this.fastMoveDistance : 1;
 
-        if (e.altKey && e.which == 83) { // Alt + s
+        if (!e.metaKey && e.altKey && e.which == 83) { // Alt + s
             PerfectPixel.toggleOverlayShown();
         }
-        else if (e.altKey && e.which == 67) { // Alt + c
+        else if (!e.metaKey && e.altKey && e.which == 67) { // Alt + c
             PerfectPixel.toggleOverlayLocked();
         }
-        else if (e.altKey && e.which == 72) { // Alt + H
+        else if (!e.metaKey && e.altKey && e.which == 72) { // Alt + H
             this.model.toggleHidden();
         }
-        else if (e.altKey && e.which == 73) { // Alt + I
+        else if (!e.metaKey && e.altKey && e.which == 73) { // Alt + I
             PerfectPixel.toggleOverlayInverted();
         }
         else if (ExtOptions.allowHotkeysPositionChangeWhenLocked || ! PerfectPixel.isOverlayLocked()) {
@@ -378,7 +390,7 @@ var PanelView = Backbone.View.extend({
         var panelHtml =
             '<div id="chromeperfectpixel-dropzone-decorator"></div>' +
             '<div id="chromeperfectpixel-panel-header">' +
-            '<div id="chromeperfectpixel-header-logo" style="background:url(' + ExtensionService.getResourceUrl("images/icons/16.png") + ') center center no-repeat;"></div>' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + ExtensionService.getResourceUrl("images/icons/16.png") + ') center center no-repeat;" title="' + ExtensionService.getLocalizedMessage("toggle_collapsed_mode") + '"></div>' +
             '<h1>' + ExtensionService.getLocalizedMessage("extension_name_short") + '</h1>' +
             '</div>' +
             '<div id="chromeperfectpixel-min-buttons">' +
@@ -615,6 +627,11 @@ var PanelView = Backbone.View.extend({
         });
 
         console.log("PP Dropzone initialized");
+    },
+
+    _isMobileEnvironment: function() {
+        try{ document.createEvent("TouchEvent"); return true; }
+        catch(e){ return false; }
     },
 
     isFrozen: function() {

@@ -61,5 +61,8 @@
     },
     "uninvert_colors": {
         "message": "Убрать инверсию"
+    },
+    "toggle_collapsed_mode": {
+        "message": "Мини-режим"
     }
 }

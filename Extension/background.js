@@ -104,6 +104,7 @@ function injectIntoTab(tabId, after_injected_callback){
     var scripts = [
         '3rd-party/jquery-1.9.1.min.js',
         '3rd-party/jquery-ui-1.10.2.min.js',
+        '3rd-party/jquery.ui.touch-punch.modified.js',
         '3rd-party/underscore-min.js',
         '3rd-party/backbone-min.js',
         '3rd-party/backbone.localStorage-min.js',

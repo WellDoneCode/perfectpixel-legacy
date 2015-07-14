@@ -61,5 +61,8 @@
     },
     "uninvert_colors": {
         "message": "Invert back"
+    },
+    "toggle_collapsed_mode": {
+        "message": "Toggle Collapsed mode"
     }
 }
