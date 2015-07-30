@@ -41,6 +41,9 @@
     "add_new_layer": {
         "message": "Add new layer"
     },
+    "add_new_layer_top": {
+        "message": "Add new"
+    },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Are you sure you want to delete layer?"
     },

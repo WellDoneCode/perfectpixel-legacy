@@ -39,7 +39,10 @@
         "message": "Разблокировать"
     },
     "add_new_layer": {
-        "message": "Добавить новый слой"
+        "message": "Добавить слой"
+    },
+    "add_new_layer_top": {
+        "message": "Добавить"
     },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Вы уверены, что хотите удалить этот слой?"

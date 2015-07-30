@@ -2,7 +2,8 @@
     /*text-align: justify;*/
     width:306px;
 }
-#chromeperfectpixel-panel .chromeperfectpixel-layer {
+#chromeperfectpixel-panel .chromeperfectpixel-layer,
+#chromeperfectpixel-panel .chromeperfectpixel-layers-btn {
     background-position: left top;
     background-size: cover;
     cursor: pointer;
@@ -16,7 +17,8 @@
     padding: 0;
     margin: 6px 6px 0 0;
 }
-#chromeperfectpixel-panel .chromeperfectpixel-layer:hover{
+#chromeperfectpixel-panel .chromeperfectpixel-layer:hover,
+#chromeperfectpixel-panel .chromeperfectpixel-layers-btn:hover{
     opacity: .8;
 }
 #chromeperfectpixel-panel .chromeperfectpixel-layer.current{
@@ -59,4 +61,15 @@
 
 #chromeperfectpixel-panel .chromeperfectpixel-layer:hover .chromeperfectpixel-delete{
     display: block;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layers-btn {
+    border: 1px dashed black;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#chromeperfectpixel-panel .chromeperfectpixel-layers-btn-text {
+    text-align: center;
+    margin-top: 25%;
 }

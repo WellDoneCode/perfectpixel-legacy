@@ -109,12 +109,13 @@ var PanelView = Backbone.View.extend({
         var itemView = new OverlayItemView({
             model: overlay
         });
-        this.$('#chromeperfectpixel-layers').append(itemView.render().el);
+        $(itemView.render().el).insertBefore('#chromeperfectpixel-layers #chromeperfectpixel-layers-add-btn');
+        //this.$('#chromeperfectpixel-layers').append(itemView.render().el);
         this.update();
     },
 
     reloadOverlays: function() {
-        this.$('#chromeperfectpixel-layers').html('');
+        this.$('#chromeperfectpixel-layers').prevAll("#chromeperfectpixel-layers-add-btn").remove();
         PerfectPixel.overlays.each($.proxy(function(overlay) {
             this.appendOverlay(overlay);
         }, this));
@@ -283,12 +284,12 @@ var PanelView = Backbone.View.extend({
             else if (e.which == 40 && !isTargetInput) { // down
               PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
             }
-            else if (e.which == 189 || e.which == 109) { // "-"
+            else if ((e.which == 189 || e.which == 109) && !isTargetInput) { // "-"
                 PerfectPixel.changeCurrentOverlayOpacity({
                     opacity: Number(Number(overlay.get('opacity')) - this.opacityChangeDistance).toFixed(1)
                 });
             }
-            else if (e.which == 187 || e.which == 107) { // "+"
+            else if ((e.which == 187 || e.which == 107) && !isTargetInput) { // "+"
                 PerfectPixel.changeCurrentOverlayOpacity({
                     opacity: Number(Number(overlay.get('opacity')) + this.opacityChangeDistance).toFixed(1)
                 });
@@ -437,7 +438,11 @@ var PanelView = Backbone.View.extend({
             '<div id="chromeperfectpixel-section-scale-label">' + ExtensionService.getLocalizedMessage("scale") + ':</div>' +
             '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
             '</div>' +
-            '<div id="chromeperfectpixel-layers"></div>' +
+            '<div id="chromeperfectpixel-layers">' +
+                '<div id="chromeperfectpixel-layers-add-btn" class="chromeperfectpixel-layers-btn">' +
+                    '<div class="chromeperfectpixel-layers-btn-text">' + ExtensionService.getLocalizedMessage("add_new_layer_top") + '</div>' +
+                '</div>' +
+            '</div>' +
 
             '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + ExtensionService.getLocalizedMessage("loading")  + '...</div>' +
 
@@ -464,6 +469,10 @@ var PanelView = Backbone.View.extend({
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
             trackEvent("layer", "add", PerfectPixel.overlays.size() + 1);
             $(this).parent().find('input[type=file]').click();
+        });
+        this.$('#chromeperfectpixel-layers-add-btn').bind('click', function (e) {
+            trackEvent("layer", "add-top-btn", PerfectPixel.overlays.size() + 1);
+            $('#chromeperfectpixel-fakefile').parent().find('input[type=file]').click();
         });
         this._bindFileUploader();
 
