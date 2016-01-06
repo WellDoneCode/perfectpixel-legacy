@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * PerfectPixel is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with PerfectPixel.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,6 +25,7 @@ var PanelView = Backbone.View.extend({
     className: "chromeperfectpixel-panel",
     id: "chromeperfectpixel-panel",
     fastMoveDistance: 10,
+    opacityChangeDistance: 0.1,
     screenBordersElementId: 'chromeperfectpixel-window',
     panelUpdatedFirstTime: true,
     _isFrozen: false,
@@ -34,12 +35,14 @@ var PanelView = Backbone.View.extend({
         'click .chromeperfectpixel-min-showHideBtn': 'toggleOverlayShown',
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
         'click .chromeperfectpixel-min-lockBtn': 'toggleOverlayLocked',
+        'click .chromeperfectpixel-invertcolorsBtn': 'toggleOverlayInverted',
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
         'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
+        'click #chromeperfectpixel-header-logo': 'panelHeaderDoubleClick',
         'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification'
     },
 
@@ -53,7 +56,7 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.notificationModel.on('change:currentNotification', this.updateNotification);
 
         var view = this;
-        chrome.extension.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
+        ExtensionService.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
             view.model = new Panel({id:res.tabId});
             view.model.fetch();
             view.listenTo(view.model, 'change', view.updatePanel);
@@ -62,6 +65,17 @@ var PanelView = Backbone.View.extend({
 
             PerfectPixel.fetch();
             PerfectPixel.overlays.fetch();
+
+            if(view._isMobileEnvironment()) {
+                view.model.set("collapsed", true);
+                view.model.set({
+                    position: {
+                        top: 0,
+                        right:0,
+                        left:"auto"
+                    }
+                });
+            }
         });
     },
 
@@ -95,12 +109,13 @@ var PanelView = Backbone.View.extend({
         var itemView = new OverlayItemView({
             model: overlay
         });
-        this.$('#chromeperfectpixel-layers').append(itemView.render().el);
+        $(itemView.render().el).insertBefore('#chromeperfectpixel-layers #chromeperfectpixel-layers-add-btn');
+        //this.$('#chromeperfectpixel-layers').append(itemView.render().el);
         this.update();
     },
 
     reloadOverlays: function() {
-        this.$('#chromeperfectpixel-layers').html('');
+        this.$('#chromeperfectpixel-layers').prevAll("#chromeperfectpixel-layers-add-btn").remove();
         PerfectPixel.overlays.each($.proxy(function(overlay) {
             this.appendOverlay(overlay);
         }, this));
@@ -150,6 +165,12 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.toggleOverlayLocked();
     },
 
+    toggleOverlayInverted: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
+        trackEvent('overlay', PerfectPixel.get('overlayInverted') ? 'un-invert' : 'invert');
+        PerfectPixel.toggleOverlayInverted();
+    },
+
     originButtonClick: function(e) {
         var button = this.$(e.currentTarget);
         trackEvent("coords", button.attr('id').replace("chromeperfectpixel-", ""));
@@ -159,9 +180,9 @@ var PanelView = Backbone.View.extend({
             var offset = button.data('offset');
             if (e.shiftKey) offset *= this.fastMoveDistance;
             if (axis == "x") {
-                overlay.save({x: overlay.get('x') - offset});
+                PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - offset});
             } else if (axis == "y") {
-                overlay.save({y: overlay.get('y') - offset});
+                PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - offset});
             }
         }
     },
@@ -176,10 +197,12 @@ var PanelView = Backbone.View.extend({
             isNaN(value) && (value = 0);
             switch (axis) {
                 case 'x':
-                    overlay.save({x: value});
+                    var currentValue = PerfectPixel.moveCurrentOverlay({x: value});
+                    input.val(currentValue.x || '');
                     break;
                 case 'y':
-                    overlay.save({y: value});
+                    var currentValue = PerfectPixel.moveCurrentOverlay({y: value});
+                    input.val(currentValue.y || '');
                     break;
                 default:
                     break;
@@ -193,8 +216,10 @@ var PanelView = Backbone.View.extend({
         }
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            var value = this.$(e.currentTarget).val();
-            overlay.save({opacity: Number(value).toFixed(1)});
+            var input = this.$(e.currentTarget);
+            var value = input.val();
+            var returnValue = PerfectPixel.changeCurrentOverlayOpacity({opacity: Number(value).toFixed(1)});
+            input.val(returnValue.opacity || 1);
         }
     },
 
@@ -203,11 +228,13 @@ var PanelView = Backbone.View.extend({
     },
 
     changeScale: function(e) {
-        var value = this.$(e.currentTarget).val();
+        var input = this.$(e.currentTarget);
+        var value = input.val();
         trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            overlay.save({scale: Number(value)});
+            var returnValue = PerfectPixel.scaleCurrentOverlay({scale: Number(value).toFixed(2)});
+            input.val(Number(returnValue.scale) || 1);
         }
     },
 
@@ -226,36 +253,57 @@ var PanelView = Backbone.View.extend({
     keyDown: function(e) {
         if ($(e.target).is('.title[contenteditable]')) return;
         var overlay = PerfectPixel.getCurrentOverlay();
-        if (overlay) {
-            var distance = e.shiftKey ? this.fastMoveDistance : 1;
-            if (e.which == 37) { // left
-                overlay.save({x: overlay.get('x') - distance});
+        var isTargetInput = $(e.target).is('input');
+
+        if (! overlay) return;
+
+        var distance = e.shiftKey ? this.fastMoveDistance : 1;
+
+        if (!e.metaKey && e.altKey && e.which == 83) { // Alt + s
+            PerfectPixel.toggleOverlayShown();
+        }
+        else if (!e.metaKey && e.altKey && e.which == 67) { // Alt + c
+            PerfectPixel.toggleOverlayLocked();
+        }
+        else if (!e.metaKey && e.altKey && e.which == 72) { // Alt + H
+            this.model.toggleHidden();
+        }
+        else if (!e.metaKey && e.altKey && e.which == 73) { // Alt + I
+            PerfectPixel.toggleOverlayInverted();
+        }
+        else if (ExtOptions.allowHotkeysPositionChangeWhenLocked || ! PerfectPixel.isOverlayLocked()) {
+            if (e.which == 37 && !isTargetInput) { // left
+              PerfectPixel.moveCurrentOverlay({x: overlay.get('x') - distance});
             }
-            else if (e.which == 38) { // up
-                overlay.save({y: overlay.get('y') - distance});
+            else if (e.which == 38 && !isTargetInput) { // up
+              PerfectPixel.moveCurrentOverlay({y: overlay.get('y') - distance});
             }
-            else if (e.which == 39) { // right
-                overlay.save({x: overlay.get('x') + distance});
+            else if (e.which == 39 && !isTargetInput) { // right
+              PerfectPixel.moveCurrentOverlay({x: overlay.get('x') + distance});
             }
-            else if (e.which == 40) { // down
-                overlay.save({y: overlay.get('y') + distance});
+            else if (e.which == 40 && !isTargetInput) { // down
+              PerfectPixel.moveCurrentOverlay({y: overlay.get('y') + distance});
             }
-            else if (e.altKey && e.which == 83) { // Alt + s
-                PerfectPixel.toggleOverlayShown();
+            else if ((e.which == 189 || e.which == 109) && !isTargetInput) { // "-"
+                PerfectPixel.changeCurrentOverlayOpacity({
+                    opacity: Number(Number(overlay.get('opacity')) - this.opacityChangeDistance).toFixed(1)
+                });
             }
-            else if (e.altKey && e.which == 67) { // Alt + c
-                PerfectPixel.toggleOverlayLocked();
-            }
-            else if (e.altKey && e.which == 72) { // Alt + H
-                this.model.toggleHidden();
+            else if ((e.which == 187 || e.which == 107) && !isTargetInput) { // "+"
+                PerfectPixel.changeCurrentOverlayOpacity({
+                    opacity: Number(Number(overlay.get('opacity')) + this.opacityChangeDistance).toFixed(1)
+                });
             }
             else {
                 return;
             }
-
-            e.stopPropagation();
-            e.preventDefault();
         }
+        else{
+            return;
+        }
+
+        e.stopPropagation();
+        e.preventDefault();
     },
 
     update: function() {
@@ -265,19 +313,20 @@ var PanelView = Backbone.View.extend({
                 this.overlayView = new OverlayView();
                 $('body').append(this.overlayView.render().el);
             }
-            this.$('.chromeperfectpixel-showHideBtn span').text(chrome.i18n.getMessage('hide'));
+            this.$('.chromeperfectpixel-showHideBtn span').text(ExtensionService.getLocalizedMessage('hide'));
             this.$('.chromeperfectpixel-min-showHideBtn').text('v');
         } else {
             if (this.overlayView) {
                 this.overlayView.unrender();
                 delete this.overlayView;
             }
-            this.$('.chromeperfectpixel-showHideBtn span').text(chrome.i18n.getMessage('show'));
+            this.$('.chromeperfectpixel-showHideBtn span').text(ExtensionService.getLocalizedMessage('show'));
             this.$('.chromeperfectpixel-min-showHideBtn').text('i');
         }
 
         if (this.overlayView) {
             this.overlayView.setLocked(PerfectPixel.get('overlayLocked'));
+            this.overlayView.setInverted(PerfectPixel.get('overlayInverted'));
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
@@ -287,9 +336,14 @@ var PanelView = Backbone.View.extend({
         this.$('.chromeperfectpixel-lockBtn').button({ disabled: isNoOverlays });
         this.$('.chromeperfectpixel-lockBtn span').text(
             PerfectPixel.get('overlayLocked')
-                ? chrome.i18n.getMessage('unlock')
-                : chrome.i18n.getMessage('lock'));
+                ? ExtensionService.getLocalizedMessage('unlock')
+                : ExtensionService.getLocalizedMessage('lock'));
         this.$('.chromeperfectpixel-min-lockBtn').text(PerfectPixel.get('overlayLocked') ? 'l' : 'u');
+        this.$('.chromeperfectpixel-invertcolorsBtn').button({ disabled: isNoOverlays });
+        this.$('.chromeperfectpixel-invertcolorsBtn span').text(
+            PerfectPixel.get('overlayInverted')
+                ? ExtensionService.getLocalizedMessage('uninvert_colors')
+                : ExtensionService.getLocalizedMessage('invert_colors'));
         this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
         this.$('input').not('input[type=file]').attr('disabled', function() {
             return isNoOverlays;
@@ -298,8 +352,8 @@ var PanelView = Backbone.View.extend({
         if (overlay) {
             this.$('#chromeperfectpixel-coordX').val(overlay.get('x'));
             this.$('#chromeperfectpixel-coordY').val(overlay.get('y'));
-            this.$('#chromeperfectpixel-opacity').val(overlay.get('opacity'));
-            this.$('#chromeperfectpixel-scale').val(overlay.get('scale'));
+            this.$('#chromeperfectpixel-opacity').val(Number(overlay.get('opacity')));
+            this.$('#chromeperfectpixel-scale').val(Number(overlay.get('scale')));
         } else {
             this.$('#chromeperfectpixel-coordX').val('');
             this.$('#chromeperfectpixel-coordY').val('');
@@ -326,19 +380,19 @@ var PanelView = Backbone.View.extend({
     togglePanelShown: function(){
         $('#chromeperfectpixel-panel').toggle();
         var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
-        chrome.extension.sendMessage({type: PP_RequestType.PanelStateChange, state: new_state});
+        ExtensionService.sendMessage({type: PP_RequestType.PanelStateChange, state: new_state});
     },
 
     render: function() {
         $('body').append(this.$el).append('<div id="' + this.screenBordersElementId + '"/>');
-        this.$el.css('background', 'url(' + chrome.extension.getURL('images/noise.jpg') + ')');
-        this.$el.addClass(chrome.i18n.getMessage("panel_css_class"));
+        this.$el.css('background', 'url(' + ExtensionService.getResourceUrl('images/noise.jpg') + ')');
+        this.$el.addClass(ExtensionService.getLocalizedMessage("panel_css_class"));
 
         var panelHtml =
             '<div id="chromeperfectpixel-dropzone-decorator"></div>' +
             '<div id="chromeperfectpixel-panel-header">' +
-            '<div id="chromeperfectpixel-header-logo" style="background:url(' + chrome.extension.getURL("images/icons/16.png") + ') center center no-repeat;"></div>' +
-            '<h1>' + chrome.i18n.getMessage("extension_name_short") + '</h1>' +
+            '<div id="chromeperfectpixel-header-logo" style="background:url(' + ExtensionService.getResourceUrl("images/icons/16.png") + ') center center no-repeat;" title="' + ExtensionService.getLocalizedMessage("toggle_collapsed_mode") + '"></div>' +
+            '<h1>' + ExtensionService.getLocalizedMessage("extension_name_short") + '</h1>' +
             '</div>' +
             '<div id="chromeperfectpixel-min-buttons">' +
             '<div class="chromeperfectpixel-min-showHideBtn"></div>' +
@@ -353,12 +407,12 @@ var PanelView = Backbone.View.extend({
 
             '<div id="chromeperfectpixel-section">'+
             '<div id="chromeperfectpixel-section-opacity">' +
-            '<span>' + chrome.i18n.getMessage("opacity") + ':</span>' +
+            '<span>' + ExtensionService.getLocalizedMessage("opacity") + ':</span>' +
             '<input type="range" id="chromeperfectpixel-opacity" min="0" max="1" step="0.01" value="0.5" />' +
             '</div>' +
 
             '<div id="chromeperfectpixel-section-origin">' +
-            '<span>' + chrome.i18n.getMessage("origin") + ':</span>' +
+            '<span>' + ExtensionService.getLocalizedMessage("origin") + ':</span>' +
             '<div id="chromeperfectpixel-origin-controls">' +
             '<button id="chromeperfectpixel-ymore" data-axis="y" data-offset="-1">&darr;</button>' +
             '<button id="chromeperfectpixel-yless" data-axis="y" data-offset="1">&uarr;</button>' +
@@ -379,20 +433,25 @@ var PanelView = Backbone.View.extend({
             '</div>' +
             '</div>' +
 
-            '<div>' + chrome.i18n.getMessage("layers") + ':</div>' +
+            '<div>' + ExtensionService.getLocalizedMessage("layers") + ':</div>' +
             '<div id="chromeperfectpixel-section-scale">' +
-            '<div id="chromeperfectpixel-section-scale-label">' + chrome.i18n.getMessage("scale") + ':</div>' +
+            '<div id="chromeperfectpixel-section-scale-label">' + ExtensionService.getLocalizedMessage("scale") + ':</div>' +
             '<input type="number" id="chromeperfectpixel-scale" value="1.0" size="3" min="0.1" max="10" step="0.1"/>' +
             '</div>' +
-            '<div id="chromeperfectpixel-layers"></div>' +
+            '<div id="chromeperfectpixel-layers">' +
+                '<div id="chromeperfectpixel-layers-add-btn" class="chromeperfectpixel-layers-btn">' +
+                    '<div class="chromeperfectpixel-layers-btn-text">' + ExtensionService.getLocalizedMessage("add_new_layer_top") + '</div>' +
+                '</div>' +
+            '</div>' +
 
-            '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + chrome.i18n.getMessage("loading")  + '...</div>' +
+            '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + ExtensionService.getLocalizedMessage("loading")  + '...</div>' +
 
             '<div id="chromeperfectpixel-buttons">' +
-            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("show") + '</button>' +
-            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + chrome.i18n.getMessage("lock") + '</button>' +
+            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("show") + '</button>' +
+            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("lock") + '</button>' +
+            '<button class="chromeperfectpixel-invertcolorsBtn" title="Hotkey: Alt + I" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("invert_colors") + '</button>' +
             '<div id="chromeperfectpixel-upload-area">' +
-            '<button id="chromeperfectpixel-fakefile">' + chrome.i18n.getMessage("add_new_layer") + '</button>' +
+            '<button id="chromeperfectpixel-fakefile">' + ExtensionService.getLocalizedMessage("add_new_layer") + '</button>' +
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
             '</div>' +
             '</div>' +
@@ -410,6 +469,10 @@ var PanelView = Backbone.View.extend({
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
             trackEvent("layer", "add", PerfectPixel.overlays.size() + 1);
             $(this).parent().find('input[type=file]').click();
+        });
+        this.$('#chromeperfectpixel-layers-add-btn').bind('click', function (e) {
+            trackEvent("layer", "add-top-btn", PerfectPixel.overlays.size() + 1);
+            $('#chromeperfectpixel-fakefile').parent().find('input[type=file]').click();
         });
         this._bindFileUploader();
 
@@ -575,6 +638,11 @@ var PanelView = Backbone.View.extend({
         console.log("PP Dropzone initialized");
     },
 
+    _isMobileEnvironment: function() {
+        try{ document.createEvent("TouchEvent"); return true; }
+        catch(e){ return false; }
+    },
+
     isFrozen: function() {
         return this._isFrozen;
     },
@@ -690,7 +758,7 @@ var OverlayItemView = Backbone.View.extend({
             deleteBtn.button(); // apply css
             this.$el.append(deleteBtn);
 
-            this.$el.attr('title', chrome.i18n.getMessage("layer_change_title_hint"))
+            this.$el.attr('title', ExtensionService.getLocalizedMessage("layer_change_title_hint"))
             var title = this.model.get('title');
             if (title) this.$el.append($(this.title_template).text(title));
         }
@@ -707,7 +775,7 @@ var OverlayItemView = Backbone.View.extend({
     },
 
     remove: function() {
-        var deleteLayerConfirmationMessage = chrome.i18n.getMessage('are_you_sure_you_want_to_delete_layer');
+        var deleteLayerConfirmationMessage = ExtensionService.getLocalizedMessage('are_you_sure_you_want_to_delete_layer');
         trackEvent("layer", "delete", undefined, "attempt");
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
             trackEvent("layer", "delete", undefined, "confirmed");
@@ -769,17 +837,34 @@ var OverlayView = Backbone.View.extend({
         this.$el.css('pointer-events', value ? 'none' : 'auto');
     },
 
+    setInverted: function(value) {
+        this.$el.css({
+            '-webkit-filter': value ? 'invert(100%)' : '',
+            'filter': value ? 'invert(100%)': ''
+        });
+    },
+
     mousewheel: function(e) {
-        if (e.originalEvent.wheelDelta < 0) {
-            this.model.save({opacity: Number(this.model.get('opacity')) - 0.05});
-        } else {
-            this.model.save({opacity: Number(this.model.get('opacity')) + 0.05});
+        if(ExtOptions.enableMousewheelOpacity) {
+            if (e.originalEvent.wheelDelta < 0) {
+                this.model.save({opacity: Number(this.model.get('opacity')) - 0.05});
+            } else {
+                this.model.save({opacity: Number(this.model.get('opacity')) + 0.05});
+            }
+            e.stopPropagation();
+            e.preventDefault();
         }
-        e.stopPropagation();
-        e.preventDefault();
     },
 
     startDrag: function(e, ui) {
+        // If focus is on PP panel input's remove it to allow arrow hotkeys work on overlay
+        var focusedElem = $(getFocusedElement());
+        if(focusedElem && (focusedElem.is('input#chromeperfectpixel-opacity')
+            || focusedElem.is('input#chromeperfectpixel-coordX')
+            || focusedElem.is('input#chromeperfectpixel-coordY'))) {
+            focusedElem.blur();
+        }
+
         // For Smart movement
         ui.helper.data('PPSmart.originalPosition', ui.position || {top: 0, left: 0});
         ui.helper.data('PPSmart.stickBorder', null);
@@ -835,7 +920,7 @@ var OverlayView = Backbone.View.extend({
     stopDrag: function(e, ui) {
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
-            overlay.save({x: ui.position.left, y: ui.position.top});
+            PerfectPixel.moveCurrentOverlay({x: ui.position.left, y: ui.position.top});
         }
     },
 
@@ -872,3 +957,11 @@ var OverlayView = Backbone.View.extend({
             this.$el.show();
     }
 });
+
+function getFocusedElement() {
+    var el;
+    if ((el = document.activeElement) && el != document.body)
+        return el;
+    else
+        return null;
+}

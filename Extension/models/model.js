@@ -62,8 +62,8 @@ Backbone.GSModel = Backbone.Model.extend({
 var Overlay = Backbone.GSModel.extend({
 
     defaults: {
-        x: 50,
-        y: 50,
+        x: 0,
+        y: 0,
         width: 300,
         height: 300,
         opacity: 0.5,
@@ -191,7 +191,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
             // 1. Add full size image to storage
             console.log("PP Add file operation");
-            chrome.extension.sendRequest(
+            ExtensionService.sendMessage(
                 {
                     type: PP_RequestType.ADDFILE,
                     fileData: bufferToString(e.target.result),
@@ -219,7 +219,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
                                     // 3. Add thumbnail image to storage
                                     console.log("PP Add file operation - thumbnail");
-                                    chrome.extension.sendRequest(
+                                    ExtensionService.sendMessage(
                                         {
                                             type: PP_RequestType.ADDFILE,
                                             fileData: bufferToString(resizedBlobBuffer),
@@ -275,7 +275,7 @@ var OverlayImage = Backbone.GSModel.extend({
         if (filename) {
             console.time("PP Profiling _getImageUrlByFilename " + filename);
             var self = this;
-            chrome.extension.sendRequest({
+            ExtensionService.sendMessage({
                     type: PP_RequestType.GETFILE,
                     fileName: filename
                 },
@@ -319,7 +319,7 @@ var OverlayImage = Backbone.GSModel.extend({
 
         console.log("PP Delete files operation " + filesToDelete.toString());
 
-        chrome.extension.sendRequest(
+        ExtensionService.sendMessage(
         {
             type: PP_RequestType.DELETEFILE,
             fileName: filesToDelete
@@ -345,6 +345,7 @@ var PerfectPixelModel = Backbone.Model.extend({
         currentOverlayId: null,
         overlayShown: false,
         overlayLocked: false,
+        overlayInverted: false,
         version: 0 // Version is always set by Converter class
     },
 
@@ -372,6 +373,46 @@ var PerfectPixelModel = Backbone.Model.extend({
         return this.get('currentOverlayId') === overlay.id
     },
 
+    isOverlayLocked: function() {
+        return this.get('overlayLocked')
+    },
+
+    moveCurrentOverlay: function(props) {
+        var overlay = this.getCurrentOverlay();
+        if (overlay) {
+            if (ExtOptions.allowPositionChangeWhenLocked ||
+                (this.get('overlayShown') && !this.get('overlayLocked'))) {
+                overlay.save(props);
+            }
+            return {x: overlay.get('x'), y: overlay.get('y')};
+        }
+        return {x: null, y: null};
+    },
+
+    scaleCurrentOverlay: function(props) {
+        var overlay = this.getCurrentOverlay();
+        if (overlay) {
+            if (ExtOptions.allowPositionChangeWhenLocked ||
+                (this.get('overlayShown') && !this.get('overlayLocked'))) {
+                overlay.save(props);
+            }
+            return {scale: overlay.get('scale')};
+        }
+        return {scale: null};
+    },
+
+    changeCurrentOverlayOpacity: function(props) {
+        var overlay = this.getCurrentOverlay();
+        if (overlay) {
+            if (ExtOptions.allowPositionChangeWhenLocked ||
+                (this.get('overlayShown') && !this.get('overlayLocked'))) {
+                overlay.save(props);
+            }
+            return {opacity: overlay.get('opacity')};
+        }
+        return {opacity: null};
+    },
+
     toggleOverlayShown: function() {
         this.save({overlayShown: !this.get('overlayShown')});
     },
@@ -386,6 +427,10 @@ var PerfectPixelModel = Backbone.Model.extend({
 
     unlockOverlay: function() {
         this.save({overlayLocked: false});
+    },
+
+    toggleOverlayInverted: function() {
+        this.save({overlayInverted: !this.get('overlayInverted')});
     },
 
     overlayRemoved: function(overlay) {
@@ -482,7 +527,7 @@ var NotificationCollection = Backbone.Collection.extend({
     },
     model: Notification,
     url: function() {
-        return "http://www.welldonecode.com/perfectpixel/data/notifications.json?random=" + Math.random();
+        return "https://s3-eu-west-1.amazonaws.com/www.welldonecode.com/perfectpixel/data/notifications.json?random=" + Math.random();
     }
 });
 
@@ -503,7 +548,7 @@ var NotificationModel = Backbone.Model.extend({
         var allNotificationsFromRemote = new NotificationCollection();
         allNotificationsFromRemote.fetch({
             success: $.proxy(function(result) {
-                chrome.extension.sendRequest(
+                ExtensionService.sendMessage(
                     {
                         type: PP_RequestType.GetNotifications,
                         keyName:'perfectpixel-notification'
@@ -524,7 +569,7 @@ var NotificationModel = Backbone.Model.extend({
 
     setCollection: function(collection){
         var collectionResult = new NotificationCollection,
-            version = Converter._getCurrentDataVersion(),
+            version = Converter._getCurrentExtensionVersion(),
             maxid = this.get("maxId");
 
         collection.each( function( notify){
@@ -552,7 +597,7 @@ var NotificationModel = Backbone.Model.extend({
 
     closeCurrentNotification: function() {
         var notify = this.getCurrentNotification();
-        chrome.extension.sendRequest(
+        ExtensionService.sendMessage(
             {
                 type: PP_RequestType.SetNotifications,
                 notifyId: notify.get("id"),

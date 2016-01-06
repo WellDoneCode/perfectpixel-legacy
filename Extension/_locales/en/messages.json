@@ -41,6 +41,9 @@
     "add_new_layer": {
         "message": "Add new layer"
     },
+    "add_new_layer_top": {
+        "message": "Add new"
+    },
     "are_you_sure_you_want_to_delete_layer": {
         "message": "Are you sure you want to delete layer?"
     },
@@ -55,5 +58,14 @@
     },
     "supported_by_disable_tooltip": {
         "message": "In extension options page"
+    },
+    "invert_colors": {
+        "message": "Invert"
+    },
+    "uninvert_colors": {
+        "message": "Invert back"
+    },
+    "toggle_collapsed_mode": {
+        "message": "Toggle Collapsed mode"
     }
 }

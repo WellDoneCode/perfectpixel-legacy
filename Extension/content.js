@@ -27,7 +27,7 @@ var trackEvent = function(senderId, eventType, integerValue, stringValue) {
     }
 
     console.log("PP track event", "senderId: " + senderId + "; eventType: " + eventType);
-    chrome.extension.sendRequest({
+    ExtensionService.sendMessage({
             type: PP_RequestType.TrackEvent,
             senderId: senderId,
             eventType: eventType,
@@ -54,7 +54,9 @@ function togglePanel(state)  {
         //delete this.panelView;
     }
     else {
-        chrome.extension.sendRequest({ type: PP_RequestType.GetExtensionOptions }, $.proxy(function (theOptions) {
+        ExtensionService.sendMessage({
+            type: PP_RequestType.GetExtensionOptions
+        }, $.proxy(function (theOptions) {
             ExtOptions = theOptions;
             if (!ExtOptions.debugMode) {
                 // disable console messages
@@ -76,7 +78,7 @@ function togglePanel(state)  {
 }
 
 // Listener for events from background.js
-chrome.runtime.onMessage.addListener(
+ExtensionService.onMessage.addListener(
     function(request, sender, sendResponse) {
 
         if(request.type == PP_Background_RequestType.NotificationsUpdated)

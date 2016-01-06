@@ -26,6 +26,13 @@ this.manifest = {
         },
         {
             "tab": this.i18n.get("general"),
+            "group": this.i18n.get('mouse_and_keyboard'),
+            "name": "enableMousewheelOpacity",
+            "type": "checkbox",
+            "label": this.i18n.get('enable_mousewheel_opacity')
+        },
+        {
+            "tab": this.i18n.get("general"),
             "group": this.i18n.get("behavior"),
             "name": "rememberPanelOpenClosedState",
             "type": "checkbox",
@@ -37,6 +44,20 @@ this.manifest = {
             "name": "enableDeleteLayerConfirmationMessage",
             "type": "checkbox",
             "label": this.i18n.get("enable_confirmation_message")
+        },
+        {
+            "tab": this.i18n.get("general"),
+            "group": this.i18n.get("behavior"),
+            "name": "allowPositionChangeWhenLocked",
+            "type": "checkbox",
+            "label": this.i18n.get("allow_position_change_when_locked")
+        },
+        {
+            "tab": this.i18n.get("general"),
+            "group": this.i18n.get("behavior"),
+            "name": "allowHotkeysPositionChangeWhenLocked",
+            "type": "checkbox",
+            "label": this.i18n.get("allow_hotkeys_position_change_when_locked")
         },
         {
             "tab": this.i18n.get("general"),
