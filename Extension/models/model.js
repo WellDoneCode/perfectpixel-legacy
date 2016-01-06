@@ -527,7 +527,7 @@ var NotificationCollection = Backbone.Collection.extend({
     },
     model: Notification,
     url: function() {
-        return "http://www.welldonecode.com/perfectpixel/data/notifications.json?random=" + Math.random();
+        return "https://s3-eu-west-1.amazonaws.com/www.welldonecode.com/perfectpixel/data/notifications.json?random=" + Math.random();
     }
 });
 
