@@ -36,6 +36,7 @@ var PanelView = Backbone.View.extend({
         'click .chromeperfectpixel-lockBtn': 'toggleOverlayLocked',
         'click .chromeperfectpixel-min-lockBtn': 'toggleOverlayLocked',
         'click .chromeperfectpixel-invertcolorsBtn': 'toggleOverlayInverted',
+		'click .chromeperfectpixel-switchsizeBtn': 'toggleSwitchSize',
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
@@ -169,6 +170,12 @@ var PanelView = Backbone.View.extend({
         if ($(ev.currentTarget).is('[disabled]')) return false;
         trackEvent('overlay', PerfectPixel.get('overlayInverted') ? 'un-invert' : 'invert');
         PerfectPixel.toggleOverlayInverted();
+    },
+	
+	toggleSwitchSize: function(ev) {
+        if ($(ev.currentTarget).is('[disabled]')) return false;
+        trackEvent('overlay', PerfectPixel.get('switchSize') ? 'un-switch' : 'switch');
+        PerfectPixel.toggleSwitchSize();
     },
 
     originButtonClick: function(e) {
@@ -327,6 +334,7 @@ var PanelView = Backbone.View.extend({
         if (this.overlayView) {
             this.overlayView.setLocked(PerfectPixel.get('overlayLocked'));
             this.overlayView.setInverted(PerfectPixel.get('overlayInverted'));
+			this.overlayView.setSwitchSize(PerfectPixel.get('switchSize'));
         }
 
         var isNoOverlays = (PerfectPixel.overlays.size() == 0);
@@ -344,6 +352,11 @@ var PanelView = Backbone.View.extend({
             PerfectPixel.get('overlayInverted')
                 ? ExtensionService.getLocalizedMessage('uninvert_colors')
                 : ExtensionService.getLocalizedMessage('invert_colors'));
+		this.$('.chromeperfectpixel-switchsizeBtn').button({ disabled: isNoOverlays });
+		this.$('.chromeperfectpixel-switchsizeBtn span').text(
+            PerfectPixel.get('switchSize')
+                ? ExtensionService.getLocalizedMessage('switch_size_on')
+                : ExtensionService.getLocalizedMessage('switch_size_off'));
         this.$('#chromeperfectpixel-origin-controls button').button({ disabled: isNoOverlays });
         this.$('input').not('input[type=file]').attr('disabled', function() {
             return isNoOverlays;
@@ -447,9 +460,10 @@ var PanelView = Backbone.View.extend({
             '<div id="chromeperfectpixel-progressbar-area" style="display: none">' + ExtensionService.getLocalizedMessage("loading")  + '...</div>' +
 
             '<div id="chromeperfectpixel-buttons">' +
-            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("show") + '</button>' +
-            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("lock") + '</button>' +
-            '<button class="chromeperfectpixel-invertcolorsBtn" title="Hotkey: Alt + I" style="margin-right: 5px; float:left;">' + ExtensionService.getLocalizedMessage("invert_colors") + '</button>' +
+            '<button class="chromeperfectpixel-showHideBtn" title="Hotkey: Alt + S" style="margin-right: 5px; margin-bottom: 5px; float:left;">' + ExtensionService.getLocalizedMessage("show") + '</button>' +
+            '<button class="chromeperfectpixel-lockBtn" title="Hotkey: Alt + C" style="margin-right: 5px; margin-bottom: 5px; float:left;">' + ExtensionService.getLocalizedMessage("lock") + '</button>' +
+            '<button class="chromeperfectpixel-invertcolorsBtn" title="Hotkey: Alt + I" style="margin-right: 5px; margin-bottom: 5px; float:left;">' + ExtensionService.getLocalizedMessage("invert_colors") + '</button>' +
+			'<button class="chromeperfectpixel-switchsizeBtn" title="Hotkey: Alt + T" style="margin-right: 5px; margin-bottom: 5px; float:left;">' + ExtensionService.getLocalizedMessage("switch_size_off") + '</button>' +
             '<div id="chromeperfectpixel-upload-area">' +
             '<button id="chromeperfectpixel-fakefile">' + ExtensionService.getLocalizedMessage("add_new_layer") + '</button>' +
             '<span><input id="chromeperfectpixel-fileUploader" type="file" accept="image/*" /></span>' +
@@ -842,6 +856,22 @@ var OverlayView = Backbone.View.extend({
             '-webkit-filter': value ? 'invert(100%)' : '',
             'filter': value ? 'invert(100%)': ''
         });
+    },
+	
+	setSwitchSize: function(value) {
+		var width = this.model.get('width');
+		var iframecount = $("#chromeperfectpixel-iframe").length
+		if (value === false) {
+			if (iframecount < 1) {
+				$("body >").not("#chromeperfectpixel-panel").not("#chromeperfectpixel-window").not("#chromeperfectpixel-overlay_3985123731465987").remove();
+				$("body").after("<iframe id='chromeperfectpixel-iframe' style='width: " + width + "px; height: 10000px; display: block; margin: 0 auto;' src='" + window.location.href + "'></iframe>");
+			}
+		} else {
+			if (iframecount > 0) {
+				window.location.reload();
+			}
+		}
+		
     },
 
     mousewheel: function(e) {

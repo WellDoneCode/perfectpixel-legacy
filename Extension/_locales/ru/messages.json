@@ -67,5 +67,11 @@
     },
     "toggle_collapsed_mode": {
         "message": "Мини-режим"
+    },
+	"switch_size_on": {
+        "message": "Размер ВКЛ"
+    },
+	"switch_size_off": {
+        "message": "Размер ВЫКЛ"
     }
 }

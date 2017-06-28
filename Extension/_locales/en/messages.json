@@ -67,5 +67,11 @@
     },
     "toggle_collapsed_mode": {
         "message": "Toggle Collapsed mode"
+    },
+	"switch_size_on": {
+        "message": "Switch size ON"
+    },
+	"switch_size_off": {
+        "message": "Switch size OFF"
     }
 }
