@@ -1,4 +1,4 @@
-[NOTE] This is legacy unmaintained code, use at your own risk. Current PerfectPixel uses different closed source codebase
+[NOTE] This is legacy unmaintained code, use at your own risk. Current PerfectPixel uses different closed source codebase. Please email to support@welldonecode.com with bugs and feature requests
 
 PerfectPixel by WellDoneCode [Legacy]
 ====================================
