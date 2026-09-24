@@ -5,6 +5,8 @@ PerfectPixel by WellDoneCode [Legacy]
 
 Chrome extension for web developers
 
+<img src="Docs/screenshot.png" alt="PerfectPixel panel" width="400">
+
 How to install
 ==============
 
