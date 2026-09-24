@@ -21,27 +21,6 @@
 var ExtOptions;
 var PerfectPixel;
 
-var trackEvent = function(senderId, eventType, integerValue, stringValue) {
-    if (ExtOptions.enableStatistics == false) {
-        return;
-    }
-
-    console.log("PP track event", "senderId: " + senderId + "; eventType: " + eventType);
-    ExtensionService.sendMessage({
-            type: PP_RequestType.TrackEvent,
-            senderId: senderId,
-            eventType: eventType,
-            integerValue: integerValue,
-            stringValue: stringValue
-        },
-        function (response) {
-            if (!response) {
-                console.log("PP error", "Tracking error: " + senderId + ", " + eventType);
-            }
-        }
-    );
-};
-
 function togglePanel(state)  {
     if (this.panelView) {
 
@@ -76,13 +55,3 @@ function togglePanel(state)  {
 
     }
 }
-
-// Listener for events from background.js
-ExtensionService.onMessage.addListener(
-    function(request, sender, sendResponse) {
-
-        if(request.type == PP_Background_RequestType.NotificationsUpdated)
-        {
-            PerfectPixel.notificationModel.initialize();
-        }
-    });

@@ -35,15 +35,10 @@ var settings = new Store("settings", {
     "NewLayerMoveToScrollPosition": true,
     "NewLayerMakeActive": true,
     "NewLayerShow": true,
-    "NewLayerUnlock": true,
-    "enableStatistics": true,
-    "disableSupportedByAd": false
+    "NewLayerUnlock": true
     // + "version" property in content script = current extension version from manifest
     // + "defaultLocale" property in content script = default locale from manifest
 });
-
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-26666773-2']);
 
 $(document).ready(function () {
     if (!settings.get("debugMode")) {
@@ -54,12 +49,6 @@ $(document).ready(function () {
         }
     }
 
-    if (settings.get("enableStatistics")) {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = 'https://ssl.google-analytics.com/ga.js';
-        //ga.src = 'https://ssl.google-analytics.com/u/ga_debug.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    }
     // because default icon is "disabled" we need to check all tabs
     chrome.tabs.getAllInWindow(null, function(tabs){
         for (var i = 0; i < tabs.length; i++) {
@@ -83,18 +72,6 @@ function togglePanel(tabId){
 }
 
 function injectIntoTab(tabId, after_injected_callback){
-    if (settings.get("enableStatistics")) {
-        _gaq.push(['_trackPageview']); // Tracking
-
-        // Track settings on each load
-        var settingsAsObj = settings.toObject();
-        for(var optionName in settingsAsObj) {
-            var optionValue = settingsAsObj[optionName];
-            var uncapitalizedOptionName = optionName.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
-            trackEvent("settings", uncapitalizedOptionName, null, String(optionValue), true); // Put in queue
-        }
-    }
-
     chrome.tabs.insertCSS(tabId, { file: "styles/style.css" });
     chrome.tabs.insertCSS(tabId, { file: "styles/jquery-ui-1.10.2.modified.min.css" });
     chrome.tabs.insertCSS(tabId, { file: "styles/compact-layers-section.css" });
@@ -244,18 +221,6 @@ chrome.runtime.onMessage.addListener(
             })*/
         }
 
-        // Event listener for tracking
-        else if (request.type == PP_RequestType.TrackEvent) {
-            var senderId = String(request.senderId);
-            var eventType = String(request.eventType);
-            var integerValue = Number(request.integerValue);
-            var stringValue = request.stringValue !== undefined ? String(request.stringValue) : request.stringValue;
-
-            trackEvent(senderId, eventType, integerValue, stringValue);
-
-            sendResponse(true);
-        }
-
         // Event listener for file operations
         else if (request.type == PP_RequestType.GETFILE
         || request.type == PP_RequestType.ADDFILE
@@ -299,24 +264,6 @@ chrome.runtime.onMessage.addListener(
             });
         }
 
-        //Event save closed notification
-        else if (request.type == PP_RequestType.SetNotifications) {
-            if (!localStorage[request.keyName] || parseInt(localStorage[request.keyName]) < parseInt(request.notifyId)){
-                localStorage[request.keyName] = request.notifyId;
-            }
-            sendMessageToAllTabs(
-                {
-                    type: PP_Background_RequestType.NotificationsUpdated
-                });
-            sendResponse(true);
-        }
-
-        //Event get last viewed notification
-        else if (request.type == PP_RequestType.GetNotifications) {
-            var id = localStorage[request.keyName];
-            sendResponse(id);
-        }
-
         return true;
     }
 );
@@ -326,49 +273,6 @@ function sendMessageToTab(tabId, data, callback)
 {
     chrome.tabs.sendMessage(tabId, data, callback);
 }
-
-// Sends message to PerfectPixel content script in all tabs
-function sendMessageToAllTabs(data)
-{
-    chrome.tabs.query({ status:"complete" }, function(tabs) {
-        for(var i=0; i<tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, data);
-        }
-    });
-}
-
-var _trackEventsQueue = [];
-function trackEvent(senderId, eventType, integerValue, stringValue, putInQueue)
-{
-    if (senderId == "settings" || settings.get("enableStatistics")) {
-        var params = ['_trackEvent', senderId, eventType];
-
-        if (integerValue && !isNaN(integerValue) && isFinite(integerValue)) {
-            // push all values
-            if (!stringValue || stringValue === undefined) {
-                stringValue = "value"; // GA don't track forth parameter without third
-            }
-            params.push(stringValue);
-            params.push(Math.round(integerValue));
-        }
-        else if (stringValue && stringValue !== undefined) {
-            // push all except integer value which is null
-            params.push(stringValue);
-        }
-
-        if(putInQueue) {
-            _trackEventsQueue.push(params);
-        } else {
-            _gaq.push(params);
-        }
-    }
-}
-setInterval(function() {
-    if(_trackEventsQueue.length > 0) {
-        var eventParams = _trackEventsQueue.pop();
-        _gaq.push(eventParams);
-    }
-}, 1000);
 
 function sendPPFileResponse(ppFile, sendResponse) {
     if (ppFile instanceof PPFile)

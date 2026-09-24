@@ -12,13 +12,6 @@ this.manifest = {
         },
         {
             "tab": this.i18n.get("general"),
-            "group": this.i18n.get('supported_by_ad'),
-            "name": "disableSupportedByAd",
-            "type": "checkbox",
-            "label": this.i18n.get('disable_supported_by_ad')
-        },
-        {
-            "tab": this.i18n.get("general"),
             "group": this.i18n.get('mouse_and_keyboard'),
             "name": "enableHotkeys",
             "type": "checkbox",
@@ -86,13 +79,6 @@ this.manifest = {
             "name": "NewLayerUnlock",
             "type": "checkbox",
             "label": this.i18n.get("unlock")
-        },
-        {
-            "tab": this.i18n.get("general"),
-            "group": this.i18n.get("statistics"),
-            "name": "enableStatistics",
-            "type": "checkbox",
-            "label": this.i18n.get("send_anonymous_statistics_to_developers")
         },
         {
             "tab": this.i18n.get('appearance'),

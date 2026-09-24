@@ -474,45 +474,6 @@ img.chromeperfectpixel-overlay {
     padding-top: 4px;
 }
 
-#chromeperfectpixel-notification-box{
-    display: none;
-    background-color: #FFFEBE;
-    box-shadow: 0 0 2px black;
-    padding: 15px 10px 15px 10px;
-    margin-bottom: 10px;
-    position: relative;
-}
-    #chromeperfectpixel-notification-text,
-    #chromeperfectpixel-notification-text *{
-        font-size: 12px;
-        line-height: 14px;
-        vertical-align: top;
-    }
-    #chromeperfectpixel-notification-text  a{
-        line-height: 14px;
-        height: 14px;
-        color: #6800A6;
-        font-size: 12px;
-        vertical-align: top;
-    }
-    #chromeperfectpixel-closeNotification {
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-        line-height: 16px;
-        color: #000000;
-        text-shadow: 0 1px 0 #ffffff;
-        opacity: 0.2;
-
-    }
-
-    #chromeperfectpixel-closeNotification:hover {
-        opacity: 0.5;
-    }
-
 #chromeperfectpixel-dropzone-decorator {
     z-index: 3000;
     position: absolute;
@@ -527,69 +488,4 @@ img.chromeperfectpixel-overlay {
 
 #chromeperfectpixel-dropzone-decorator.chromeperfectpixel-dropzone-decorator-hover {
     opacity: 0.3;
-}
-
-/* Ads */
-
-#chromeperfectpixel-panel #chromeperfectpixel-supported-by {
-    margin-top: 8px;
-}
-
-#chromeperfectpixel-panel #chromeperfectpixel-supported-by-disable {
-    float:right;
-    color:#aaa;
-    text-decoration: none;
-    margin-bottom: 0;
-}
-
-#chromeperfectpixel-panel #chromeperfectpixel-supported-by-disable:hover {
-    text-decoration: none;
-    border-bottom:1px dotted;
-    margin-bottom:-1px;
-    cursor: pointer;
-    color:#999;
-}
-
-#chromeperfectpixel-ad,
-#chromeperfectpixel-ad iframe {
-    max-height: 117px;
-}
-
-#chromeperfectpixel-sponsored body {
-    font: 10pt/10pt sans-serif;
-    margin: 10px 0;
-}
-
-#chromeperfectpixel-sponsored body .carbon-wrap {
-    display: block;
-}
-
-#chromeperfectpixel-sponsored body .carbon-img {
-    float: left;
-    margin: 0px 10px 5px 0;
-}
-
-#chromeperfectpixel-sponsored body .carbon-text {
-    font-size: 13px;
-    line-height: 17px;
-    color: #333;
-    display: block;
-    text-decoration: none;
-}
-
-#chromeperfectpixel-sponsored body .carbon-text:hover {
-    color: #0700ff;
-}
-
-#chromeperfectpixel-sponsored body .carbon-poweredby {
-    margin: 0;
-    line-height: 17px;
-    font-size: 13px;
-    color: #aaa;
-    text-decoration: none;
-}
-
-#chromeperfectpixel-sponsored body .carbon-poweredby:hover {
-    color: #999;
-    border-bottom:1px dotted;
 }

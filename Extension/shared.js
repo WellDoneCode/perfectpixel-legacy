@@ -73,21 +73,11 @@ function stringToBuffer(str) {
 // --------------------------------------------------------------
 var PP_RequestType = new function () {
     this.GetExtensionOptions = "GETEXTOPTIONS";
-    this.TrackEvent = "TRACKEVENT"; // Google Analytics
     this.ADDFILE = "ADDFILE";
     this.GETFILE = "GETFILE";
     this.DELETEFILE = "DELETEFILE";
     this.getTabId = "GETTABID";
     this.PanelStateChange = "PANELSTATECHANGE";
-    this.GetNotifications = "GETNOTIFICATION";
-    this.SetNotifications = "SETNOTIFICATION";
     this.ExecuteScript = "EXECUTESCRIPT";
     this.OpenSettingsPage = "OPENSETTINGSPAGE";
-};
-
-// --------------------------------------------------------------
-// PP_Background_RequestType - enum for extension background page -> content script requests
-// --------------------------------------------------------------
-var PP_Background_RequestType = new function () {
-    this.NotificationsUpdated = "NotificationsUpdated"
 };

@@ -20,7 +20,6 @@ var Converter = {
             {
                 console.log("PP Data conversion started from version '" + this._getCurrentDataVersion()
                     + "' to version '" + this._getCurrentExtensionVersion() + "'");
-                trackEvent("system", "convert_version", null, this._getCurrentExtensionVersion());
                 this._convert();
                 console.log("PP Data conversion finished");
             }
