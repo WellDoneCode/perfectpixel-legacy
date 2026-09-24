@@ -88,12 +88,6 @@ var PPFileManager = new function () {
                     ppFile.MimeType = file.type;
                     ppFile.Date = file.lastModifiedDate;
 
-                    if (settings.get("enableStatistics")) {
-                        var fileLength = file.size;
-                        //var mimeType = file.type;
-                        trackEvent("filemanager", "getfile", fileLength, "size")
-                    }
-
                     callback(ppFile);
                 };
 
@@ -129,12 +123,6 @@ var PPFileManager = new function () {
                     ppFile.Name = newFileName;
                     ppFile.Date = fileEntry.lastModifiedDate;
 
-                    if (settings.get("enableStatistics")) {
-                        var fileLength = this.length;
-                        //var mimeType = ppFile.MimeType;
-                        trackEvent("filemanager", "savefile", fileLength, "size")
-                    }
-
                     callback(ppFile);
                 }
 
@@ -161,10 +149,6 @@ var PPFileManager = new function () {
 
             fileEntry.remove(function () {
                 console.log('PP File removed');
-
-                if (settings.get("enableStatistics")) {
-                    trackEvent("filemanager", "deletefile")
-                }
 
                 callback();
             }, function (e) { PPFileManager._errorHandler(e); callback(); });

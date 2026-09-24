@@ -13,7 +13,7 @@
         "default_title": "PerfectPixel",
         "default_popup":"popups/tab-not-allowed.html"
     },
-    "content_security_policy":"script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+    "content_security_policy":"script-src 'self'; object-src 'self'",
     "default_locale": "en",
     "description":"__MSG_extension_description__",
     "icons":{
@@ -29,7 +29,6 @@
     "version":"1.77",
     "web_accessible_resources":[
         "images/*.*",
-        "ads/*.*",
         "styles/style.css"
     ]
 }

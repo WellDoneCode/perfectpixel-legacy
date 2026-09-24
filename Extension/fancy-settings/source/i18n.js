@@ -19,14 +19,6 @@ this.i18n = {
         "en": "Debug",
         "ru": "Дебаг"
     },
-    "supported_by_ad": {
-        "en": "Supported by Ads",
-        "ru": "Реклама спонсора"
-    },
-    "disable_supported_by_ad": {
-        "en": "Disable",
-        "ru": "Отключить"
-    },
     "enable_debug_mode": {
         "en": "Enable DEBUG mode",
         "ru": "Включить режим дебага"
@@ -82,14 +74,6 @@ this.i18n = {
     "unlock": {
         "en": "Unlock",
         "ru": "Разблокировать"
-    },
-    "statistics": {
-        "en": "Statistics",
-        "ru": "Статистика"
-    },
-    "send_anonymous_statistics_to_developers": {
-        "en": "Send anonymous statistics to developers",
-        "ru": "Отсылать анонимную статистику разработчикам"
     },
 
     "appearance": {

@@ -39,11 +39,9 @@ var PanelView = Backbone.View.extend({
         'click #chromeperfectpixel-origin-controls button': 'originButtonClick',
         'change .chromeperfectpixel-coords': 'changeOrigin',
         'change #chromeperfectpixel-opacity': 'changeOpacity',
-        'changed #chromeperfectpixel-opacity': 'onOpacityChanged',
         'change #chromeperfectpixel-scale': 'changeScale',
         'dblclick #chromeperfectpixel-panel-header': 'panelHeaderDoubleClick',
-        'click #chromeperfectpixel-header-logo': 'panelHeaderDoubleClick',
-        'click #chromeperfectpixel-closeNotification': 'closeCurrentNotification'
+        'click #chromeperfectpixel-header-logo': 'panelHeaderDoubleClick'
     },
 
     initialize: function(options) {
@@ -53,7 +51,6 @@ var PanelView = Backbone.View.extend({
         PerfectPixel.overlays.bind('remove', this.update);
         PerfectPixel.overlays.bind('change', this.update);
         PerfectPixel.overlays.bind('reset', this.reloadOverlays);
-        PerfectPixel.notificationModel.on('change:currentNotification', this.updateNotification);
 
         var view = this;
         ExtensionService.sendMessage({ type: PP_RequestType.getTabId }, function(res) {
@@ -155,25 +152,21 @@ var PanelView = Backbone.View.extend({
 
     toggleOverlayShown: function(ev) {
         if ($(ev.currentTarget).is('[disabled]')) return false;
-        trackEvent('overlay', PerfectPixel.get('overlayShown') ? 'hide' : 'show');
         PerfectPixel.toggleOverlayShown();
     },
 
     toggleOverlayLocked: function(ev) {
         if ($(ev.currentTarget).is('[disabled]')) return false;
-        trackEvent('overlay', PerfectPixel.get('overlayLocked') ? 'unlock' : 'lock');
         PerfectPixel.toggleOverlayLocked();
     },
 
     toggleOverlayInverted: function(ev) {
         if ($(ev.currentTarget).is('[disabled]')) return false;
-        trackEvent('overlay', PerfectPixel.get('overlayInverted') ? 'un-invert' : 'invert');
         PerfectPixel.toggleOverlayInverted();
     },
 
     originButtonClick: function(e) {
         var button = this.$(e.currentTarget);
-        trackEvent("coords", button.attr('id').replace("chromeperfectpixel-", ""));
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var axis = button.data('axis');
@@ -189,7 +182,6 @@ var PanelView = Backbone.View.extend({
 
     changeOrigin: function(e) {
         var input = $(e.currentTarget);
-        trackEvent("coords", input.attr('id').replace("chromeperfectpixel-", ""));
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var axis = input.data('axis');
@@ -223,14 +215,9 @@ var PanelView = Backbone.View.extend({
         }
     },
 
-    onOpacityChanged: function(e) {
-        trackEvent("opacity", e.type, e.currentTarget.value * 100); // GA tracks only integers not floats
-    },
-
     changeScale: function(e) {
         var input = this.$(e.currentTarget);
         var value = input.val();
-        trackEvent("scale", e.type, value * 10);
         var overlay = PerfectPixel.getCurrentOverlay();
         if (overlay) {
             var returnValue = PerfectPixel.scaleCurrentOverlay({scale: Number(value).toFixed(2)});
@@ -239,15 +226,7 @@ var PanelView = Backbone.View.extend({
     },
 
     panelHeaderDoubleClick: function(e) {
-        trackEvent(this.$(e.currentTarget).attr('id').replace("chromeperfectpixel-", ""), e.type);
-
         this.model.toggleCollapsed();
-    },
-
-    closeCurrentNotification: function(e){
-        var myNotify = PerfectPixel.notificationModel.getCurrentNotification();
-        trackEvent("notification", "close", null, myNotify.get("id"));
-        PerfectPixel.notificationModel.closeCurrentNotification();
     },
 
     keyDown: function(e) {
@@ -362,21 +341,6 @@ var PanelView = Backbone.View.extend({
         }
     },
 
-    updateNotification: function() {
-        var myNotify = PerfectPixel.notificationModel.getCurrentNotification(),
-            box = $('#chromeperfectpixel-notification-box'),
-            textDiv = $('#chromeperfectpixel-notification-text'),
-            button = $('#chromeperfectpixel-closeNotification');
-        if (myNotify) {
-            textDiv.html(myNotify.getText());
-            button.data("id", myNotify.get("id"));
-            trackEvent("notification", "show", null, myNotify.get("id"));
-            box.show();
-        } else {
-            box.hide();
-        }
-    },
-
     togglePanelShown: function(){
         $('#chromeperfectpixel-panel').toggle();
         var new_state = $('#chromeperfectpixel-panel').is(':visible') ? 'open' : 'hidden';
@@ -399,11 +363,6 @@ var PanelView = Backbone.View.extend({
             '<div class="chromeperfectpixel-min-lockBtn"></div>' +
             '</div>' +
             '<div id="chromeperfectpixel-panel-body">' +
-
-            '<div id="chromeperfectpixel-notification-box">' +
-            '<div id="chromeperfectpixel-notification-text"></div>' +
-            '<div id="chromeperfectpixel-closeNotification">x</div>' +
-            '</div>' +
 
             '<div id="chromeperfectpixel-section">'+
             '<div id="chromeperfectpixel-section-opacity">' +
@@ -467,31 +426,12 @@ var PanelView = Backbone.View.extend({
         }
 
         this.$('#chromeperfectpixel-fakefile').bind('click', function (e) {
-            trackEvent("layer", "add", PerfectPixel.overlays.size() + 1);
             $(this).parent().find('input[type=file]').click();
         });
         this.$('#chromeperfectpixel-layers-add-btn').bind('click', function (e) {
-            trackEvent("layer", "add-top-btn", PerfectPixel.overlays.size() + 1);
             $('#chromeperfectpixel-fakefile').parent().find('input[type=file]').click();
         });
         this._bindFileUploader();
-
-        // Workaround to catch single value of opacity during opacity HTML element change
-        (function(el, timeout) {
-            var prevVal = el.val();
-            var timer, trig=function() { el.trigger("changed"); };
-            setInterval(function() {
-                var currentVal = el.val();
-                if(currentVal != prevVal)
-                {
-                    if(timer) {
-                        clearTimeout(timer);
-                    }
-                    timer = setTimeout(trig, timeout);
-                    prevVal = currentVal;
-                }
-            }, timeout);
-        })(this.$("#chromeperfectpixel-opacity"), 500);
 
         // make panel draggable
         var panelModel = this.model;
@@ -616,23 +556,8 @@ var PanelView = Backbone.View.extend({
             if(e.originalEvent.dataTransfer.files.length > 0) {
                 console.log("PP File or directory dropped");
                 var file = e.originalEvent.dataTransfer.files[0];
-                trackEvent("dropzone", e.type, "file");
                 self.upload(file);
             }
-
-            // Just for statistics for now
-            /*try
-            {
-                var length = e.originalEvent.dataTransfer.items.length;
-                for (var i = 0; i < length; i++) {
-                    var entry = e.originalEvent.dataTransfer.items[i].webkitGetAsEntry();
-                    if (entry && (entry.isFile || entry.isDirectory))
-                    {
-                        trackEvent("dropzone", e.type, entry.isFile ? "file" : "directory");
-                    }
-                }
-            }
-            catch(e) {}*/
         });
 
         console.log("PP Dropzone initialized");
@@ -776,12 +701,8 @@ var OverlayItemView = Backbone.View.extend({
 
     remove: function() {
         var deleteLayerConfirmationMessage = ExtensionService.getLocalizedMessage('are_you_sure_you_want_to_delete_layer');
-        trackEvent("layer", "delete", undefined, "attempt");
         if (!ExtOptions.enableDeleteLayerConfirmationMessage || confirm(deleteLayerConfirmationMessage)) {
-            trackEvent("layer", "delete", undefined, "confirmed");
             this.model.destroy();
-        } else {
-            trackEvent("layer", "delete", undefined, "canceled");
         }
     }
 });
